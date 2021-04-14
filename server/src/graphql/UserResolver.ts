@@ -68,7 +68,7 @@ export class UserResolver {
       if (isPasswordValid) {
         const { email, id } = user;
         const token = await jwt.sign(
-          { data: `${email}-${id}` }, 'secret', { expiresIn: '30m' }
+          { data: `${email}-${id}` }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' }
         );
         return { token, user };
       }
@@ -77,5 +77,20 @@ export class UserResolver {
     }
     console.log('final error handler');
     return errorHandler('Login failed', res);
+  }
+
+  @Query()
+  async homePage(
+    @Ctx() { req, res }: RequestContext
+  ) {
+    const authorization: string | undefined = req.headers['authorization'];
+
+    if (!authorization) {
+      return errorHandler('Unauthorized access', res);
+    }
+
+    const accessToken: string = authorization.split(' ')[1];
+    const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    return User.findOne({ where: { email: payload.email }})
   }
 }
