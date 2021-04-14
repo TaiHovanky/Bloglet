@@ -19,7 +19,9 @@ import { UserResolver } from "./graphql/UserResolver";
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [UserResolver]
-    })
+    }),
+    context: ({ req, res }) => ({ req, res })
+    // needed or else Ctx doesn't pass into mutations/queries
   });
 
   apolloServer.applyMiddleware({ app, cors: false });
