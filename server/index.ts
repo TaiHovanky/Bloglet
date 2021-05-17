@@ -1,11 +1,11 @@
-require('dotenv').config({ path: '../.env' });
+import 'dotenv/config';
 import "reflect-metadata";
 import express from 'express';
 import cors from 'cors';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import {createConnection} from "typeorm";
-import { UserResolver } from "./graphql/UserResolver";
+import { UserResolver } from "./src/graphql/UserResolver";
 
 (async () => {
   const app = express();

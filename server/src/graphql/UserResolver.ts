@@ -68,7 +68,7 @@ export class UserResolver {
       if (isPasswordValid) {
         const { email, id } = user;
         const token = await jwt.sign(
-          { data: `${email}-${id}` }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' }
+          { data: `${email}-${id}` }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '30m' }
         );
         return { token, user };
       }
@@ -79,7 +79,7 @@ export class UserResolver {
     return errorHandler('Login failed', res);
   }
 
-  @Query()
+  @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type
   async homePage(
     @Ctx() { req, res }: RequestContext
   ) {
@@ -90,7 +90,8 @@ export class UserResolver {
     }
 
     const accessToken: string = authorization.split(' ')[1];
-    const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
+    // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
     return User.findOne({ where: { email: payload.email }})
   }
 }
