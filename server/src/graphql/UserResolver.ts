@@ -92,6 +92,7 @@ export class UserResolver {
     const accessToken: string = authorization.split(' ')[1];
     const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
     // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
-    return User.findOne({ where: { email: payload.email }})
+
+    return User.findOne({ where: { email: payload.email }}).then((x) => console.log('success', x));
   }
 }
