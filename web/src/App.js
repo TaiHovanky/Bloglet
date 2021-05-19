@@ -1,19 +1,14 @@
 import './App.css';
-import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/client';
+import { useHelloQuery } from './generated/graphql';
 
 function App() {
-  const { data, loading } = useQuery(gql`
-    {
-      hello
-    }
-  `);
+  const { data, loading } = useHelloQuery();
 
-  if (loading) {
+  if (loading || !data) {
     return (
       <div className="App">
         <header className="App-header">
-          waiting...
+          loading...
         </header>
       </div>
     );
