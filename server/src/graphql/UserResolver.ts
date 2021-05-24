@@ -46,7 +46,7 @@ export class UserResolver {
       password: hashedPassword
     })
     .catch((err) => {
-      console.error(err);
+      errorHandler('User registration failed', err);
       return false;
     });
     return true;
