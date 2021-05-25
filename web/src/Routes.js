@@ -1,30 +1,36 @@
 import './App.css';
-import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import NavBar from './pages/NavBar';
+import { makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(3),
+    marginLeft: 240
+  }
+}));
 
 const Routes = () => {
+  const classes = useStyles();
 
   return (
     <BrowserRouter>
       <div>
         <header>
-          <div>
-            <Link to="/">home</Link>
-          </div>
-          <div>
-            <Link to="/register">register</Link>
-          </div>
-          <div>
-            <Link to="/login">login</Link>
-          </div>
+          <NavBar />
         </header>
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/login" component={Login} />
-        </Switch>
+        <main className={classes.content}>
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route exact path="/register" component={Register} />
+            <Route exact path="/login" component={Login} />
+          </Switch>
+        </main>
       </div>
     </BrowserRouter>
   );
