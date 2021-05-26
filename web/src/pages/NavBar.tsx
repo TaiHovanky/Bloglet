@@ -5,13 +5,6 @@ import { Link } from 'react-router-dom';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  appBar: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-  },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -21,11 +14,6 @@ const useStyles = makeStyles((theme) => ({
   },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
-  },
 }));
 
 const NavBar = () => {
@@ -42,15 +30,21 @@ const NavBar = () => {
       <div className={classes.toolbar} />
       <Divider />
       <List>
-        <ListItem button>
-          <ListItemText><Link to="/">Home</Link></ListItemText>
-        </ListItem>
-        <ListItem button>
-          <ListItemText><Link to="/register">Register</Link></ListItemText>
-        </ListItem>
-        <ListItem button>
-          <ListItemText><Link to="/login">Login</Link></ListItemText>
-        </ListItem>
+        <Link to="/">
+          <ListItem button>
+            <ListItemText primary="Home" />
+          </ListItem>
+        </Link>
+        <Link to="/register">
+          <ListItem button>
+            <ListItemText primary="Register" />
+          </ListItem>
+        </Link>
+        <Link to="/login">
+          <ListItem button>
+            <ListItemText primary="Login" />
+          </ListItem>
+        </Link>
       </List>
     </Drawer>
   );

@@ -17,10 +17,6 @@ export class User extends BaseEntity {
     @Column()
     lastName: string;
 
-    @Field()
-    @Column()
-    age: number;
-
     @Field() // Field() indicates a field that can be returned by users query
     @Column('text')
     email: string;

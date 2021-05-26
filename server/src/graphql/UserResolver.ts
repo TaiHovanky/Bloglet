@@ -28,10 +28,9 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async registerUser(
+  async register(
     @Arg('firstName') firstName: string,
     @Arg('lastName') lastName: string,
-    @Arg('age') age: number,
     @Arg('email') email: string,
     @Arg('password') password: string
   ) {
@@ -41,7 +40,6 @@ export class UserResolver {
     await User.insert({
       firstName,
       lastName,
-      age,
       email,
       password: hashedPassword
     })
