@@ -1,9 +1,10 @@
 import bcrypt, { compare } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { errorHandler } from '../utils/error-handler';
+import { errorHandler } from '../utils/errorHandler';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { User } from '../entity/User';
 import { RequestContext } from './types';
+import { sendRefreshToken } from '../utils/sendRefreshToken';
 
 @ObjectType()
 class LoginResponse {
@@ -64,16 +65,31 @@ export class UserResolver {
       const isPasswordValid: boolean = await compare(password, user.password);
 
       if (isPasswordValid) {
-        const { email, id } = user;
-        const token = await jwt.sign(
-          { data: `${email}-${id}` }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '30m' }
+        const { email, id, tokenVersion } = user;
+        const accessToken = await jwt.sign(
+          { data: `${email}-${id}` },
+          process.env.ACCESS_TOKEN_SECRET as string,
+          { expiresIn: '30m' }
         );
-        return { token, user };
+        const refreshToken = await jwt.sign(
+          { data: `${email}-${id}`, tokenVersion },
+          process.env.REFRESH_TOKEN_SECRET as string,
+          { expiresIn: '7d' }
+        );
+
+        sendRefreshToken(res, refreshToken);
+        return { token: accessToken, user };
       }
     } else {
       return errorHandler('Invalid password', res);
     }
     return errorHandler('Login failed', res);
+  }
+
+  @Mutation(() => Boolean)
+  async logout(@Ctx() { res }: any) {
+    sendRefreshToken(res, '');
+    return true;
   }
 
   @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type

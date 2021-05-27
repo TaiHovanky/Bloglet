@@ -1,4 +1,4 @@
-import { errorHandler } from '../utils/error-handler';
+import { errorHandler } from '../utils/errorHandler';
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { Post } from 'src/entity/Post';
 import { RequestContext } from './types';

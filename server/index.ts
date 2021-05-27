@@ -25,7 +25,7 @@ import { UserResolver } from "./src/graphql/UserResolver";
     // needed or else Ctx doesn't pass into mutations/queries
   });
 
-  apolloServer.applyMiddleware({ app, cors: false });
+  apolloServer.applyMiddleware({ app, cors: false }); // need this to avoid cors error
 
   app.get('/', (_req, res) => res.send('hello'));
 
