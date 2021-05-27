@@ -1,6 +1,7 @@
-import { Divider, Drawer, List, ListItem, ListItemText, makeStyles } from '@material-ui/core';
 import React from 'react';
+import { Divider, Drawer, List, ListItem, ListItemText, makeStyles } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+import Logout from '../components/Logout'
 
 const drawerWidth = 240;
 
@@ -45,6 +46,7 @@ const NavBar = () => {
             <ListItemText primary="Login" />
           </ListItem>
         </Link>
+        <Logout />
       </List>
     </Drawer>
   );

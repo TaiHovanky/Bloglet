@@ -6,7 +6,8 @@ import './index.css';
 import Routes from './Routes';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:3001/graphql'
+  uri: 'http://localhost:3001/graphql',
+  credentials: 'include' // need this so that cookie gets set after login response
 });
 
 /* ApolloProvider acts similar to React Context and passes the client connection
