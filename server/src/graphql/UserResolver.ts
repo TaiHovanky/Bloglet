@@ -51,7 +51,7 @@ export class UserResolver {
   }
 
   @Mutation(() => LoginResponse)
-  async loginUser(
+  async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
     @Ctx() { res }: RequestContext
@@ -73,7 +73,6 @@ export class UserResolver {
     } else {
       return errorHandler('Invalid password', res);
     }
-    console.log('final error handler');
     return errorHandler('Login failed', res);
   }
 

@@ -5,10 +5,10 @@ import { useRegisterMutation } from '../generated/graphql';
 import { useFormField } from '../hooks/useFormField';
 
 const Register: React.FC<RouteComponentProps> = ({ history }) => {
-  const firstName = useFormField();
-  const lastName = useFormField();
-  const email = useFormField();
-  const password = useFormField();
+  const firstName = useFormField('', 'text');
+  const lastName = useFormField('', 'text');
+  const email = useFormField('', 'email');
+  const password = useFormField('', 'text');
 
   const [register] = useRegisterMutation();
 
