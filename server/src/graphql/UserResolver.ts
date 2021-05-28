@@ -65,19 +65,19 @@ export class UserResolver {
       const isPasswordValid: boolean = await compare(password, user.password);
 
       if (isPasswordValid) {
-        const { email, id, tokenVersion } = user;
+        const { email } = user;
         const accessToken = await jwt.sign(
-          { data: `${email}-${id}` },
+          { email },
           process.env.ACCESS_TOKEN_SECRET as string,
           { expiresIn: '30m' }
         );
-        const refreshToken = await jwt.sign(
-          { data: `${email}-${id}`, tokenVersion },
-          process.env.REFRESH_TOKEN_SECRET as string,
-          { expiresIn: '7d' }
-        );
+        // const refreshToken = await jwt.sign(
+        //   { data: `${email}-${id}`, tokenVersion },
+        //   process.env.REFRESH_TOKEN_SECRET as string,
+        //   { expiresIn: '7d' }
+        // );
 
-        sendRefreshToken(res, refreshToken);
+        // sendRefreshToken(res, refreshToken);
         return { token: accessToken, user };
       }
     } else {
@@ -96,16 +96,18 @@ export class UserResolver {
   async homePage(
     @Ctx() { req, res }: RequestContext
   ) {
-    const authorization: string | undefined = req.headers['authorization'];
+    try {
+      const authorization: string | undefined = req.headers['authorization'];
 
-    if (!authorization) {
-      return errorHandler('Unauthorized access', res);
+      if (authorization) {
+        const accessToken: string = authorization.split(' ')[1];
+        const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
+        return User.findOne({ where: { email: payload.email }});
+      }
+      // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
+      return null;
+    } catch (err) {
+      return errorHandler(`Unauthorized access - ${err}`, res);
     }
-
-    const accessToken: string = authorization.split(' ')[1];
-    const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
-    // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
-
-    return User.findOne({ where: { email: payload.email }}).then((x) => console.log('success', x));
   }
 }

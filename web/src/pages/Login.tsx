@@ -3,6 +3,7 @@ import { Button, TextField } from '@material-ui/core';
 import { RouteComponentProps } from 'react-router';
 import { useFormField } from '../hooks/useFormField';
 import { useLoginMutation } from '../generated/graphql';
+import { setAccessToken } from '../accessToken';
 
 const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const email = useFormField('', 'email');
@@ -18,6 +19,9 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
         password: formData.get('password') as string
       }
     });
+    if (response && response.data) {
+      setAccessToken(response.data.login.token);
+    }
     console.log('response', response);
     history.push('/');
   }
