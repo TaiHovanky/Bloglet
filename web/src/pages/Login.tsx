@@ -29,13 +29,13 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
   return (
     <form noValidate autoComplete="off" onSubmit={handleSubmit}>
       <TextField
-        id="standard-basic"
+        id="input-email"
         label="Email"
         name="email"
         {...email}
       />
       <TextField
-        id="standard-basic"
+        id="input-password"
         label="Password"
         type="password"
         name="password"

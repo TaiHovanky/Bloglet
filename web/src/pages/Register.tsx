@@ -30,25 +30,25 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
   return (
     <form noValidate autoComplete="off" onSubmit={handleSubmit}>
       <TextField
-        id="standard-basic"
+        id="input_firstName"
         label="First Name"
         name="firstName"
         {...firstName}
       />
       <TextField
-        id="standard-basic"
+        id="input_lastName"
         label="Last Name"
         name="lastName"
         {...lastName}
       />
       <TextField
-        id="standard-basic"
+        id="input_email"
         label="Email"
         name="email"
         {...email}
       />
       <TextField
-        id="standard-basic"
+        id="input_password"
         label="Password"
         type="password"
         name="password"

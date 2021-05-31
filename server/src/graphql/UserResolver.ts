@@ -65,19 +65,19 @@ export class UserResolver {
       const isPasswordValid: boolean = await compare(password, user.password);
 
       if (isPasswordValid) {
-        const { email } = user;
+        const { email, tokenVersion, id } = user;
         const accessToken = await jwt.sign(
           { email },
           process.env.ACCESS_TOKEN_SECRET as string,
           { expiresIn: '30m' }
         );
-        // const refreshToken = await jwt.sign(
-        //   { data: `${email}-${id}`, tokenVersion },
-        //   process.env.REFRESH_TOKEN_SECRET as string,
-        //   { expiresIn: '7d' }
-        // );
+        const refreshToken = await jwt.sign(
+          { email, tokenVersion, id },
+          process.env.REFRESH_TOKEN_SECRET as string,
+          { expiresIn: '7d' }
+        );
 
-        // sendRefreshToken(res, refreshToken);
+        sendRefreshToken(res, refreshToken);
         return { token: accessToken, user };
       }
     } else {
