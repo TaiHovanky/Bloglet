@@ -1,16 +1,14 @@
 import React, { useEffect } from 'react';
 import { useHomePageLazyQuery } from '../generated/graphql';
 
-interface Props {
-
-}
+interface Props {}
 
 const Home: React.FC<Props> = () => {
   const [homePageQueryExecutor, { data, loading }] = useHomePageLazyQuery({ fetchPolicy: 'network-only' });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
 
   useEffect(
-    () => { homePageQueryExecutor(); },
+    () => homePageQueryExecutor(),
     [homePageQueryExecutor]
   );
 

@@ -2,20 +2,21 @@ import 'dotenv/config';
 import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
-import {createConnection} from 'typeorm';
-// import cookieParser from 'cookie-parser';
-import jwt, { verify } from 'jsonwebtoken';
+import { createConnection } from 'typeorm';
+import { verify } from 'jsonwebtoken';
+import { createAccessToken, createRefreshToken } from './src/utils/createTokens';
 import { UserResolver } from './src/graphql/UserResolver';
 import { User } from './src/entity/User';
-import cookieParser from 'cookie-parser';
+import { sendRefreshToken } from './src/utils/sendRefreshToken';
 
 (async () => {
   const app = express();
   app.use(cors({
-    credentials: true,
-    origin: 'http://localhost:3000'
+    origin: 'http://localhost:3000',
+    credentials: true
   }));
   app.use(cookieParser());
 
@@ -29,8 +30,6 @@ import cookieParser from 'cookie-parser';
     context: ({ req, res }) => ({ req, res })
     // needed or else Ctx doesn't pass into mutations/queries
   });
-
-  apolloServer.applyMiddleware({ app, cors: false }); // need this to avoid cors error
 
   app.get('/', (_req, res) => res.send('hello'));
 
@@ -59,12 +58,17 @@ import cookieParser from 'cookie-parser';
       return res.send({ ok: false, accessToken: '' });
     }
 
-    return res.send({ ok: true, accessToken: await jwt.sign(
-      { email: user.email },
-      process.env.ACCESS_TOKEN_SECRET as string,
-      { expiresIn: '30m' }
-    )});
+    // if (user.tokenVersion !== payload.tokenVersion) {
+    //   return res.send({ ok: false, accessToken: '' });
+    // }
+
+    // If refresh token and access token are expired, send both back
+    sendRefreshToken(res, createRefreshToken(user));
+
+    return res.send({ ok: true, accessToken: createAccessToken(user) });
   });
+
+  apolloServer.applyMiddleware({ app, cors: false }); // need "cors: false" to avoid cors error
 
   app.listen(3001, () => {
     console.log('app listening at 3001');

@@ -5,6 +5,7 @@ import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from 'type-gra
 import { User } from '../entity/User';
 import { RequestContext } from './types';
 import { sendRefreshToken } from '../utils/sendRefreshToken';
+import { createAccessToken, createRefreshToken } from '../utils/createTokens';
 
 @ObjectType()
 class LoginResponse {
@@ -65,17 +66,8 @@ export class UserResolver {
       const isPasswordValid: boolean = await compare(password, user.password);
 
       if (isPasswordValid) {
-        const { email, tokenVersion, id } = user;
-        const accessToken = await jwt.sign(
-          { email },
-          process.env.ACCESS_TOKEN_SECRET as string,
-          { expiresIn: '30m' }
-        );
-        const refreshToken = await jwt.sign(
-          { email, tokenVersion, id },
-          process.env.REFRESH_TOKEN_SECRET as string,
-          { expiresIn: '7d' }
-        );
+        const accessToken = createAccessToken(user);
+        const refreshToken = createRefreshToken(user);
 
         sendRefreshToken(res, refreshToken);
         return { token: accessToken, user };
