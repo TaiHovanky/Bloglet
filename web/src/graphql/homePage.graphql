@@ -1,5 +1,6 @@
 query HomePage {
   homePage {
+    id
     firstName
     lastName
     email

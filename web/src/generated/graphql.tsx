@@ -25,6 +25,7 @@ export type Mutation = {
   register: Scalars['Boolean'];
   login: LoginResponse;
   logout: Scalars['Boolean'];
+  createPost: Scalars['Boolean'];
 };
 
 
@@ -41,11 +42,38 @@ export type MutationLoginArgs = {
   email: Scalars['String'];
 };
 
+
+export type MutationCreatePostArgs = {
+  body: Scalars['String'];
+  title: Scalars['String'];
+  creatorId: Scalars['Float'];
+};
+
+export type Post = {
+  __typename?: 'Post';
+  id: Scalars['Float'];
+  title: Scalars['String'];
+  body: Scalars['String'];
+  creatorId: Scalars['Float'];
+};
+
 export type Query = {
   __typename?: 'Query';
   users: Array<User>;
   hello: Scalars['String'];
   homePage?: Maybe<User>;
+  getUserPosts: Array<Post>;
+  getPost: Post;
+};
+
+
+export type QueryGetUserPostsArgs = {
+  userId: Scalars['Float'];
+};
+
+
+export type QueryGetPostArgs = {
+  postId: Scalars['Float'];
 };
 
 export type User = {
@@ -55,6 +83,18 @@ export type User = {
   lastName: Scalars['String'];
   email: Scalars['String'];
 };
+
+export type CreatePostMutationVariables = Exact<{
+  creatorId: Scalars['Float'];
+  title: Scalars['String'];
+  body: Scalars['String'];
+}>;
+
+
+export type CreatePostMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'createPost'>
+);
 
 export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -71,7 +111,7 @@ export type HomePageQuery = (
   { __typename?: 'Query' }
   & { homePage?: Maybe<(
     { __typename?: 'User' }
-    & Pick<User, 'firstName' | 'lastName' | 'email'>
+    & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
   )> }
 );
 
@@ -115,6 +155,39 @@ export type RegisterMutation = (
 );
 
 
+export const CreatePostDocument = gql`
+    mutation CreatePost($creatorId: Float!, $title: String!, $body: String!) {
+  createPost(creatorId: $creatorId, title: $title, body: $body)
+}
+    `;
+export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
+
+/**
+ * __useCreatePostMutation__
+ *
+ * To run a mutation, you first call `useCreatePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
+ *   variables: {
+ *      creatorId: // value for 'creatorId'
+ *      title: // value for 'title'
+ *      body: // value for 'body'
+ *   },
+ * });
+ */
+export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<CreatePostMutation, CreatePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument, options);
+      }
+export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
+export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
+export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
 export const HelloDocument = gql`
     query Hello {
   hello
@@ -150,6 +223,7 @@ export type HelloQueryResult = Apollo.QueryResult<HelloQuery, HelloQueryVariable
 export const HomePageDocument = gql`
     query HomePage {
   homePage {
+    id
     firstName
     lastName
     email

@@ -1,16 +1,16 @@
-import { errorHandler } from '../utils/errorHandler';
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { Post } from 'src/entity/Post';
+import { errorHandler } from '../utils/errorHandler';
+import { Post } from '../entity/Post';
 import { RequestContext } from './types';
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  getUserPosts(
+  async getUserPosts(
     @Arg('userId') userId: number,
     @Ctx() { res }: RequestContext
   ) {
-    return Post.find({ where: { creatorId: userId }})
+    return await Post.find({ where: { creatorId: userId }})
       .catch(() => {
         errorHandler('Failed to get user\'s posts', res);
       });
@@ -29,19 +29,18 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   async createPost(
+    @Arg('creatorId') creatorId: number, 
     @Arg('title') title: string,
-    @Arg('body') body: string,
-    @Ctx() { res }: RequestContext
+    @Arg('body') body: string
   ) {
     await Post.insert({
+      creatorId, 
       title,
       body
-    })
-      .catch(() => {
-        errorHandler('Failed to create post', res);
-        return false;
-      });
-    
+    }).catch((err) => {
+      errorHandler('User registration failed', err);
+      return false;
+    });
     return true;
   }
 }
