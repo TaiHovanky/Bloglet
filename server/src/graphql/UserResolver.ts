@@ -1,11 +1,11 @@
 import bcrypt, { compare } from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { errorHandler } from '../utils/errorHandler';
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { User } from '../entity/User';
-import { RequestContext } from './types';
 import { sendRefreshToken } from '../utils/sendRefreshToken';
 import { createAccessToken, createRefreshToken } from '../utils/createTokens';
+import { requestContext } from '../types/context';
+import { isAuthenticated } from '../utils/isAuthenticated';
 
 @ObjectType()
 class LoginResponse {
@@ -56,7 +56,7 @@ export class UserResolver {
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { res }: RequestContext
+    @Ctx() { res }: requestContext
   ) {
     /* Get the user from database using the email, then compare the password that was entered
     to the password from the db. Sign a JWT and return that. */
@@ -85,21 +85,17 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type
+  @UseMiddleware(isAuthenticated)
   async homePage(
-    @Ctx() { req, res }: RequestContext
+    @Ctx() { payload }: requestContext
   ) {
     try {
-      const authorization: string | undefined = req.headers['authorization'];
-
-      if (authorization) {
-        const accessToken: string = authorization.split(' ')[1];
-        const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
+      if (payload) {
         return User.findOne({ where: { email: payload.email }});
       }
-      // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
       return null;
     } catch (err) {
-      return errorHandler(`Unauthorized access - ${err}`, res);
+      return null;
     }
   }
 }

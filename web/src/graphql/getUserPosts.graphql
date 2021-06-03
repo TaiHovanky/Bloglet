@@ -1,0 +1,6 @@
+query GetUserPosts($userId: Float!) {
+  getUserPosts(userId: $userId) {
+    title
+    body
+  }
+}

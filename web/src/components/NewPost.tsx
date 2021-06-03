@@ -6,7 +6,7 @@ interface Props {
   handleSubmit: (e: React.FormEvent) => Promise<void>
 }
 
-const NewPost: React.FC<Props> = (props: any) => {
+const NewPost: React.FC<Props> = (props: Props) => {
   const title = useFormField('', 'title');
   const bodyText = useFormField('', 'title');
 

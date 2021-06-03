@@ -1,15 +1,17 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { errorHandler } from '../utils/errorHandler';
 import { Post } from '../entity/Post';
-import { RequestContext } from './types';
+import { requestContext } from '../types/context';
+import { isAuthenticated } from '../utils/isAuthenticated';
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
   async getUserPosts(
     @Arg('userId') userId: number,
-    @Ctx() { res }: RequestContext
+    @Ctx() { res }: requestContext
   ) {
+    console.log('userid in posts', userId);
     return await Post.find({ where: { creatorId: userId }})
       .catch(() => {
         errorHandler('Failed to get user\'s posts', res);
@@ -19,7 +21,7 @@ export class PostResolver {
   @Query(() => Post)
   getPost(
     @Arg('postId') postId: number,
-    @Ctx() { res }: RequestContext
+    @Ctx() { res }: requestContext
   ) {
     return Post.find({ where: { id: postId }})
       .catch(() => {
@@ -28,6 +30,7 @@ export class PostResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuthenticated)
   async createPost(
     @Arg('creatorId') creatorId: number, 
     @Arg('title') title: string,
@@ -38,7 +41,7 @@ export class PostResolver {
       title,
       body
     }).catch((err) => {
-      errorHandler('User registration failed', err);
+      errorHandler('Post creation failed', err);
       return false;
     });
     return true;

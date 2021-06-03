@@ -1,18 +1,26 @@
 import { Container } from '@material-ui/core';
 import React, { useEffect } from 'react';
 import NewPost from '../components/NewPost';
-import { useCreatePostMutation, useHomePageLazyQuery } from '../generated/graphql';
+import { useCreatePostMutation, useHomePageLazyQuery, useGetUserPostsQuery } from '../generated/graphql';
 
 interface Props {}
 
 const Home: React.FC<Props> = () => {
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({ fetchPolicy: 'network-only' });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
-
+  // const  = useGetUserPostsQuery();
   const [createPost, { data: postData }] = useCreatePostMutation();
 
   useEffect(
-    () => homePageQueryExecutor(),
+    () => {
+      homePageQueryExecutor();
+      console.log('calling use effect');
+      if (userData && userData.homePage) {
+        // getUserPosts({
+        //   variables: userData.homePage.id
+        // });
+      }
+    },
     [homePageQueryExecutor]
   );
 
@@ -28,7 +36,7 @@ const Home: React.FC<Props> = () => {
     });
   }
 
-  if (loading || !userData) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
@@ -37,11 +45,15 @@ const Home: React.FC<Props> = () => {
     if (postData) {
       console.log('post data', postData);
     }
+    // if (postsData) {
+    //   console.log('postss', postsData);
+    // }
     return (
       <div>
         Welcome, {userData.homePage.firstName} {userData.homePage.lastName}
         <Container maxWidth="sm">
           <NewPost handleSubmit={handleSubmit} />
+          {/* <Posts posts={} /> */}
         </Container>
       </div>
     );
