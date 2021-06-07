@@ -105,7 +105,7 @@ export type GetUserPostsQuery = (
   { __typename?: 'Query' }
   & { getUserPosts: Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'title' | 'body'>
+    & Pick<Post, 'id' | 'title' | 'body'>
   )> }
 );
 
@@ -204,6 +204,7 @@ export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMut
 export const GetUserPostsDocument = gql`
     query GetUserPosts($userId: Float!) {
   getUserPosts(userId: $userId) {
+    id
     title
     body
   }
