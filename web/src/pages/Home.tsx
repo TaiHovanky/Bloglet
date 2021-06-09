@@ -10,7 +10,7 @@ const Home: React.FC<Props> = () => {
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({ fetchPolicy: 'network-only' });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
 
-  const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
+  const { data: postsData, loading: postsLoading, refetch } = useGetUserPostsQuery({
     variables: {
       userId: userData && userData.homePage && userData.homePage.id ? userData.homePage.id : 0
     },
@@ -39,6 +39,7 @@ const Home: React.FC<Props> = () => {
         body: formData.get('bodyText') as string
       }
     });
+    refetch(); // is needed to refetch the posts query
   }
 
   if (loading || postsLoading) {
