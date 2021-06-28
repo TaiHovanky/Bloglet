@@ -6,6 +6,7 @@ import { sendRefreshToken } from '../utils/sendRefreshToken';
 import { createAccessToken, createRefreshToken } from '../utils/createTokens';
 import { requestContext } from '../types/context';
 import { isAuthenticated } from '../utils/isAuthenticated';
+import { createQueryBuilder } from 'typeorm';
 
 @ObjectType()
 class LoginResponse {
@@ -97,5 +98,23 @@ export class UserResolver {
     } catch (err) {
       return null;
     }
+  }
+
+  @Query(() => [User], { nullable: true })
+  @UseMiddleware(isAuthenticated)
+  async searchUsers(
+    @Arg('name') name: string,
+    @Ctx() { res }: requestContext
+  ) {
+    if (name) {
+      try {
+        return createQueryBuilder('User')
+          .where('User.firstName = :firstName', { firstName: `${name}`})
+          .orWhere('User.lastName = :lastName', { lastName: `${name}`})
+      } catch(err) {
+        return errorHandler('Search user failed', res);
+      }
+    }
+    return errorHandler('Search user failed - missing "name" argument', res);
   }
 }

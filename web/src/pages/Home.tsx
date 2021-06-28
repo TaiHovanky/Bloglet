@@ -3,6 +3,7 @@ import { Container } from '@material-ui/core';
 import NewPost from '../components/NewPost';
 import Posts from '../components/Posts';
 import { useCreatePostMutation, useHomePageLazyQuery, useGetUserPostsQuery } from '../generated/graphql';
+import PrimaryAppBar from '../components/PrimaryAppBar';
 
 interface Props {}
 
@@ -24,7 +25,6 @@ const Home: React.FC<Props> = () => {
   useEffect(
     () => {
       homePageQueryExecutor();
-      console.log('calling use effect');
     },
     [homePageQueryExecutor]
   );
@@ -49,7 +49,8 @@ const Home: React.FC<Props> = () => {
   if (userData && userData.homePage) {
     return (
       <div>
-        Welcome, {userData.homePage.firstName} {userData.homePage.lastName}
+        {/* Welcome, {userData.homePage.firstName} {userData.homePage.lastName} */}
+        <PrimaryAppBar userName={`${userData.homePage.firstName} ${userData.homePage.lastName}`} />
         <Container maxWidth="sm">
           <NewPost handleSubmit={handleSubmit} />
           {postsData && postsData.getUserPosts && <Posts posts={postsData?.getUserPosts} />}
