@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
+import { useSearchUsersQuery } from '../generated/graphql';
 
 interface Props {
   userName: string
@@ -72,6 +73,20 @@ const useStyles = makeStyles((theme) => ({
 const PrimaryAppBar = (props: Props) => {
   const classes = useStyles();
 
+  const [value, setValue] = useState('');
+  const { data, loading } = useSearchUsersQuery({
+    variables: {
+      name: value
+    },
+    onCompleted: (res) => {
+      console.log('completed', res);
+    }
+  });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
   return (
     <div className={classes.grow}>
       <AppBar position="static">
@@ -90,6 +105,8 @@ const PrimaryAppBar = (props: Props) => {
                 input: classes.inputInput,
               }}
               inputProps={{ 'aria-label': 'search' }}
+              onChange={handleChange}
+              value={value}
             />
           </div>
         </Toolbar>

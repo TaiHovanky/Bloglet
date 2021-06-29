@@ -19,7 +19,7 @@ export const isAuthenticated: MiddlewareFn = async ({ context }: any, next: any)
     // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
     context.payload = payload;
   } catch(err) {
-    console.log(err);
+    console.log('Auth validation error:', err);
   }
 
   return next();

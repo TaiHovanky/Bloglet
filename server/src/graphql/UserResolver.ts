@@ -6,7 +6,7 @@ import { sendRefreshToken } from '../utils/sendRefreshToken';
 import { createAccessToken, createRefreshToken } from '../utils/createTokens';
 import { requestContext } from '../types/context';
 import { isAuthenticated } from '../utils/isAuthenticated';
-import { createQueryBuilder } from 'typeorm';
+import { Like } from 'typeorm';
 
 @ObjectType()
 class LoginResponse {
@@ -103,18 +103,17 @@ export class UserResolver {
   @Query(() => [User], { nullable: true })
   @UseMiddleware(isAuthenticated)
   async searchUsers(
-    @Arg('name') name: string,
-    @Ctx() { res }: requestContext
+    @Arg('name') name: string
   ) {
     if (name) {
       try {
-        return createQueryBuilder('User')
-          .where('User.firstName = :firstName', { firstName: `${name}`})
-          .orWhere('User.lastName = :lastName', { lastName: `${name}`})
+        return User.find({ where: { firstName: Like(`%${name}%`) }})
       } catch(err) {
-        return errorHandler('Search user failed', res);
+        console.log('err in search', err);
+        return null;
       }
     }
-    return errorHandler('Search user failed - missing "name" argument', res);
+    console.log('err in search no name');
+    return null;
   }
 }
