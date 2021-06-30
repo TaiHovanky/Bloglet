@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import { useSearchUsersQuery } from '../generated/graphql';
+import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 
 interface Props {
   userName: string
@@ -68,13 +69,19 @@ const useStyles = makeStyles((theme) => ({
       display: 'flex',
     },
   },
+  paper: {
+    marginRight: theme.spacing(2)
+  }
 }));
 
 const PrimaryAppBar = (props: Props) => {
   const classes = useStyles();
 
   const [value, setValue] = useState('');
-  const { data, loading } = useSearchUsersQuery({
+  const [open, setOpen] = useState(false);
+  const anchorRef: any = useRef(null);
+
+  const { data } = useSearchUsersQuery({
     variables: {
       name: value
     },
@@ -83,8 +90,27 @@ const PrimaryAppBar = (props: Props) => {
     }
   });
 
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event: any) => {
+    setOpen(false);
+  };
+
+  function handleListKeyDown(event: any) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      setOpen(false);
+    }
+  }
+
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
+    if (data) {
+      handleOpen();
+    }
   };
 
   return (
@@ -107,7 +133,24 @@ const PrimaryAppBar = (props: Props) => {
               inputProps={{ 'aria-label': 'search' }}
               onChange={handleChange}
               value={value}
+              ref={anchorRef}
             />
+            <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 2, width: anchorRef.current.offsetWidth }}>
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleClose}>
+                      <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
+                        {data && data.searchUsers?.map(user => <MenuItem onClick={handleClose}>{user.firstName} {user.lastName}</MenuItem>)}
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
           </div>
         </Toolbar>
       </AppBar>

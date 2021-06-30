@@ -35,9 +35,7 @@ const client = new ApolloClient({
 into all the child components */
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <React.StrictMode>
-      <Routes />
-    </React.StrictMode>
+    <Routes />
   </ApolloProvider>,
   document.getElementById('root')
 );
