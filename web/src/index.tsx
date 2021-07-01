@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { ApolloClient, ApolloLink, createHttpLink, InMemoryCache } from '@apollo/client';
-import './index.css';
 import Routes from './Routes';
 import { getAccessToken } from './accessToken';
+import './index.css';
 
 const httpLink = createHttpLink({
   uri: 'http://localhost:3001/graphql',

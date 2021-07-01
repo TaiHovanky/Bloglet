@@ -5,9 +5,7 @@ import Posts from '../components/Posts';
 import { useCreatePostMutation, useHomePageLazyQuery, useGetUserPostsQuery } from '../generated/graphql';
 import PrimaryAppBar from '../components/PrimaryAppBar';
 
-interface Props {}
-
-const Home: React.FC<Props> = () => {
+const Home: React.FC<any> = () => {
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({ fetchPolicy: 'network-only' });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
 
@@ -49,7 +47,6 @@ const Home: React.FC<Props> = () => {
   if (userData && userData.homePage) {
     return (
       <div>
-        {/* Welcome, {userData.homePage.firstName} {userData.homePage.lastName} */}
         <PrimaryAppBar userName={`${userData.homePage.firstName} ${userData.homePage.lastName}`} />
         <Container maxWidth="sm">
           <NewPost handleSubmit={handleSubmit} />

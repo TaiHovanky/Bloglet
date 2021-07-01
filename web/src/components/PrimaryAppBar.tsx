@@ -1,15 +1,16 @@
 import React, { ChangeEvent, useRef, useState } from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
-import { useSearchUsersQuery } from '../generated/graphql';
+import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
+import { useSearchUsersQuery } from '../generated/graphql';
 
 interface Props {
-  userName: string
+  userName?: string,
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -74,8 +75,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const PrimaryAppBar = (props: Props) => {
+const PrimaryAppBar = ({ userName }: Props) => {
   const classes = useStyles();
+  const history = useHistory();
 
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
@@ -94,8 +96,19 @@ const PrimaryAppBar = (props: Props) => {
     setOpen(true);
   };
 
-  const handleClose = (event: any) => {
+  const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleMenuClick = (user: any) => {
+    console.log('handle click', user);
+    history.push({
+      pathname:`/user/${user.id}`,
+      state: {
+        userName: `${user.firstName} ${user.lastName}`
+      }
+    });
+    handleClose();
   };
 
   function handleListKeyDown(event: any) {
@@ -117,9 +130,9 @@ const PrimaryAppBar = (props: Props) => {
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          <Typography className={classes.title} variant="h6" noWrap>
-            Welcome, {props.userName}
-          </Typography>
+          {userName && <Typography className={classes.title} variant="h6" noWrap>
+            Welcome, {userName}
+          </Typography>}
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -135,7 +148,17 @@ const PrimaryAppBar = (props: Props) => {
               value={value}
               ref={anchorRef}
             />
-            <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal style={{ zIndex: 2, width: anchorRef.current.offsetWidth }}>
+            <Popper
+              open={open}
+              anchorEl={anchorRef.current}
+              role={undefined}
+              transition
+              disablePortal
+              style={{
+                zIndex: 2,
+                width: anchorRef && anchorRef.current ? anchorRef.current.offsetWidth : 100
+              }}
+            >
               {({ TransitionProps, placement }) => (
                 <Grow
                   {...TransitionProps}
@@ -144,7 +167,9 @@ const PrimaryAppBar = (props: Props) => {
                   <Paper>
                     <ClickAwayListener onClickAway={handleClose}>
                       <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                        {data && data.searchUsers?.map(user => <MenuItem onClick={handleClose}>{user.firstName} {user.lastName}</MenuItem>)}
+                        {data && data.searchUsers?.map(
+                          (user, index) => <MenuItem key={index} onClick={() => handleMenuClick(user)}>{user.firstName} {user.lastName}</MenuItem>
+                        )}
                       </MenuList>
                     </ClickAwayListener>
                   </Paper>

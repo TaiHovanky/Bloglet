@@ -182,7 +182,7 @@ export type SearchUsersQuery = (
   { __typename?: 'Query' }
   & { searchUsers?: Maybe<Array<(
     { __typename?: 'User' }
-    & Pick<User, 'firstName' | 'lastName' | 'email'>
+    & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
   )>> }
 );
 
@@ -436,6 +436,7 @@ export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutatio
 export const SearchUsersDocument = gql`
     query searchUsers($name: String!) {
   searchUsers(name: $name) {
+    id
     firstName
     lastName
     email

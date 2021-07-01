@@ -1,5 +1,6 @@
 query searchUsers($name: String!) {
   searchUsers(name: $name) {
+    id
     firstName
     lastName
     email
