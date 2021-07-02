@@ -1,11 +1,18 @@
 import React, { useEffect } from 'react';
-import { Container } from '@material-ui/core';
+import { Container, makeStyles } from '@material-ui/core';
 import NewPost from '../components/NewPost';
 import Posts from '../components/Posts';
 import { useCreatePostMutation, useHomePageLazyQuery, useGetUserPostsQuery } from '../generated/graphql';
 import PrimaryAppBar from '../components/PrimaryAppBar';
 
+const useStyles = makeStyles(() => ({
+  homePageContainer: {
+    height: '100vh'
+  }
+}));
+
 const Home: React.FC<any> = () => {
+  const classes = useStyles();
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({ fetchPolicy: 'network-only' });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
 
@@ -46,7 +53,7 @@ const Home: React.FC<any> = () => {
 
   if (userData && userData.homePage) {
     return (
-      <div>
+      <div className={classes.homePageContainer}>
         <PrimaryAppBar userName={`${userData.homePage.firstName} ${userData.homePage.lastName}`} />
         <Container maxWidth="sm">
           <NewPost handleSubmit={handleSubmit} />

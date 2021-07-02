@@ -101,7 +101,6 @@ const PrimaryAppBar = ({ userName }: Props) => {
   };
 
   const handleMenuClick = (user: any) => {
-    console.log('handle click', user);
     history.push({
       pathname:`/user/${user.id}`,
       state: {

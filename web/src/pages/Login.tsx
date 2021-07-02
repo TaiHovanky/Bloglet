@@ -1,11 +1,28 @@
 import React from 'react';
-import { Button, TextField } from '@material-ui/core';
+import { Button, TextField, makeStyles, Paper, Container, Typography } from '@material-ui/core';
 import { RouteComponentProps } from 'react-router';
 import { useFormField } from '../hooks/useFormField';
 import { useLoginMutation } from '../generated/graphql';
 import { setAccessToken } from '../accessToken';
 
+const useStyles = makeStyles((theme) => ({
+  loginPageContainer: {
+    paddingTop: '1px',
+    height: '100vh',
+  },
+  loginPaper: {
+    margin: theme.spacing(32),
+    paddingBottom: theme.spacing(4),
+    paddingTop: theme.spacing(4)
+  },
+  submitBtn: {
+    marginTop: theme.spacing(4)
+  }
+}));
+
 const Login: React.FC<RouteComponentProps> = ({ history }) => {
+  const classes = useStyles();
+
   const email = useFormField('', 'email');
   const password = useFormField('', 'text');
   const [login] = useLoginMutation();
@@ -27,22 +44,33 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
   }
 
   return (
-    <form noValidate autoComplete="off" onSubmit={handleSubmit}>
-      <TextField
-        id="input-email"
-        label="Email"
-        name="email"
-        {...email}
-      />
-      <TextField
-        id="input-password"
-        label="Password"
-        type="password"
-        name="password"
-        {...password}
-      />
-      <Button variant="contained" color="primary" type="submit">Submit</Button>
-    </form>
+    <div className={classes.loginPageContainer}>
+      <Paper elevation={3} className={classes.loginPaper}>
+        <Container maxWidth="md">
+          <Typography variant="h3" noWrap>Log In</Typography>
+          <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <div>
+              <TextField
+                id="input-email"
+                label="Email"
+                name="email"
+                {...email}
+              />
+            </div>
+            <div>
+              <TextField
+                id="input-password"
+                label="Password"
+                type="password"
+                name="password"
+                {...password}
+              />
+            </div>
+            <Button className={classes.submitBtn} variant="contained" color="primary" type="submit">Submit</Button>
+          </form>
+        </Container>
+      </Paper>
+    </div>
   );
 }
 

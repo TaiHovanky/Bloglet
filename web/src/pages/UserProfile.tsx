@@ -23,7 +23,7 @@ const UserProfile: React.FC<any> = ({ location }) => {
   return (
     <div>
       <PrimaryAppBar />
-      <Container maxWidth="sm">
+      <Container fixed maxWidth="sm">
         {location && <Typography variant="h3">{location.state.userName}</Typography>}
         {postsData && postsData.getUserPosts && <Posts posts={postsData?.getUserPosts} />}
       </Container>
