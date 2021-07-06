@@ -3,6 +3,7 @@ import { errorHandler } from '../utils/errorHandler';
 import { Post } from '../entity/Post';
 import { requestContext } from '../types/context';
 import { isAuthenticated } from '../utils/isAuthenticated';
+import { User } from 'src/entity/User';
 
 @Resolver()
 export class PostResolver {
@@ -45,5 +46,22 @@ export class PostResolver {
       return false;
     });
     return true;
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuthenticated)
+  async favoritePost(
+    @Arg('postId') postId: number,
+    @Arg('userId') userId: number
+  ) {
+    const postToUpdate = await Post.findOne(postId);
+    const userToUpdate = await User.findOne(userId);
+    console.log('found post/user to update', postToUpdate, userToUpdate);
+    if (postToUpdate && userToUpdate) {
+      postToUpdate.favorites = [...postToUpdate.favorites, userToUpdate];
+      userToUpdate.favoritedPosts = [...userToUpdate.favoritedPosts, postToUpdate];
+      await Post.save(postToUpdate);
+      await User.save(userToUpdate);
+    }
   }
 }

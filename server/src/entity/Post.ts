@@ -1,5 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable} from "typeorm";
+import { User } from "./User";
 
 @ObjectType()
 @Entity('posts')
@@ -19,4 +20,8 @@ export class Post extends BaseEntity {
   @Field()
   @Column()
   creatorId: number;
+
+  @ManyToMany(() => User, (user: User) => user.favoritedPosts)
+  @JoinTable()
+  favorites: User[]
 }
