@@ -3,7 +3,7 @@ import { errorHandler } from '../utils/errorHandler';
 import { Post } from '../entity/Post';
 import { requestContext } from '../types/context';
 import { isAuthenticated } from '../utils/isAuthenticated';
-import { User } from 'src/entity/User';
+import { User } from '../entity/User';
 
 @Resolver()
 export class PostResolver {
@@ -52,16 +52,23 @@ export class PostResolver {
   @UseMiddleware(isAuthenticated)
   async favoritePost(
     @Arg('postId') postId: number,
-    @Arg('userId') userId: number
+    @Arg('userId') userId: number,
+    @Ctx() { res }: requestContext
   ) {
-    const postToUpdate = await Post.findOne(postId);
-    const userToUpdate = await User.findOne(userId);
-    console.log('found post/user to update', postToUpdate, userToUpdate);
-    if (postToUpdate && userToUpdate) {
-      postToUpdate.favorites = [...postToUpdate.favorites, userToUpdate];
-      userToUpdate.favoritedPosts = [...userToUpdate.favoritedPosts, postToUpdate];
-      await Post.save(postToUpdate);
-      await User.save(userToUpdate);
+    try {
+      const postToUpdate = await Post.findOne(postId, { relations: ['favorites']});
+      const userToUpdate = await User.findOne(userId, { relations: ['favoritedPosts']});
+      if (postToUpdate && userToUpdate) {
+        postToUpdate.favorites = [...postToUpdate.favorites, userToUpdate];
+        userToUpdate.favoritedPosts = [...userToUpdate.favoritedPosts, postToUpdate];
+        await Post.save(postToUpdate);
+        await User.save(userToUpdate);
+        return true;
+      }
+      return false;
+    } catch(err) {
+      errorHandler('Failed to get post', res);
+      return false;
     }
   }
 }
