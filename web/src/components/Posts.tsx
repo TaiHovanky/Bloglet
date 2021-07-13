@@ -6,6 +6,16 @@ interface Props {
   posts: GetUserPostsQuery['getUserPosts']
 }
 
+const useStyles = makeStyles({
+  root: {
+    minWidth: 400,
+    marginTop: 30
+  },
+  post: {
+    marginBottom: 12,
+  },
+});
+
 const Posts: React.FC<Props> = (props: any) => {
   const classes = useStyles();
   return (
@@ -16,7 +26,7 @@ const Posts: React.FC<Props> = (props: any) => {
             <Typography variant="h5" component="h2">
               {post.title}
             </Typography>
-            <Typography className={classes.pos} color="textSecondary">
+            <Typography className={classes.post} color="textSecondary">
               {post.body}
             </Typography>
           </CardContent>
@@ -25,15 +35,5 @@ const Posts: React.FC<Props> = (props: any) => {
     </Container>
   )
 };
-
-const useStyles = makeStyles({
-  root: {
-    minWidth: 400,
-    marginTop: 30
-  },
-  pos: {
-    marginBottom: 12,
-  },
-});
 
 export default Posts;

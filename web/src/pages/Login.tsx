@@ -15,6 +15,9 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(4),
     paddingTop: theme.spacing(4)
   },
+  textField: {
+    width: '100%'
+  },
   submitBtn: {
     marginTop: theme.spacing(4)
   }
@@ -36,10 +39,11 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
         password: formData.get('password') as string
       }
     });
+
     if (response && response.data) {
       setAccessToken(response.data.login.token);
     }
-    console.log('response', response);
+
     history.push('/');
   }
 
@@ -54,6 +58,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
                 id="input-email"
                 label="Email"
                 name="email"
+                className={classes.textField}
                 {...email}
               />
             </div>
@@ -63,6 +68,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
                 label="Password"
                 type="password"
                 name="password"
+                className={classes.textField}
                 {...password}
               />
             </div>

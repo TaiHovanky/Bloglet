@@ -3,5 +3,6 @@ query GetUserPosts($userId: Float!) {
     id
     title
     body
+    favorites
   }
 }

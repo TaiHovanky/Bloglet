@@ -90,14 +90,14 @@ export class UserResolver {
   async homePage(
     @Ctx() { payload }: requestContext
   ) {
-    try {
-      if (payload) {
-        return User.findOne({ where: { email: payload.email }});
-      }
-      return null;
-    } catch (err) {
-      return null;
+    if (payload) {
+      return User.findOne({ where: { email: payload.email }})
+        .catch((err) => {
+          console.log('catch err', err);
+          return null;
+        });
     }
+    return null;
   }
 
   @Query(() => [User], { nullable: true })
@@ -106,14 +106,11 @@ export class UserResolver {
     @Arg('name') name: string
   ) {
     if (name) {
-      try {
-        return User.find({ where: { firstName: Like(`%${name}%`) }})
-      } catch(err) {
-        console.log('err in search', err);
-        return null;
-      }
+      return User.find({ where: { firstName: Like(`%${name}%`) }})
+        .catch((err) => {
+          console.log('error finding user', err);
+        });
     }
-    console.log('err in search no name');
     return null;
   }
 }

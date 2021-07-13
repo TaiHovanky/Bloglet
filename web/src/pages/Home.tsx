@@ -1,13 +1,22 @@
 import React, { useEffect } from 'react';
-import { Container, makeStyles } from '@material-ui/core';
+import { Container, makeStyles, Paper, Typography } from '@material-ui/core';
 import NewPost from '../components/NewPost';
 import Posts from '../components/Posts';
 import { useCreatePostMutation, useHomePageLazyQuery, useGetUserPostsQuery } from '../generated/graphql';
 import PrimaryAppBar from '../components/PrimaryAppBar';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   homePageContainer: {
+    paddingTop: '1px',
     height: '100vh'
+  },
+  homePaper: {
+    margin: theme.spacing(8),
+    paddingBottom: theme.spacing(8),
+    paddingTop: theme.spacing(4)
+  },
+  homePageText: {
+    marginTop: theme.spacing(4)
   }
 }));
 
@@ -20,9 +29,8 @@ const Home: React.FC<any> = () => {
     variables: {
       userId: userData && userData.homePage && userData.homePage.id ? userData.homePage.id : 0
     },
-    skip: !userData?.homePage?.id,
-    onError: (err) => console.log(err),
-    onCompleted: (x) => console.log(x, postsData)
+    skip: !userData || !userData.homePage || !userData.homePage.id,
+    onError: (err) => console.log(err)
   });
 
   const [createPost] = useCreatePostMutation();
@@ -63,7 +71,17 @@ const Home: React.FC<any> = () => {
     );
   }
 
-  return <div>Home</div>
+  return (
+    <div className={classes.homePageContainer}>
+      <Paper elevation={3} className={classes.homePaper}>
+        <Container maxWidth="md">
+          <Typography className={classes.homePageText} variant="h3">Welcome to my practice social media app</Typography>
+          <Typography className={classes.homePageText} variant="h5">Share your musings with the world through blog posts</Typography>
+          <Typography className={classes.homePageText} variant="h5">To get started, register yourself as a user or login with an existing account</Typography>
+        </Container>
+      </Paper>
+    </div>
+  );
 }
 
 export default Home;

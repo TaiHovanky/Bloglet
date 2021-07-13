@@ -7,15 +7,18 @@ import { User } from '../entity/User';
 
 @Resolver()
 export class PostResolver {
-  @Query(() => [Post])
+  @Query(() => [Post], { nullable: true })
+  @UseMiddleware(isAuthenticated)
   async getUserPosts(
-    @Arg('userId') userId: number,
-    @Ctx() { res }: requestContext
+    @Arg('userId') userId: number
   ) {
-    console.log('userid in posts', userId);
-    return await Post.find({ where: { creatorId: userId }})
-      .catch(() => {
-        errorHandler('Failed to get user\'s posts', res);
+    return Post.find({
+      where: { creatorId: userId },
+      relations: ['favorites']
+    })
+      .catch((err) => {
+        console.log('err', err);
+        return null;
       });
   }
 
@@ -58,6 +61,7 @@ export class PostResolver {
     try {
       const postToUpdate = await Post.findOne(postId, { relations: ['favorites']});
       const userToUpdate = await User.findOne(userId, { relations: ['favoritedPosts']});
+
       if (postToUpdate && userToUpdate) {
         postToUpdate.favorites = [...postToUpdate.favorites, userToUpdate];
         userToUpdate.favoritedPosts = [...userToUpdate.favoritedPosts, postToUpdate];

@@ -27,7 +27,8 @@ export class User extends BaseEntity {
   @Column('int', {default: 0})
   tokenVersion: number;
 
+  @Field(() => [Post])
   @ManyToMany(() => Post, (post: Post) => post.favorites)
-  @JoinTable()
+  @JoinTable({ name: 'favorites' })
   favoritedPosts: Post[]
 }

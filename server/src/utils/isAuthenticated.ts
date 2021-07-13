@@ -10,7 +10,7 @@ export const isAuthenticated: MiddlewareFn = async ({ context }: any, next: any)
   const authorization: string | undefined = context.req.headers['authorization'];
 
   if (!authorization) {
-    throw new Error('Not authenticated');
+    return;
   }
 
   try {
@@ -20,6 +20,7 @@ export const isAuthenticated: MiddlewareFn = async ({ context }: any, next: any)
     context.payload = payload;
   } catch(err) {
     console.log('Auth validation error:', err);
+    return;
   }
 
   return next();

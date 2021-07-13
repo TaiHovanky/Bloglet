@@ -12,7 +12,10 @@ const useStyles = makeStyles((theme) => ({
   registerPaper: {
     margin: theme.spacing(32),
     paddingBottom: theme.spacing(4),
-    paddingTop: theme.spacing(4)
+    paddingTop: theme.spacing(4),
+  },
+  textField: {
+    width: '100%'
   },
   submitBtn: {
     marginTop: theme.spacing(4)
@@ -32,7 +35,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const response = await register({
+    await register({
       variables: {
         firstName: formData.get('firstName') as string,
         lastName: formData.get('lastName') as string,
@@ -40,7 +43,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
         password: formData.get('password') as string
       }
     });
-    console.log('response', response);
+
     history.push('/');
   };
 
@@ -55,6 +58,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
                 id="input_firstName"
                 label="First Name"
                 name="firstName"
+                className={classes.textField}
                 {...firstName}
               />
             </div>
@@ -63,6 +67,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
                 id="input_lastName"
                 label="Last Name"
                 name="lastName"
+                className={classes.textField}
                 {...lastName}
               />
             </div>
@@ -71,6 +76,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
                 id="input_email"
                 label="Email"
                 name="email"
+                className={classes.textField}
                 {...email}
               />
             </div>
@@ -80,6 +86,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
                 label="Password"
                 type="password"
                 name="password"
+                className={classes.textField}
                 {...password}
               />
             </div>

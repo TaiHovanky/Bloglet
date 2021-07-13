@@ -86,9 +86,6 @@ const PrimaryAppBar = ({ userName }: Props) => {
   const { data } = useSearchUsersQuery({
     variables: {
       name: value
-    },
-    onCompleted: (res) => {
-      console.log('completed', res);
     }
   });
 
