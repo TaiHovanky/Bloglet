@@ -13,9 +13,9 @@ export class PostResolver {
     @Arg('userId') userId: number
   ) {
     return Post.find({
-      where: { creatorId: userId },
-      relations: ['favorites']
-    })
+        where: { creatorId: userId },
+        relations: ['favorites']
+      })
       .catch((err) => {
         console.log('err', err);
         return null;
@@ -65,8 +65,8 @@ export class PostResolver {
       if (postToUpdate && userToUpdate) {
         postToUpdate.favorites = [...postToUpdate.favorites, userToUpdate];
         userToUpdate.favoritedPosts = [...userToUpdate.favoritedPosts, postToUpdate];
-        await Post.save(postToUpdate);
-        await User.save(userToUpdate);
+        await Post.save(postToUpdate).catch((err) => console.log('post update err', err));;
+        await User.save(userToUpdate).catch((err) => console.log('user update err', err));
         return true;
       }
       return false;

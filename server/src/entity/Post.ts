@@ -22,7 +22,7 @@ export class Post extends BaseEntity {
   creatorId: number;
 
   @Field(() => [User], { nullable: true })
-  @ManyToMany(() => User, (user: User) => user.favoritedPosts)
+  @ManyToMany(() => User, (user: User) => user.favoritedPosts, { cascade: true })
   @JoinTable({ name: 'favorites' })
   favorites: User[]
 }

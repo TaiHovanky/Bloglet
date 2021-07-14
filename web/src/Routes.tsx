@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import NavBar from './pages/NavBar';
+import NavBar from './components/NavBar';
 import UserProfile from './pages/UserProfile';
 
 const useStyles = makeStyles((theme) => ({

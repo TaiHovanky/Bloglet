@@ -22,7 +22,8 @@ export class UserResolver {
 
   @Query(() => [User])
   users() {
-    return User.find();
+    return User.find()
+      .catch((err) => console.log(err));
   }
 
   @Query(() => String)
