@@ -26,6 +26,7 @@ export type Mutation = {
   login: LoginResponse;
   logout: Scalars['Boolean'];
   createPost: Scalars['Boolean'];
+  favoritePost: Scalars['Boolean'];
 };
 
 
@@ -49,12 +50,19 @@ export type MutationCreatePostArgs = {
   creatorId: Scalars['Float'];
 };
 
+
+export type MutationFavoritePostArgs = {
+  userId: Scalars['Float'];
+  postId: Scalars['Float'];
+};
+
 export type Post = {
   __typename?: 'Post';
   id: Scalars['Float'];
   title: Scalars['String'];
   body: Scalars['String'];
   creatorId: Scalars['Float'];
+  favorites?: Maybe<Array<User>>;
 };
 
 export type Query = {
@@ -63,7 +71,7 @@ export type Query = {
   hello: Scalars['String'];
   homePage?: Maybe<User>;
   searchUsers?: Maybe<Array<User>>;
-  getUserPosts: Array<Post>;
+  getUserPosts?: Maybe<Array<Post>>;
   getPost: Post;
 };
 
@@ -88,6 +96,7 @@ export type User = {
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   email: Scalars['String'];
+  favoritedPosts?: Maybe<Array<Post>>;
 };
 
 export type CreatePostMutationVariables = Exact<{
@@ -102,6 +111,17 @@ export type CreatePostMutation = (
   & Pick<Mutation, 'createPost'>
 );
 
+export type FavoritePostMutationVariables = Exact<{
+  userId: Scalars['Float'];
+  postId: Scalars['Float'];
+}>;
+
+
+export type FavoritePostMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'favoritePost'>
+);
+
 export type GetUserPostsQueryVariables = Exact<{
   userId: Scalars['Float'];
 }>;
@@ -109,10 +129,14 @@ export type GetUserPostsQueryVariables = Exact<{
 
 export type GetUserPostsQuery = (
   { __typename?: 'Query' }
-  & { getUserPosts: Array<(
+  & { getUserPosts?: Maybe<Array<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'title' | 'body'>
-  )> }
+    & { favorites?: Maybe<Array<(
+      { __typename?: 'User' }
+      & Pick<User, 'id'>
+    )>> }
+  )>> }
 );
 
 export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
@@ -220,12 +244,47 @@ export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
+export const FavoritePostDocument = gql`
+    mutation FavoritePost($userId: Float!, $postId: Float!) {
+  favoritePost(userId: $userId, postId: $postId)
+}
+    `;
+export type FavoritePostMutationFn = Apollo.MutationFunction<FavoritePostMutation, FavoritePostMutationVariables>;
+
+/**
+ * __useFavoritePostMutation__
+ *
+ * To run a mutation, you first call `useFavoritePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useFavoritePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [favoritePostMutation, { data, loading, error }] = useFavoritePostMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useFavoritePostMutation(baseOptions?: Apollo.MutationHookOptions<FavoritePostMutation, FavoritePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<FavoritePostMutation, FavoritePostMutationVariables>(FavoritePostDocument, options);
+      }
+export type FavoritePostMutationHookResult = ReturnType<typeof useFavoritePostMutation>;
+export type FavoritePostMutationResult = Apollo.MutationResult<FavoritePostMutation>;
+export type FavoritePostMutationOptions = Apollo.BaseMutationOptions<FavoritePostMutation, FavoritePostMutationVariables>;
 export const GetUserPostsDocument = gql`
     query GetUserPosts($userId: Float!) {
   getUserPosts(userId: $userId) {
     id
     title
     body
+    favorites {
+      id
+    }
   }
 }
     `;

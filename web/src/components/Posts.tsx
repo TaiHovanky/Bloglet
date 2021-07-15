@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Container, makeStyles, Typography } from '@material-ui/core';
+import { Button, Card, CardContent, Container, Divider, Grid, makeStyles, Typography } from '@material-ui/core';
 import { GetUserPostsQuery } from '../generated/graphql';
 
 interface Props {
@@ -14,6 +14,9 @@ const useStyles = makeStyles({
   post: {
     marginBottom: 12,
   },
+  divider: {
+    marginBottom: 16
+  }
 });
 
 const Posts: React.FC<Props> = (props: any) => {
@@ -29,6 +32,15 @@ const Posts: React.FC<Props> = (props: any) => {
             <Typography className={classes.post} color="textSecondary">
               {post.body}
             </Typography>
+            <Divider variant="middle" className={classes.divider} />
+            <Grid container spacing={3}>
+              <Grid item xs={2}>
+                <Button variant="contained" color="primary">Like</Button>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography variant="h6" color="textSecondary">{post.favorites.length}</Typography>
+              </Grid>
+            </Grid>
           </CardContent>
         </Card>
       ))}

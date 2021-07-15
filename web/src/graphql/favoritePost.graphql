@@ -1,0 +1,3 @@
+mutation FavoritePost($userId: Float!, $postId: Float!) {
+  favoritePost(userId: $userId, postId: $postId)
+}

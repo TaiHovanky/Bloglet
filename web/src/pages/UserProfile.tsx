@@ -7,7 +7,7 @@ import PrimaryAppBar from '../components/PrimaryAppBar';
 
 const UserProfile: React.FC<any> = ({ location }) => {
   const { id } = useParams<{ id: string }>();
-  console.log('user id', id, location);
+
   const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: {
       userId: parseInt(id)
