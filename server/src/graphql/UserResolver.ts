@@ -22,7 +22,7 @@ export class UserResolver {
 
   @Query(() => [User])
   users() {
-    return User.find()
+    return User.find({ relations: ['likedPosts']})
       .catch((err) => console.log(err));
   }
 

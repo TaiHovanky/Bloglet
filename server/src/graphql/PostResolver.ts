@@ -14,7 +14,7 @@ export class PostResolver {
   ) {
     return Post.find({
         where: { creatorId: userId },
-        relations: ['favorites']
+        relations: ['likes']
       })
       .catch((err) => {
         console.log('err', err);
@@ -53,25 +53,33 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuthenticated)
-  async favoritePost(
+  async likePost(
     @Arg('postId') postId: number,
     @Arg('userId') userId: number,
     @Ctx() { res }: requestContext
   ) {
     try {
-      const postToUpdate = await Post.findOne(postId, { relations: ['favorites']});
-      const userToUpdate = await User.findOne(userId, { relations: ['favoritedPosts']});
+      const postToUpdate: any = await Post
+        .findOne({
+          where: { id: postId },
+          relations: ['likes']
+        });
+      const userToUpdate: any = await User
+        .findOne({
+          where: { id: userId },
+          relations: ['likedPosts']
+        });
 
       if (postToUpdate && userToUpdate) {
-        postToUpdate.favorites = [...postToUpdate.favorites, userToUpdate];
-        userToUpdate.favoritedPosts = [...userToUpdate.favoritedPosts, postToUpdate];
-        await Post.save(postToUpdate).catch((err) => console.log('post update err', err));;
-        await User.save(userToUpdate).catch((err) => console.log('user update err', err));
+        postToUpdate.likes.push(userToUpdate);
+        userToUpdate.likedPosts.push(postToUpdate);
+        await Post.save(postToUpdate).catch((err) => console.log('post update err', err));
         return true;
       }
       return false;
     } catch(err) {
-      errorHandler('Failed to get post', res);
+      console.log('err in like post', err);
+      errorHandler('Failed to like post', res);
       return false;
     }
   }
