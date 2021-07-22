@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany } from "typeorm";
-import { Post } from "./Post";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from "typeorm";
+import { UserLikesPosts } from "./Likes";
 
 @ObjectType()
 @Entity('users')
@@ -10,24 +10,24 @@ export class User extends BaseEntity {
   id: number;
 
   @Field()
-  @Column()
+  @Column({ nullable: true })
   firstName: string;
 
   @Field()
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
 
   @Field() // Field() indicates a field that can be returned by users query
-  @Column('text')
+  @Column('text', { nullable: true })
   email: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   password: string;
 
-  @Column('int', {default: 0})
+  @Column('int', { default: 0, nullable: true })
   tokenVersion: number;
 
-  @Field(() => [Post])
-  @ManyToMany(() => Post, (post: Post) => post.likes)
-  likedPosts: Post[]
+  @Field(() => [UserLikesPosts], { nullable: true })
+  @OneToMany(() => UserLikesPosts, (likes: UserLikesPosts) => likes.user)
+  likedPosts: Array<UserLikesPosts>;
 }

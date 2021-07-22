@@ -4,6 +4,7 @@ import { Post } from '../entity/Post';
 import { requestContext } from '../types/context';
 import { isAuthenticated } from '../utils/isAuthenticated';
 import { User } from '../entity/User';
+import { UserLikesPosts } from '../entity/Likes';
 
 @Resolver()
 export class PostResolver {
@@ -12,10 +13,12 @@ export class PostResolver {
   async getUserPosts(
     @Arg('userId') userId: number
   ) {
-    return Post.find({
-        where: { creatorId: userId },
-        relations: ['likes']
-      })
+    return Post
+      .createQueryBuilder('posts')
+      .where('posts.creatorId = :creatorId', { creatorId: userId })
+      .leftJoinAndMapMany('posts.likes', 'user_likes_posts', 'likes', 'posts.id = likes.post_id')
+      .leftJoinAndMapOne('likes.user', 'users', 'users', 'likes.user_id = users.id')
+      .getMany()
       .catch((err) => {
         console.log('err', err);
         return null;
@@ -71,14 +74,12 @@ export class PostResolver {
         });
 
       if (postToUpdate && userToUpdate) {
-        postToUpdate.likes.push(userToUpdate);
-        userToUpdate.likedPosts.push(postToUpdate);
-        await Post.save(postToUpdate).catch((err) => console.log('post update err', err));
+        const likePost = new UserLikesPosts(userToUpdate, postToUpdate);
+        await UserLikesPosts.save(likePost);
         return true;
       }
       return false;
     } catch(err) {
-      console.log('err in like post', err);
       errorHandler('Failed to like post', res);
       return false;
     }

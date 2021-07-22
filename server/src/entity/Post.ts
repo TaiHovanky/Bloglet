@@ -1,6 +1,6 @@
-import { Field, ObjectType } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany, JoinTable } from "typeorm";
-import { User } from "./User";
+import { Field, ObjectType } from 'type-graphql';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
+import { UserLikesPosts } from './Likes';
 
 @ObjectType()
 @Entity('posts')
@@ -10,19 +10,18 @@ export class Post extends BaseEntity {
   id: number;
 
   @Field()
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
   @Field()
-  @Column()
+  @Column({ nullable: true })
   body: string;
 
   @Field()
-  @Column()
+  @Column({ nullable: true })
   creatorId: number;
 
-  @Field(() => [User])
-  @ManyToMany(() => User, (user: User) => user.likedPosts, { cascade: ['insert', 'update'] })
-  @JoinTable({ name: 'likes' })
-  likes: User[]
+  @Field(() => [UserLikesPosts], { nullable: true })
+  @OneToMany(() => UserLikesPosts, (likes: UserLikesPosts) => likes.post)
+  likes: Array<UserLikesPosts>
 }
