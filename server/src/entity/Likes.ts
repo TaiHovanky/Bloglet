@@ -1,20 +1,30 @@
-import { ObjectType } from 'type-graphql';
-import { Entity, BaseEntity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Field, ObjectType } from 'type-graphql';
+import { Entity, BaseEntity, JoinColumn, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Post } from './Post';
 import { User } from './User';
 
 @ObjectType()
-@Entity('likes')
-export class Post extends BaseEntity {
+@Entity({ name: 'user_likes_posts' })
+export class UserLikesPosts extends BaseEntity {
+  constructor(
+    user: User,
+    post: Post
+  ) {
+    super();
+    this.user = user;
+    this.post = post;
+  }
 
-  @PrimaryColumn('int') usersId: number;
+  @Field()
+  @PrimaryGeneratedColumn() id: number;
 
-  @PrimaryColumn('int') postsId: number;
-
-  @OneToOne(() => User)
-  @JoinColumn()
-  user: User;
-
-  @OneToOne(() => Post)
-  @JoinColumn()
+  @Field(() => Post, { nullable: true })
+  @ManyToOne(() => Post, (post: Post) => post.likes)
+  @JoinColumn({ name: 'post_id' })
   post: Post;
+
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, (user: User) => user.likedPosts)
+  @JoinColumn({ name: 'user_id' })
+  user: User
 }
