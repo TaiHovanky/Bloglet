@@ -10,7 +10,7 @@ import { useHistory } from 'react-router-dom';
 import { useSearchUsersQuery } from '../generated/graphql';
 
 interface Props {
-  userName?: string,
+  user?: any,
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const PrimaryAppBar = ({ userName }: Props) => {
+const PrimaryAppBar = ({ user }: Props) => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -101,7 +101,7 @@ const PrimaryAppBar = ({ userName }: Props) => {
     history.push({
       pathname:`/user/${user.id}`,
       state: {
-        userName: `${user.firstName} ${user.lastName}`
+        user
       }
     });
     handleClose();
@@ -126,8 +126,8 @@ const PrimaryAppBar = ({ userName }: Props) => {
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          {userName && <Typography className={classes.title} variant="h6" noWrap>
-            Welcome, {userName}
+          {user && <Typography className={classes.title} variant="h6" noWrap>
+            Welcome, {`${user.firstName} ${user.lastName}`}
           </Typography>}
           <div className={classes.search}>
             <div className={classes.searchIcon}>

@@ -2,7 +2,12 @@ import React, { useEffect } from 'react';
 import { Container, makeStyles, Paper, Typography } from '@material-ui/core';
 import NewPost from '../components/NewPost';
 import Posts from '../components/Posts';
-import { useCreatePostMutation, useHomePageLazyQuery, useGetUserPostsQuery } from '../generated/graphql';
+import {
+  useCreatePostMutation,
+  useHomePageLazyQuery,
+  useGetUserPostsQuery,
+  useLikePostMutation
+} from '../generated/graphql';
 import PrimaryAppBar from '../components/PrimaryAppBar';
 
 const useStyles = makeStyles((theme) => ({
@@ -34,6 +39,7 @@ const Home: React.FC<any> = () => {
   });
 
   const [createPost] = useCreatePostMutation();
+  const [likePost] = useLikePostMutation();
 
   useEffect(
     () => {
@@ -55,6 +61,15 @@ const Home: React.FC<any> = () => {
     refetch(); // is needed to refetch the posts query
   }
 
+  const handleLikePost = (userId: number, postId: number) => {
+    likePost({
+      variables: {
+        userId,
+        postId
+      }
+    });
+  }
+
   if (loading || postsLoading) {
     return <div>Loading...</div>;
   }
@@ -62,10 +77,12 @@ const Home: React.FC<any> = () => {
   if (userData && userData.homePage) {
     return (
       <div className={classes.homePageContainer}>
-        <PrimaryAppBar userName={`${userData.homePage.firstName} ${userData.homePage.lastName}`} />
+        <PrimaryAppBar user={userData.homePage} />
         <Container maxWidth="sm">
           <NewPost handleSubmit={handleSubmit} />
-          {postsData && postsData.getUserPosts && <Posts posts={postsData?.getUserPosts} />}
+          {postsData && postsData.getUserPosts &&
+            <Posts posts={postsData?.getUserPosts} likePost={handleLikePost} user={userData.homePage} />
+          }
         </Container>
       </div>
     );
