@@ -26,7 +26,7 @@ export type Mutation = {
   login: LoginResponse;
   logout: Scalars['Boolean'];
   createPost: Scalars['Boolean'];
-  favoritePost: Scalars['Boolean'];
+  likePost: Scalars['Boolean'];
 };
 
 
@@ -51,7 +51,7 @@ export type MutationCreatePostArgs = {
 };
 
 
-export type MutationFavoritePostArgs = {
+export type MutationLikePostArgs = {
   userId: Scalars['Float'];
   postId: Scalars['Float'];
 };
@@ -62,7 +62,7 @@ export type Post = {
   title: Scalars['String'];
   body: Scalars['String'];
   creatorId: Scalars['Float'];
-  favorites?: Maybe<Array<User>>;
+  likes?: Maybe<Array<UserLikesPosts>>;
 };
 
 export type Query = {
@@ -96,7 +96,14 @@ export type User = {
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   email: Scalars['String'];
-  favoritedPosts?: Maybe<Array<Post>>;
+  likedPosts?: Maybe<Array<UserLikesPosts>>;
+};
+
+export type UserLikesPosts = {
+  __typename?: 'UserLikesPosts';
+  id: Scalars['Float'];
+  post?: Maybe<Post>;
+  user?: Maybe<User>;
 };
 
 export type CreatePostMutationVariables = Exact<{
@@ -111,15 +118,15 @@ export type CreatePostMutation = (
   & Pick<Mutation, 'createPost'>
 );
 
-export type FavoritePostMutationVariables = Exact<{
+export type LikePostMutationVariables = Exact<{
   userId: Scalars['Float'];
   postId: Scalars['Float'];
 }>;
 
 
-export type FavoritePostMutation = (
+export type LikePostMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'favoritePost'>
+  & Pick<Mutation, 'likePost'>
 );
 
 export type GetUserPostsQueryVariables = Exact<{
@@ -132,9 +139,12 @@ export type GetUserPostsQuery = (
   & { getUserPosts?: Maybe<Array<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'title' | 'body'>
-    & { favorites?: Maybe<Array<(
-      { __typename?: 'User' }
-      & Pick<User, 'id'>
+    & { likes?: Maybe<Array<(
+      { __typename?: 'UserLikesPosts' }
+      & { user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id'>
+      )> }
     )>> }
   )>> }
 );
@@ -244,46 +254,48 @@ export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
-export const FavoritePostDocument = gql`
-    mutation FavoritePost($userId: Float!, $postId: Float!) {
-  favoritePost(userId: $userId, postId: $postId)
+export const LikePostDocument = gql`
+    mutation LikePost($userId: Float!, $postId: Float!) {
+  likePost(userId: $userId, postId: $postId)
 }
     `;
-export type FavoritePostMutationFn = Apollo.MutationFunction<FavoritePostMutation, FavoritePostMutationVariables>;
+export type LikePostMutationFn = Apollo.MutationFunction<LikePostMutation, LikePostMutationVariables>;
 
 /**
- * __useFavoritePostMutation__
+ * __useLikePostMutation__
  *
- * To run a mutation, you first call `useFavoritePostMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useFavoritePostMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useLikePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLikePostMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [favoritePostMutation, { data, loading, error }] = useFavoritePostMutation({
+ * const [likePostMutation, { data, loading, error }] = useLikePostMutation({
  *   variables: {
  *      userId: // value for 'userId'
  *      postId: // value for 'postId'
  *   },
  * });
  */
-export function useFavoritePostMutation(baseOptions?: Apollo.MutationHookOptions<FavoritePostMutation, FavoritePostMutationVariables>) {
+export function useLikePostMutation(baseOptions?: Apollo.MutationHookOptions<LikePostMutation, LikePostMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<FavoritePostMutation, FavoritePostMutationVariables>(FavoritePostDocument, options);
+        return Apollo.useMutation<LikePostMutation, LikePostMutationVariables>(LikePostDocument, options);
       }
-export type FavoritePostMutationHookResult = ReturnType<typeof useFavoritePostMutation>;
-export type FavoritePostMutationResult = Apollo.MutationResult<FavoritePostMutation>;
-export type FavoritePostMutationOptions = Apollo.BaseMutationOptions<FavoritePostMutation, FavoritePostMutationVariables>;
+export type LikePostMutationHookResult = ReturnType<typeof useLikePostMutation>;
+export type LikePostMutationResult = Apollo.MutationResult<LikePostMutation>;
+export type LikePostMutationOptions = Apollo.BaseMutationOptions<LikePostMutation, LikePostMutationVariables>;
 export const GetUserPostsDocument = gql`
     query GetUserPosts($userId: Float!) {
   getUserPosts(userId: $userId) {
     id
     title
     body
-    favorites {
-      id
+    likes {
+      user {
+        id
+      }
     }
   }
 }

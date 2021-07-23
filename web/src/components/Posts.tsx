@@ -3,7 +3,9 @@ import { Button, Card, CardContent, Container, Divider, Grid, makeStyles, Typogr
 import { GetUserPostsQuery } from '../generated/graphql';
 
 interface Props {
-  posts: GetUserPostsQuery['getUserPosts']
+  posts: GetUserPostsQuery['getUserPosts'],
+  likePost: (userId: number, postId: number) => void,
+  user: any
 }
 
 const useStyles = makeStyles({
@@ -21,6 +23,8 @@ const useStyles = makeStyles({
 
 const Posts: React.FC<Props> = (props: any) => {
   const classes = useStyles();
+  console.log('posts', props.user);
+
   return (
     <Container maxWidth="sm">
       {props.posts.map((post: any) => (
@@ -35,10 +39,10 @@ const Posts: React.FC<Props> = (props: any) => {
             <Divider variant="middle" className={classes.divider} />
             <Grid container spacing={3}>
               <Grid item xs={2}>
-                <Button variant="contained" color="primary">Like</Button>
+                <Button variant="contained" color="primary" onClick={() => props.likePost(props.user.id, post.id)}>Like</Button>
               </Grid>
               <Grid item xs={2}>
-                <Typography variant="h6" color="textSecondary">{post.favorites.length}</Typography>
+                <Typography variant="h6" color="textSecondary">{post.likes.length}</Typography>
               </Grid>
             </Grid>
           </CardContent>

@@ -3,8 +3,10 @@ query GetUserPosts($userId: Float!) {
     id
     title
     body
-    favorites {
-      id
+    likes {
+      user {
+        id
+      }
     }
   }
 }

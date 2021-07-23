@@ -1,18 +1,29 @@
 import React from 'react';
 import { Container, Typography } from '@material-ui/core';
 import { useParams } from "react-router-dom";
-import { useGetUserPostsQuery } from '../generated/graphql';
+import { useGetUserPostsQuery, useLikePostMutation } from '../generated/graphql';
 import Posts from '../components/Posts';
 import PrimaryAppBar from '../components/PrimaryAppBar';
 
 const UserProfile: React.FC<any> = ({ location }) => {
   const { id } = useParams<{ id: string }>();
-
+  const [likePost] = useLikePostMutation();
+  console.log('user profile', id, location.state)
   const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: {
       userId: parseInt(id)
-    }
+    },
+    onCompleted: (x) => console.log('data', x)
   });
+
+  const handleLikePost = (userId: number, postId: number) => {
+    likePost({
+      variables: {
+        userId,
+        postId
+      }
+    });
+  }
 
   if (postsLoading) {
     return (
@@ -24,8 +35,10 @@ const UserProfile: React.FC<any> = ({ location }) => {
     <div>
       <PrimaryAppBar />
       <Container fixed maxWidth="sm">
-        {location && <Typography variant="h3">{location.state.userName}</Typography>}
-        {postsData && postsData.getUserPosts && <Posts posts={postsData?.getUserPosts} />}
+        {location && <Typography variant="h3">{`${location.state.user.firstName} ${location.state.user.lastName}`}</Typography>}
+        {postsData && postsData.getUserPosts &&
+          <Posts posts={postsData?.getUserPosts} likePost={handleLikePost} user={location.state.user} />
+        }
       </Container>
     </div>
   );

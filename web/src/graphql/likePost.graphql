@@ -1,0 +1,3 @@
+mutation LikePost($userId: Float!, $postId: Float!) {
+  likePost(userId: $userId, postId: $postId)
+}
