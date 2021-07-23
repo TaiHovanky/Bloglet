@@ -8,12 +8,11 @@ import PrimaryAppBar from '../components/PrimaryAppBar';
 const UserProfile: React.FC<any> = ({ location }) => {
   const { id } = useParams<{ id: string }>();
   const [likePost] = useLikePostMutation();
-  console.log('user profile', id, location.state)
+
   const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: {
       userId: parseInt(id)
-    },
-    onCompleted: (x) => console.log('data', x)
+    }
   });
 
   const handleLikePost = (userId: number, postId: number) => {

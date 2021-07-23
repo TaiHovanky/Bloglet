@@ -25,8 +25,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const Home: React.FC<any> = ({ client }) => {
-  console.log('this', client);
+const Home: React.FC<any> = () => {
   const classes = useStyles();
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({ fetchPolicy: 'network-only' });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
@@ -63,7 +62,6 @@ const Home: React.FC<any> = ({ client }) => {
   }
 
   const handleLikePost = (userId: number, postId: number) => {
-    console.log('handleLikePost', userId, postId);
     likePost({
       variables: {
         userId,

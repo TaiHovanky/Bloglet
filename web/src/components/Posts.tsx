@@ -23,7 +23,6 @@ const useStyles = makeStyles({
 
 const Posts: React.FC<Props> = (props: any) => {
   const classes = useStyles();
-  console.log('posts', props.user);
 
   return (
     <Container maxWidth="sm">
