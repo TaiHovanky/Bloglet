@@ -2,8 +2,8 @@ import React from 'react';
 import { Container, Typography } from '@material-ui/core';
 import { useParams } from "react-router-dom";
 import { useGetUserPostsQuery, useLikePostMutation } from '../generated/graphql';
-import Posts from '../components/Posts';
-import PrimaryAppBar from '../components/PrimaryAppBar';
+import PostList from '../components/post-list/PostList';
+import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
 
 const UserProfile: React.FC<any> = ({ location }) => {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +36,7 @@ const UserProfile: React.FC<any> = ({ location }) => {
       <Container fixed maxWidth="sm">
         {location && <Typography variant="h3">{`${location.state.user.firstName} ${location.state.user.lastName}`}</Typography>}
         {postsData && postsData.getUserPosts &&
-          <Posts posts={postsData?.getUserPosts} likePost={handleLikePost} user={location.state.user} />
+          <PostList posts={postsData?.getUserPosts} likePost={handleLikePost} user={location.state.user} />
         }
       </Container>
     </div>

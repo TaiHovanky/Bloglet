@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Card, CardContent, Container, Divider, Grid, makeStyles, Typography } from '@material-ui/core';
-import { GetUserPostsQuery } from '../generated/graphql';
+import { GetUserPostsQuery } from '../../generated/graphql';
 
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
@@ -21,7 +21,7 @@ const useStyles = makeStyles({
   }
 });
 
-const Posts: React.FC<Props> = (props: any) => {
+const PostList: React.FC<Props> = (props: any) => {
   const classes = useStyles();
 
   return (
@@ -51,4 +51,4 @@ const Posts: React.FC<Props> = (props: any) => {
   )
 };
 
-export default Posts;
+export default PostList;

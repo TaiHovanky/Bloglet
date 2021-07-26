@@ -62,12 +62,12 @@ export class PostResolver {
     @Ctx() { res }: requestContext
   ) {
     try {
-      const postToUpdate: any = await Post
+      const postToUpdate: Post | undefined = await Post
         .findOne({
           where: { id: postId },
           relations: ['likes']
         });
-      const userToUpdate: any = await User
+      const userToUpdate: User | undefined = await User
         .findOne({
           where: { id: userId },
           relations: ['likedPosts']

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
-import { useFormField } from '../hooks/useFormField';
+import { useFormField } from '../../hooks/useFormField';
 
 interface Props {
   handleSubmit: (e: React.FormEvent) => Promise<void>
@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const NewPost: React.FC<Props> = (props: Props) => {
+const NewPostForm: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
   const title = useFormField('', 'title');
   const bodyText = useFormField('', 'title');
@@ -61,4 +61,4 @@ const NewPost: React.FC<Props> = (props: Props) => {
   );
 }
 
-export default NewPost;
+export default NewPostForm;
