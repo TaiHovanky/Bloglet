@@ -1,27 +1,20 @@
 import React, { useEffect } from 'react';
-import { Container, makeStyles, Paper, Typography } from '@material-ui/core';
-import NewPost from '../components/NewPost';
-import Posts from '../components/Posts';
+import { Container, makeStyles } from '@material-ui/core';
+import NewPostForm from '../components/new-post-form/NewPostForm';
+import PostList from '../components/post-list/PostList';
+import SplashPage from '../components/splash-page/SplashPage';
 import {
   useCreatePostMutation,
   useHomePageLazyQuery,
   useGetUserPostsQuery,
   useLikePostMutation
 } from '../generated/graphql';
-import PrimaryAppBar from '../components/PrimaryAppBar';
+import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
 
 const useStyles = makeStyles((theme) => ({
   homePageContainer: {
     paddingTop: '1px',
     height: '100vh'
-  },
-  homePaper: {
-    margin: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
-    paddingTop: theme.spacing(4)
-  },
-  homePageText: {
-    marginTop: theme.spacing(4)
   }
 }));
 
@@ -74,29 +67,20 @@ const Home: React.FC<any> = () => {
     return <div>Loading...</div>;
   }
 
-  if (userData && userData.homePage) {
-    return (
-      <div className={classes.homePageContainer}>
-        <PrimaryAppBar user={userData.homePage} />
-        <Container maxWidth="sm">
-          <NewPost handleSubmit={handleSubmit} />
-          {postsData && postsData.getUserPosts &&
-            <Posts posts={postsData?.getUserPosts} likePost={handleLikePost} user={userData.homePage} />
-          }
-        </Container>
-      </div>
-    );
-  }
-
   return (
     <div className={classes.homePageContainer}>
-      <Paper elevation={3} className={classes.homePaper}>
-        <Container maxWidth="md">
-          <Typography className={classes.homePageText} variant="h3">Welcome to my practice social media app</Typography>
-          <Typography className={classes.homePageText} variant="h5">Share your musings with the world through blog posts</Typography>
-          <Typography className={classes.homePageText} variant="h5">To get started, register yourself as a user or login with an existing account</Typography>
-        </Container>
-      </Paper>
+      {userData && userData.homePage ?
+        <>
+          <PrimaryAppBar user={userData.homePage} />
+          <Container maxWidth="sm">
+            <NewPostForm handleSubmit={handleSubmit} />
+            {postsData && postsData.getUserPosts &&
+              <PostList posts={postsData?.getUserPosts} likePost={handleLikePost} user={userData.homePage} />
+            }
+          </Container>
+        </> :
+        <SplashPage />
+      }
     </div>
   );
 }

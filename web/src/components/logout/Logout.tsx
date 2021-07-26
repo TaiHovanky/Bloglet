@@ -1,7 +1,7 @@
 import React from 'react';
 import { ListItem, ListItemText } from '@material-ui/core';
-import { useLogoutMutation } from '../generated/graphql';
-import { setAccessToken } from '../accessToken';
+import { useLogoutMutation } from '../../generated/graphql';
+import { setAccessToken } from '../../accessToken';
 
 interface Props {}
 

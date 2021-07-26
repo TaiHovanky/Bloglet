@@ -7,7 +7,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { useSearchUsersQuery } from '../generated/graphql';
+import { useSearchUsersQuery } from '../../generated/graphql';
 
 interface Props {
   user?: any,
