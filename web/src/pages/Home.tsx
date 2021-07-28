@@ -10,6 +10,10 @@ import {
   useLikePostMutation
 } from '../generated/graphql';
 import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
+import { useQuery } from '@apollo/client';
+import getCurrentUserProfile from '../cache-queries/current-user-profile';
+import { currentUserProfileVar } from '../cache';
+import User from '../types/user.interface';
 
 const useStyles = makeStyles((theme) => ({
   homePageContainer: {
@@ -20,15 +24,32 @@ const useStyles = makeStyles((theme) => ({
 
 const Home: React.FC<any> = () => {
   const classes = useStyles();
-  const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({ fetchPolicy: 'network-only' });
+  const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({
+    fetchPolicy: 'network-only',
+    onCompleted: (data: any) => {
+      console.log('data', data);
+      if (data && data.homePage) {
+        const { id, email, firstName, lastName } = data.homePage;
+        const user = new User(id, email, firstName, lastName);
+        currentUserProfileVar(user);
+        console.log('currentuser in useEffect', currentUserProfileVar());
+      }
+    }
+  });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
-
+  const currentUserProfile = useQuery(getCurrentUserProfile);
+  console.log('current user profile ', currentUserProfile);
   const { data: postsData, loading: postsLoading, refetch } = useGetUserPostsQuery({
     variables: {
-      userId: userData && userData.homePage && userData.homePage.id ? userData.homePage.id : 0
+      userId: currentUserProfileVar().id
+      // userId: currentUserProfile && currentUserProfile.data  && currentUserProfile.data.currentUserProfile ?
+      //   currentUserProfile.data.currentUserProfile.id : 0
+      // userId: userData && userData.homePage && userData.homePage.id ? userData.homePage.id : 0
     },
-    skip: !userData || !userData.homePage || !userData.homePage.id,
-    onError: (err) => console.log(err)
+    skip: !currentUserProfileVar().id,
+    // skip: !currentUserProfile || !currentUserProfile.data || !currentUserProfile.data.currentUserProfile || currentUserProfile.data.currentUserProfile.id,
+    onError: (err) => console.log(err),
+    onCompleted: (x) => console.log('got user data', x)
   });
 
   const [createPost] = useCreatePostMutation();
