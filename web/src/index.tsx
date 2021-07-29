@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { ApolloClient, ApolloLink, createHttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloLink, createHttpLink } from '@apollo/client';
 import Routes from './Routes';
 import { getAccessToken } from './accessToken';
 import './index.css';
+import cache from './cache';
 
 const httpLink = createHttpLink({
   uri: 'http://localhost:3001/graphql',
@@ -28,7 +29,7 @@ const authLink = new ApolloLink((operation, forward) => {
 
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache()
+  cache
 });
 
 /* ApolloProvider acts similar to React Context and passes the client connection

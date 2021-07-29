@@ -5,7 +5,6 @@ import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import NavBar from './components/navbar/NavBar';
-import UserProfile from './pages/UserProfile';
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -20,19 +19,16 @@ const Routes = () => {
 
   return (
     <BrowserRouter>
-      <div>
-        <header>
-          <NavBar />
-        </header>
-        <main className={classes.content}>
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/register" component={Register} />
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/user/:id" component={UserProfile} />
-          </Switch>
-        </main>
-      </div>
+      <header>
+        <NavBar />
+      </header>
+      <main className={classes.content}>
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/register" component={Register} />
+          <Route exact path="/login" component={Login} />
+        </Switch>
+      </main>
     </BrowserRouter>
   );
 }
