@@ -6,7 +6,6 @@ import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
-// import { useHistory } from 'react-router-dom';
 import { useSearchUsersQuery } from '../../generated/graphql';
 import { currentUserProfileVar } from '../../cache';
 import User from '../../types/user.interface';
@@ -79,7 +78,6 @@ const useStyles = makeStyles((theme) => ({
 
 const PrimaryAppBar = ({ user }: Props) => {
   const classes = useStyles();
-  // const history = useHistory();
 
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
@@ -100,12 +98,6 @@ const PrimaryAppBar = ({ user }: Props) => {
   };
 
   const handleMenuClick = (user: User) => {
-    // history.push({
-    //   pathname:`/user/${user.id}`,
-    //   state: {
-    //     user
-    //   }
-    // });
     currentUserProfileVar(user);
     handleClose();
   };
@@ -167,7 +159,11 @@ const PrimaryAppBar = ({ user }: Props) => {
                     <ClickAwayListener onClickAway={handleClose}>
                       <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
                         {data && data.searchUsers?.map(
-                          (user, index) => <MenuItem key={index} onClick={() => handleMenuClick(user)}>{user.firstName} {user.lastName}</MenuItem>
+                          (user, index) => (
+                            <MenuItem key={index} onClick={() => handleMenuClick(user)}>
+                              {user.firstName} {user.lastName}
+                            </MenuItem>
+                          )
                         )}
                       </MenuList>
                     </ClickAwayListener>

@@ -13,7 +13,6 @@ import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
 import { useQuery } from '@apollo/client';
 import getCurrentUserProfile from '../cache-queries/current-user-profile';
 import { currentUserProfileVar } from '../cache';
-import User from '../types/user.interface';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -28,15 +27,19 @@ const Home: React.FC<any> = () => {
     fetchPolicy: 'network-only',
     onCompleted: (data: any) => {
       if (data && data.homePage) {
-        const { id, email, firstName, lastName } = data.homePage;
-        const user = new User(id, email, firstName, lastName);
-        currentUserProfileVar(user);
+        const {__typename, ...newUser} = data.homePage;
+        currentUserProfileVar(newUser); /* this updates the local Apollo state in the cache for the currentUserProfileVar
+        reactive variable. Instead of using routing to open a user profile, I'll be using local state to determine
+        which user posts to display. In primaryAppBar, when a user is searched for and selected, currentUserProfileVar
+        is updated, causing the useGetUserPostsQuery to call with a new userId. */
       }
     }
   });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
+
   const currentUserProfile = useQuery(getCurrentUserProfile);
   console.log('current user profile ', currentUserProfile);
+
   const { data: postsData, loading: postsLoading, refetch } = useGetUserPostsQuery({
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
@@ -51,7 +54,7 @@ const Home: React.FC<any> = () => {
       homePageQueryExecutor();
     },
     [homePageQueryExecutor]
-  );
+  ); /* This calls the homePageQuery once to get the currently logged in user */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
