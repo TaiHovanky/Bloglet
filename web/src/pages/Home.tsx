@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Container, makeStyles } from '@material-ui/core';
+import { Container, makeStyles, Typography } from '@material-ui/core';
 import NewPostForm from '../components/new-post-form/NewPostForm';
 import PostList from '../components/post-list/PostList';
 import SplashPage from '../components/splash-page/SplashPage';
@@ -15,7 +15,7 @@ import getCurrentUserProfile from '../cache-queries/current-user-profile';
 import { currentUserProfileVar } from '../cache';
 import User from '../types/user.interface';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   homePageContainer: {
     paddingTop: '1px',
     height: '100vh'
@@ -27,12 +27,10 @@ const Home: React.FC<any> = () => {
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({
     fetchPolicy: 'network-only',
     onCompleted: (data: any) => {
-      console.log('data', data);
       if (data && data.homePage) {
         const { id, email, firstName, lastName } = data.homePage;
         const user = new User(id, email, firstName, lastName);
         currentUserProfileVar(user);
-        console.log('currentuser in useEffect', currentUserProfileVar());
       }
     }
   });
@@ -40,16 +38,9 @@ const Home: React.FC<any> = () => {
   const currentUserProfile = useQuery(getCurrentUserProfile);
   console.log('current user profile ', currentUserProfile);
   const { data: postsData, loading: postsLoading, refetch } = useGetUserPostsQuery({
-    variables: {
-      userId: currentUserProfileVar().id
-      // userId: currentUserProfile && currentUserProfile.data  && currentUserProfile.data.currentUserProfile ?
-      //   currentUserProfile.data.currentUserProfile.id : 0
-      // userId: userData && userData.homePage && userData.homePage.id ? userData.homePage.id : 0
-    },
+    variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
-    // skip: !currentUserProfile || !currentUserProfile.data || !currentUserProfile.data.currentUserProfile || currentUserProfile.data.currentUserProfile.id,
-    onError: (err) => console.log(err),
-    onCompleted: (x) => console.log('got user data', x)
+    onError: (err) => console.log(err)
   });
 
   const [createPost] = useCreatePostMutation();
@@ -94,6 +85,7 @@ const Home: React.FC<any> = () => {
         <>
           <PrimaryAppBar user={userData.homePage} />
           <Container maxWidth="sm">
+          <Typography variant="h3">{`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}</Typography>
             <NewPostForm handleSubmit={handleSubmit} />
             {postsData && postsData.getUserPosts &&
               <PostList posts={postsData?.getUserPosts} likePost={handleLikePost} user={userData.homePage} />
