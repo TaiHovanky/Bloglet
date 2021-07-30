@@ -7,7 +7,9 @@ import {
   useCreatePostMutation,
   useHomePageLazyQuery,
   useGetUserPostsQuery,
-  useLikePostMutation
+  useLikePostMutation,
+  Post,
+  UserLikesPosts
 } from '../generated/graphql';
 import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
 import { useQuery } from '@apollo/client';
@@ -69,11 +71,25 @@ const Home: React.FC<any> = () => {
     refetch(); // is needed to refetch the posts query
   }
 
-  const handleLikePost = (userId: number, postId: number) => {
+  const handleLikePost = (userId: number, post: Post) => {
     likePost({
       variables: {
         userId,
-        postId
+        postId: post.id
+      },
+      optimisticResponse: {
+        likePost: [
+          {
+            __typename: 'Post',
+            id: post.id,
+            title: post.title,
+            body: post.body,
+            likes: [
+              ...post.likes as Array<UserLikesPosts>,
+              { __typename: 'UserLikesPosts', user: { __typename: 'User', id: userId }} as UserLikesPosts
+            ]
+          }
+        ]
       }
     });
   }

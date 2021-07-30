@@ -6,6 +6,7 @@ import { isAuthenticated } from '../utils/isAuthenticated';
 import { User } from '../entity/User';
 import { UserLikesPosts } from '../entity/Likes';
 
+
 @Resolver()
 export class PostResolver {
   @Query(() => [Post], { nullable: true })
@@ -54,7 +55,7 @@ export class PostResolver {
     return true;
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => [Post], { nullable: true })
   @UseMiddleware(isAuthenticated)
   async likePost(
     @Arg('postId') postId: number,
@@ -75,13 +76,14 @@ export class PostResolver {
 
       if (postToUpdate && userToUpdate) {
         const likePost = new UserLikesPosts(userToUpdate, postToUpdate);
-        await UserLikesPosts.save(likePost);
-        return true;
+        const successfulLike = await UserLikesPosts.save(likePost);
+        postToUpdate.likes = [...postToUpdate.likes, successfulLike]
+        return [postToUpdate];
       }
-      return false;
+      return null;
     } catch(err) {
       errorHandler('Failed to like post', res);
-      return false;
+      return null;
     }
   }
 }
