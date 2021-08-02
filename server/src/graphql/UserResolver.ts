@@ -114,4 +114,18 @@ export class UserResolver {
     }
     return null;
   }
+
+  @Mutation(() => User, { nullable: true })
+  async followUser(
+    @Arg('userToBeFollowed') userToBeFollowed: number,
+    @Arg('loggedInUser') loggedInUser: number,
+    @Ctx() { res }: requestContext
+  ) {
+    try {
+      
+    } catch (err) {
+      errorHandler('Failed to like post', res);
+      return null;
+    }
+  }
 }

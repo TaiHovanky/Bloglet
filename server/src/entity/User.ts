@@ -30,4 +30,10 @@ export class User extends BaseEntity {
   @Field(() => [UserLikesPosts], { nullable: true })
   @OneToMany(() => UserLikesPosts, (likes: UserLikesPosts) => likes.user)
   likedPosts: Array<UserLikesPosts>;
+
+  @Field(() => [User], { nullable: true })
+  following: Array<User>;
+
+  @Field(() => [User], { nullable: true })
+  followers: Array<User>;
 }

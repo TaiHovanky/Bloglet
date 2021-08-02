@@ -15,6 +15,7 @@ import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
 import { useQuery } from '@apollo/client';
 import getCurrentUserProfile from '../cache-queries/current-user-profile';
 import { currentUserProfileVar } from '../cache';
+import FollowButton from '../components/follow-button/FollowButton';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -94,6 +95,10 @@ const Home: React.FC<any> = () => {
     });
   }
 
+  // const handleFollow = (userToBeFollowed: number, loggedInUser: number) => {
+    
+  // }
+
   if (loading || postsLoading) {
     return <div>Loading...</div>;
   }
@@ -104,7 +109,10 @@ const Home: React.FC<any> = () => {
         <>
           <PrimaryAppBar user={userData.homePage} />
           <Container maxWidth="sm">
-          <Typography variant="h3">{`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}</Typography>
+            <>
+              <Typography variant="h3">{`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}</Typography>
+              <FollowButton loggedInUser={userData.homePage.id} userToBeFollowed={currentUserProfileVar().id} />
+            </>
             <NewPostForm handleSubmit={handleSubmit} />
             {postsData && postsData.getUserPosts &&
               <PostList posts={postsData?.getUserPosts} likePost={handleLikePost} user={userData.homePage} />
