@@ -95,10 +95,6 @@ const Home: React.FC<any> = () => {
     });
   }
 
-  // const handleFollow = (userToBeFollowed: number, loggedInUser: number) => {
-    
-  // }
-
   if (loading || postsLoading) {
     return <div>Loading...</div>;
   }

@@ -6,7 +6,6 @@ import { isAuthenticated } from '../utils/isAuthenticated';
 import { User } from '../entity/User';
 import { UserLikesPosts } from '../entity/Likes';
 
-
 @Resolver()
 export class PostResolver {
   @Query(() => [Post], { nullable: true })
