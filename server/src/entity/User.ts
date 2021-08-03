@@ -1,6 +1,7 @@
-import { Field, ObjectType } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from "typeorm";
-import { UserLikesPosts } from "./Likes";
+import { Field, ObjectType } from 'type-graphql';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
+import { Follows } from './Follows';
+import { UserLikesPosts } from './Likes';
 
 @ObjectType()
 @Entity('users')
@@ -32,8 +33,12 @@ export class User extends BaseEntity {
   likedPosts: Array<UserLikesPosts>;
 
   @Field(() => [User], { nullable: true })
-  following: Array<User>;
+  @OneToMany(() => Follows, (follows: Follows) => follows.user)
+  /* The inverse relationship corresponds to the way the field is defined 
+  in Follows */
+  following: Array<Follows>;
 
   @Field(() => [User], { nullable: true })
-  followers: Array<User>;
+  @OneToMany(() => Follows, (follows: Follows) => follows.follower)
+  followers: Array<Follows>;
 }

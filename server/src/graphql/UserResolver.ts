@@ -7,6 +7,8 @@ import { createAccessToken, createRefreshToken } from '../utils/createTokens';
 import { requestContext } from '../types/context';
 import { isAuthenticated } from '../utils/isAuthenticated';
 import { Like } from 'typeorm';
+import { Follows } from '../entity/Follows';
+import { FollowUserResult } from '../types/followUserResult';
 
 @ObjectType()
 class LoginResponse {
@@ -115,14 +117,29 @@ export class UserResolver {
     return null;
   }
 
-  @Mutation(() => User, { nullable: true })
+  @Mutation(() => FollowUserResult, { nullable: true })
   async followUser(
     @Arg('userToBeFollowed') userToBeFollowed: number,
     @Arg('loggedInUser') loggedInUser: number,
     @Ctx() { res }: requestContext
   ) {
     try {
-      
+      const updatedLoggedInUser = await User.findOne({
+        where: { id: loggedInUser },
+        relations: ['following']
+      });
+      const updatedUserToBeFollowed = await User.findOne({
+        where: { id: userToBeFollowed },
+        relations: ['followers']
+      });
+      if (updatedLoggedInUser && updatedUserToBeFollowed) {
+        const followUser = new Follows(updatedUserToBeFollowed.id, updatedLoggedInUser.id)
+        const successfulFollow = await Follows.save(followUser);
+        updatedLoggedInUser.following = [...updatedLoggedInUser.following, successfulFollow];
+        updatedUserToBeFollowed.followers = [...updatedUserToBeFollowed.followers, successfulFollow];
+        return new FollowUserResult(updatedLoggedInUser, updatedUserToBeFollowed);
+      }
+      return null;
     } catch (err) {
       errorHandler('Failed to like post', res);
       return null;
