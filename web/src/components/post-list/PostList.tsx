@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button, Card, CardContent, Container, Divider, Grid, makeStyles, Typography } from '@material-ui/core';
-import { GetUserPostsQuery } from '../../generated/graphql';
+import { GetUserPostsQuery, Post } from '../../generated/graphql';
 
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
-  likePost: (userId: number, postId: number) => void,
+  likePost: (userId: number, post: Post) => void,
   user: any
 }
 
@@ -38,7 +38,7 @@ const PostList: React.FC<Props> = (props: any) => {
             <Divider variant="middle" className={classes.divider} />
             <Grid container spacing={3}>
               <Grid item xs={2}>
-                <Button variant="contained" color="primary" onClick={() => props.likePost(props.user.id, post.id)}>Like</Button>
+                <Button variant="contained" color="primary" onClick={() => props.likePost(props.user.id, post)}>Like</Button>
               </Grid>
               <Grid item xs={2}>
                 <Typography variant="h6" color="textSecondary">{post.likes.length}</Typography>

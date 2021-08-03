@@ -7,12 +7,15 @@ import {
   useCreatePostMutation,
   useHomePageLazyQuery,
   useGetUserPostsQuery,
-  useLikePostMutation
+  useLikePostMutation,
+  Post,
+  UserLikesPosts
 } from '../generated/graphql';
 import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
 import { useQuery } from '@apollo/client';
 import getCurrentUserProfile from '../cache-queries/current-user-profile';
 import { currentUserProfileVar } from '../cache';
+import FollowButton from '../components/follow-button/FollowButton';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -69,11 +72,25 @@ const Home: React.FC<any> = () => {
     refetch(); // is needed to refetch the posts query
   }
 
-  const handleLikePost = (userId: number, postId: number) => {
+  const handleLikePost = (userId: number, post: Post) => {
     likePost({
       variables: {
         userId,
-        postId
+        postId: post.id
+      },
+      optimisticResponse: {
+        likePost: [
+          {
+            __typename: 'Post',
+            id: post.id,
+            title: post.title,
+            body: post.body,
+            likes: [
+              ...post.likes as Array<UserLikesPosts>,
+              { __typename: 'UserLikesPosts', user: { __typename: 'User', id: userId }} as UserLikesPosts
+            ]
+          }
+        ]
       }
     });
   }
@@ -88,7 +105,10 @@ const Home: React.FC<any> = () => {
         <>
           <PrimaryAppBar user={userData.homePage} />
           <Container maxWidth="sm">
-          <Typography variant="h3">{`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}</Typography>
+            <>
+              <Typography variant="h3">{`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}</Typography>
+              <FollowButton loggedInUser={userData.homePage.id} userToBeFollowed={currentUserProfileVar().id} />
+            </>
             <NewPostForm handleSubmit={handleSubmit} />
             {postsData && postsData.getUserPosts &&
               <PostList posts={postsData?.getUserPosts} likePost={handleLikePost} user={userData.homePage} />

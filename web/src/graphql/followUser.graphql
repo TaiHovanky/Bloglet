@@ -1,0 +1,8 @@
+mutation FollowUser (userToBeFollowed: number, loggedInUser: number) {
+  followUser(userToBeFollowed: $userToBeFollowed, loggedInUser: $loggedInUser) {
+    id
+    firstName
+    lastName
+    email
+  }
+}
