@@ -32,13 +32,13 @@ export class User extends BaseEntity {
   @OneToMany(() => UserLikesPosts, (likes: UserLikesPosts) => likes.user)
   likedPosts: Array<UserLikesPosts>;
 
-  @Field(() => [User], { nullable: true })
-  @OneToMany(() => Follows, (follows: Follows) => follows.user)
+  @Field(() => [Follows], { nullable: true })
+  @OneToMany(() => Follows, (follows: Follows) => follows.following)
   /* The inverse relationship corresponds to the way the field is defined 
   in Follows */
   following: Array<Follows>;
 
-  @Field(() => [User], { nullable: true })
+  @Field(() => [Follows], { nullable: true })
   @OneToMany(() => Follows, (follows: Follows) => follows.follower)
   followers: Array<Follows>;
 }
