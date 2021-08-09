@@ -32,8 +32,8 @@ export class PostResolver {
     @Ctx() { res }: requestContext
   ) {
     return Post.find({ where: { id: postId }})
-      .catch(() => {
-        errorHandler('Failed to get post', res);
+      .catch((err) => {
+        errorHandler(`Failed to get post: ${err}`, res);
       });
   }
 
@@ -42,14 +42,15 @@ export class PostResolver {
   async createPost(
     @Arg('creatorId') creatorId: number, 
     @Arg('title') title: string,
-    @Arg('body') body: string
+    @Arg('body') body: string,
+    @Ctx() { res }: requestContext
   ) {
     await Post.insert({
       creatorId, 
       title,
       body
     }).catch((err) => {
-      errorHandler('Post creation failed', err);
+      errorHandler(`Post creation failed: ${err}`, res);
       return false;
     });
     return true;
@@ -82,7 +83,7 @@ export class PostResolver {
       }
       return null;
     } catch(err) {
-      errorHandler('Failed to like post', res);
+      errorHandler(`Failed to like post: ${err}`, res);
       return null;
     }
   }

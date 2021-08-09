@@ -119,8 +119,8 @@ export class UserResolver {
 
   @Mutation(() => FollowUserResult, { nullable: true })
   async followUser(
-    @Arg('userToBeFollowed') userToBeFollowed: number,
     @Arg('loggedInUser') loggedInUser: number,
+    @Arg('userToBeFollowed') userToBeFollowed: number,
     @Ctx() { res }: requestContext
   ) {
     try {
@@ -133,7 +133,7 @@ export class UserResolver {
         relations: ['followers']
       });
       if (updatedLoggedInUser && updatedUserToBeFollowed) {
-        const followUser = new Follows(updatedUserToBeFollowed.id, updatedLoggedInUser.id)
+        const followUser = new Follows(updatedUserToBeFollowed, updatedLoggedInUser)
         const successfulFollow = await Follows.save(followUser);
         updatedLoggedInUser.following = [...updatedLoggedInUser.following, successfulFollow];
         updatedUserToBeFollowed.followers = [...updatedUserToBeFollowed.followers, successfulFollow];
@@ -141,7 +141,7 @@ export class UserResolver {
       }
       return null;
     } catch (err) {
-      errorHandler('Failed to like post', res);
+      errorHandler(`Failed to like post: ${err}`, res);
       return null;
     }
   }

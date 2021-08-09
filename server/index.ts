@@ -12,6 +12,7 @@ import { UserResolver } from './src/graphql/UserResolver';
 import { User } from './src/entity/User';
 import { sendRefreshToken } from './src/utils/sendRefreshToken';
 import { PostResolver } from './src/graphql/PostResolver';
+import { FollowerResolver } from './src/graphql/FollowerResolver';
 
 (async () => {
   const app = express();
@@ -26,7 +27,7 @@ import { PostResolver } from './src/graphql/PostResolver';
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, PostResolver]
+      resolvers: [UserResolver, PostResolver, FollowerResolver]
     }),
     context: ({ req, res }) => ({ req, res })
     // needed or else Ctx doesn't pass into mutations/queries

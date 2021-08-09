@@ -6,24 +6,24 @@ import { User } from './User';
 @Entity({ name: 'user_follows_user' })
 export class Follows extends BaseEntity {
   constructor(
-    user: number,
-    follower: number
+    following: User,
+    follower: User
   ) {
     super();
-    this.user = user;
+    this.following = following;
     this.follower = follower;
   }
 
   @Field()
   @PrimaryGeneratedColumn() id: number;
 
-  @Field(() => Number, { nullable: true })
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user: User) => user.followers)
   @JoinColumn({ name: 'follower_id' })
-  follower: Number;
+  follower: User;
 
-  @Field(() => Number, { nullable: true })
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user: User) => user.following)
-  @JoinColumn({ name: 'user_id' })
-  user: Number;
+  @JoinColumn({ name: 'following_id' })
+  following: User;
 }
