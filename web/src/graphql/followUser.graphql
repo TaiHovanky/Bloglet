@@ -1,8 +1,21 @@
-mutation FollowUser (userToBeFollowed: number, loggedInUser: number) {
+mutation FollowUser ($userToBeFollowed: Float!, $loggedInUser: Float!) {
   followUser(userToBeFollowed: $userToBeFollowed, loggedInUser: $loggedInUser) {
-    id
-    firstName
-    lastName
-    email
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
+    followedUser {
+      id
+      firstName
+      lastName
+      email
+      followers {
+        follower {
+          id
+        }
+      }
+    }
   }
 }

@@ -14,6 +14,19 @@ export type Scalars = {
   Float: number;
 };
 
+export type FollowUserResult = {
+  __typename?: 'FollowUserResult';
+  user: User;
+  followedUser: User;
+};
+
+export type Follows = {
+  __typename?: 'Follows';
+  id: Scalars['Float'];
+  follower?: Maybe<User>;
+  following?: Maybe<User>;
+};
+
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   token: Scalars['String'];
@@ -25,6 +38,7 @@ export type Mutation = {
   register: Scalars['Boolean'];
   login: LoginResponse;
   logout: Scalars['Boolean'];
+  followUser?: Maybe<FollowUserResult>;
   createPost: Scalars['Boolean'];
   likePost?: Maybe<Array<Post>>;
 };
@@ -41,6 +55,12 @@ export type MutationRegisterArgs = {
 export type MutationLoginArgs = {
   password: Scalars['String'];
   email: Scalars['String'];
+};
+
+
+export type MutationFollowUserArgs = {
+  userToBeFollowed: Scalars['Float'];
+  loggedInUser: Scalars['Float'];
 };
 
 
@@ -68,11 +88,12 @@ export type Post = {
 export type Query = {
   __typename?: 'Query';
   users: Array<User>;
-  hello: Scalars['String'];
   homePage?: Maybe<User>;
   searchUsers?: Maybe<Array<User>>;
   getUserPosts?: Maybe<Array<Post>>;
   getPost: Post;
+  getFollowers?: Maybe<Array<Follows>>;
+  getFollowing?: Maybe<Array<Follows>>;
 };
 
 
@@ -90,6 +111,16 @@ export type QueryGetPostArgs = {
   postId: Scalars['Float'];
 };
 
+
+export type QueryGetFollowersArgs = {
+  userId: Scalars['Float'];
+};
+
+
+export type QueryGetFollowingArgs = {
+  userId: Scalars['Float'];
+};
+
 export type User = {
   __typename?: 'User';
   id: Scalars['Float'];
@@ -97,6 +128,8 @@ export type User = {
   lastName: Scalars['String'];
   email: Scalars['String'];
   likedPosts?: Maybe<Array<UserLikesPosts>>;
+  following?: Maybe<Array<Follows>>;
+  followers?: Maybe<Array<Follows>>;
 };
 
 export type UserLikesPosts = {
@@ -118,6 +151,65 @@ export type CreatePostMutation = (
   & Pick<Mutation, 'createPost'>
 );
 
+export type FollowUserMutationVariables = Exact<{
+  userToBeFollowed: Scalars['Float'];
+  loggedInUser: Scalars['Float'];
+}>;
+
+
+export type FollowUserMutation = (
+  { __typename?: 'Mutation' }
+  & { followUser?: Maybe<(
+    { __typename?: 'FollowUserResult' }
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+    ), followedUser: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+      & { followers?: Maybe<Array<(
+        { __typename?: 'Follows' }
+        & { follower?: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'id'>
+        )> }
+      )>> }
+    ) }
+  )> }
+);
+
+export type GetFollowersQueryVariables = Exact<{
+  userId: Scalars['Float'];
+}>;
+
+
+export type GetFollowersQuery = (
+  { __typename?: 'Query' }
+  & { getFollowers?: Maybe<Array<(
+    { __typename?: 'Follows' }
+    & { follower?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName'>
+    )> }
+  )>> }
+);
+
+export type GetFollowingQueryVariables = Exact<{
+  userId: Scalars['Float'];
+}>;
+
+
+export type GetFollowingQuery = (
+  { __typename?: 'Query' }
+  & { getFollowing?: Maybe<Array<(
+    { __typename?: 'Follows' }
+    & { following?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName'>
+    )> }
+  )>> }
+);
+
 export type GetUserPostsQueryVariables = Exact<{
   userId: Scalars['Float'];
 }>;
@@ -136,14 +228,6 @@ export type GetUserPostsQuery = (
       )> }
     )>> }
   )>> }
-);
-
-export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type HelloQuery = (
-  { __typename?: 'Query' }
-  & Pick<Query, 'hello'>
 );
 
 export type HomePageQueryVariables = Exact<{ [key: string]: never; }>;
@@ -264,6 +348,134 @@ export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
+export const FollowUserDocument = gql`
+    mutation FollowUser($userToBeFollowed: Float!, $loggedInUser: Float!) {
+  followUser(userToBeFollowed: $userToBeFollowed, loggedInUser: $loggedInUser) {
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
+    followedUser {
+      id
+      firstName
+      lastName
+      email
+      followers {
+        follower {
+          id
+        }
+      }
+    }
+  }
+}
+    `;
+export type FollowUserMutationFn = Apollo.MutationFunction<FollowUserMutation, FollowUserMutationVariables>;
+
+/**
+ * __useFollowUserMutation__
+ *
+ * To run a mutation, you first call `useFollowUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useFollowUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [followUserMutation, { data, loading, error }] = useFollowUserMutation({
+ *   variables: {
+ *      userToBeFollowed: // value for 'userToBeFollowed'
+ *      loggedInUser: // value for 'loggedInUser'
+ *   },
+ * });
+ */
+export function useFollowUserMutation(baseOptions?: Apollo.MutationHookOptions<FollowUserMutation, FollowUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<FollowUserMutation, FollowUserMutationVariables>(FollowUserDocument, options);
+      }
+export type FollowUserMutationHookResult = ReturnType<typeof useFollowUserMutation>;
+export type FollowUserMutationResult = Apollo.MutationResult<FollowUserMutation>;
+export type FollowUserMutationOptions = Apollo.BaseMutationOptions<FollowUserMutation, FollowUserMutationVariables>;
+export const GetFollowersDocument = gql`
+    query GetFollowers($userId: Float!) {
+  getFollowers(userId: $userId) {
+    follower {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFollowersQuery__
+ *
+ * To run a query within a React component, call `useGetFollowersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFollowersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFollowersQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetFollowersQuery(baseOptions: Apollo.QueryHookOptions<GetFollowersQuery, GetFollowersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFollowersQuery, GetFollowersQueryVariables>(GetFollowersDocument, options);
+      }
+export function useGetFollowersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFollowersQuery, GetFollowersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFollowersQuery, GetFollowersQueryVariables>(GetFollowersDocument, options);
+        }
+export type GetFollowersQueryHookResult = ReturnType<typeof useGetFollowersQuery>;
+export type GetFollowersLazyQueryHookResult = ReturnType<typeof useGetFollowersLazyQuery>;
+export type GetFollowersQueryResult = Apollo.QueryResult<GetFollowersQuery, GetFollowersQueryVariables>;
+export const GetFollowingDocument = gql`
+    query GetFollowing($userId: Float!) {
+  getFollowing(userId: $userId) {
+    following {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFollowingQuery__
+ *
+ * To run a query within a React component, call `useGetFollowingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFollowingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFollowingQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetFollowingQuery(baseOptions: Apollo.QueryHookOptions<GetFollowingQuery, GetFollowingQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFollowingQuery, GetFollowingQueryVariables>(GetFollowingDocument, options);
+      }
+export function useGetFollowingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFollowingQuery, GetFollowingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFollowingQuery, GetFollowingQueryVariables>(GetFollowingDocument, options);
+        }
+export type GetFollowingQueryHookResult = ReturnType<typeof useGetFollowingQuery>;
+export type GetFollowingLazyQueryHookResult = ReturnType<typeof useGetFollowingLazyQuery>;
+export type GetFollowingQueryResult = Apollo.QueryResult<GetFollowingQuery, GetFollowingQueryVariables>;
 export const GetUserPostsDocument = gql`
     query GetUserPosts($userId: Float!) {
   getUserPosts(userId: $userId) {
@@ -306,38 +518,6 @@ export function useGetUserPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetUserPostsQueryHookResult = ReturnType<typeof useGetUserPostsQuery>;
 export type GetUserPostsLazyQueryHookResult = ReturnType<typeof useGetUserPostsLazyQuery>;
 export type GetUserPostsQueryResult = Apollo.QueryResult<GetUserPostsQuery, GetUserPostsQueryVariables>;
-export const HelloDocument = gql`
-    query Hello {
-  hello
-}
-    `;
-
-/**
- * __useHelloQuery__
- *
- * To run a query within a React component, call `useHelloQuery` and pass it any options that fit your needs.
- * When your component renders, `useHelloQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHelloQuery({
- *   variables: {
- *   },
- * });
- */
-export function useHelloQuery(baseOptions?: Apollo.QueryHookOptions<HelloQuery, HelloQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HelloQuery, HelloQueryVariables>(HelloDocument, options);
-      }
-export function useHelloLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HelloQuery, HelloQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HelloQuery, HelloQueryVariables>(HelloDocument, options);
-        }
-export type HelloQueryHookResult = ReturnType<typeof useHelloQuery>;
-export type HelloLazyQueryHookResult = ReturnType<typeof useHelloLazyQuery>;
-export type HelloQueryResult = Apollo.QueryResult<HelloQuery, HelloQueryVariables>;
 export const HomePageDocument = gql`
     query HomePage {
   homePage {
