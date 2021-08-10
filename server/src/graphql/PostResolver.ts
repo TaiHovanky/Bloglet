@@ -11,7 +11,8 @@ export class PostResolver {
   @Query(() => [Post], { nullable: true })
   @UseMiddleware(isAuthenticated)
   async getUserPosts(
-    @Arg('userId') userId: number
+    @Arg('userId') userId: number,
+    @Ctx() { res }: requestContext
   ) {
     return Post
       .createQueryBuilder('posts')
@@ -20,7 +21,7 @@ export class PostResolver {
       .leftJoinAndMapOne('likes.user', 'users', 'users', 'likes.user_id = users.id')
       .getMany()
       .catch((err) => {
-        console.log('err', err);
+        errorHandler(`Failed to get user posts: ${err}`, res);
         return null;
       });
   }
@@ -31,9 +32,7 @@ export class PostResolver {
     @Ctx() { res }: requestContext
   ) {
     return Post.find({ where: { id: postId }})
-      .catch((err) => {
-        errorHandler(`Failed to get post: ${err}`, res);
-      });
+      .catch((err) => errorHandler(`Failed to get post: ${err}`, res));
   }
 
   @Mutation(() => Boolean)

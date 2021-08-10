@@ -1,16 +1,26 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
+import { useFollowUserMutation } from '../../generated/graphql';
 
 interface Props {
-  userToBeFollowed: number,
-  loggedInUser: number
+  loggedInUser: number,
+  userToBeFollowed: number
 }
 
-const FollowButton = (props: Props) => {
-  console.log('follow button props', props);
+const FollowButton = ({ loggedInUser, userToBeFollowed }: Props) => {
+  const [followUser] = useFollowUserMutation();
+
+  const handleClick = () => {
+    followUser({
+      variables: {
+        loggedInUser,
+        userToBeFollowed
+      }
+    });
+  }
 
   return (
-    <Button variant="contained" color="primary">Follow</Button>
+    <Button variant="contained" color="primary" onClick={handleClick}>Follow</Button>
   );
 }
 

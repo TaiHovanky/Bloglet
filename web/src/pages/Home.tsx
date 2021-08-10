@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography } from '@material-ui/core';
+import { useQuery } from '@apollo/client';
 import NewPostForm from '../components/new-post-form/NewPostForm';
 import PostList from '../components/post-list/PostList';
 import SplashPage from '../components/splash-page/SplashPage';
@@ -12,10 +13,10 @@ import {
   UserLikesPosts
 } from '../generated/graphql';
 import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
-import { useQuery } from '@apollo/client';
 import getCurrentUserProfile from '../cache-queries/current-user-profile';
 import { currentUserProfileVar } from '../cache';
 import FollowButton from '../components/follow-button/FollowButton';
+import UserFollows from '../components/user-follows/UserFollows';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -108,6 +109,7 @@ const Home: React.FC<any> = () => {
             <>
               <Typography variant="h3">{`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}</Typography>
               <FollowButton loggedInUser={userData.homePage.id} userToBeFollowed={currentUserProfileVar().id} />
+              <UserFollows userId={currentUserProfileVar().id} />
             </>
             <NewPostForm handleSubmit={handleSubmit} />
             {postsData && postsData.getUserPosts &&
