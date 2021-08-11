@@ -12,8 +12,11 @@ mutation FollowUser ($userToBeFollowed: Float!, $loggedInUser: Float!) {
       lastName
       email
       followers {
+        id
         follower {
           id
+          firstName
+          lastName
         }
       }
     }

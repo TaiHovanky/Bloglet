@@ -1,24 +1,28 @@
 import React from 'react';
 import { Typography } from '@material-ui/core';
-import { useGetFollowersQuery, useGetFollowingQuery } from '../../generated/graphql';
 
 interface Props {
-  userId: number;
+  followers: any;
+  following: any;
+  followerLoading: boolean;
+  followingLoading: boolean;
 }
 
-const UserFollows = ({ userId }: Props) => {
-  const { data: followingData, loading: followingLoading } = useGetFollowingQuery({ variables: { userId } });
-
-  const { data: followerData, loading: followerLoading } = useGetFollowersQuery({ variables: { userId } });
-
+const UserFollows = ({
+  followers,
+  following,
+  followerLoading,
+  followingLoading
+}: Props) => {
+  
   if (followingLoading || followerLoading) {
     return (<>Loading</>);
   }
 
   return (
     <>
-      <Typography variant="h5">Following: {followingData ? followingData?.getFollowing?.length : 0}</Typography>
-      <Typography variant="h5">Followers: {followerData ? followerData?.getFollowers?.length : 0}</Typography>
+      <Typography variant="h5">Following: {following ? following?.getFollowing?.length : 0}</Typography>
+      <Typography variant="h5">Followers: {followers ? followers?.getFollowers?.length : 0}</Typography>
     </>
   );
 }
