@@ -1,10 +1,10 @@
 import './App.css';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
-import Home from './pages/Home';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import NavBar from './components/navbar/NavBar';
+import Home from './pages/home';
+import Register from './pages/register';
+import Login from './pages/login';
+import NavBar from './components/navbar';
 
 const useStyles = makeStyles((theme) => ({
   content: {

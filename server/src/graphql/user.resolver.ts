@@ -1,14 +1,12 @@
 import bcrypt, { compare } from 'bcryptjs';
-import { errorHandler } from '../utils/errorHandler';
+import { Like } from 'typeorm';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { User } from '../entity/User';
-import { sendRefreshToken } from '../utils/sendRefreshToken';
-import { createAccessToken, createRefreshToken } from '../utils/createTokens';
-import { requestContext } from '../types/context';
-import { isAuthenticated } from '../utils/isAuthenticated';
-import { Like } from 'typeorm';
-import { Follows } from '../entity/Follows';
-import { FollowUserResult } from '../types/followUserResult';
+import { requestContext } from '../types/context.interface';
+import { sendRefreshToken } from '../utils/send-refresh-token.util';
+import { errorHandler } from '../utils/error-handler.util';
+import { createAccessToken, createRefreshToken } from '../utils/create-tokens.util';
+import { isAuthenticated } from '../utils/is-authenticated.util';
 
 @ObjectType()
 class LoginResponse {
@@ -114,34 +112,5 @@ export class UserResolver {
         });
     }
     return null;
-  }
-
-  @Mutation(() => FollowUserResult, { nullable: true })
-  async followUser(
-    @Arg('loggedInUser') loggedInUser: number,
-    @Arg('userToBeFollowed') userToBeFollowed: number,
-    @Ctx() { res }: requestContext
-  ) {
-    try {
-      const updatedLoggedInUser = await User.findOne({
-        where: { id: loggedInUser },
-        relations: ['following']
-      });
-      const updatedUserToBeFollowed = await User.findOne({
-        where: { id: userToBeFollowed },
-        relations: ['followers']
-      });
-      if (updatedLoggedInUser && updatedUserToBeFollowed) {
-        const followUser = new Follows(updatedUserToBeFollowed, updatedLoggedInUser)
-        const successfulFollow = await Follows.save(followUser);
-        updatedLoggedInUser.following = [...updatedLoggedInUser.following, successfulFollow];
-        updatedUserToBeFollowed.followers = [...updatedUserToBeFollowed.followers, successfulFollow];
-        return new FollowUserResult(updatedLoggedInUser, updatedUserToBeFollowed);
-      }
-      return null;
-    } catch (err) {
-      errorHandler(`Failed to like post: ${err}`, res);
-      return null;
-    }
   }
 }

@@ -1,4 +1,4 @@
-import { validateRequiredTextField } from './textFieldValidation';
+import { validateRequiredTextField } from './text-field-validation.util';
 
 export const validateEmailField = (value: string): boolean => {
   let isEmailValid: boolean = validateRequiredTextField(value);

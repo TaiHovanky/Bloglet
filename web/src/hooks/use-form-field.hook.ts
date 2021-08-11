@@ -1,6 +1,6 @@
 import { useState, useCallback, ChangeEvent } from 'react';
-import { validateEmailField } from '../utils/emailFieldValidation';
-import { validateRequiredTextField } from '../utils/textFieldValidation';
+import { validateEmailField } from '../utils/email-field-validation.util';
+import { validateRequiredTextField } from '../utils/text-field-validation.util';
 
 export const useFormField = (initialValue: string = '', fieldType: string = 'text') => {
   const [value, setValue] = useState(initialValue);

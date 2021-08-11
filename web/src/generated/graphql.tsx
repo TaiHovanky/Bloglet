@@ -14,12 +14,6 @@ export type Scalars = {
   Float: number;
 };
 
-export type FollowUserResult = {
-  __typename?: 'FollowUserResult';
-  user: User;
-  followedUser: User;
-};
-
 export type Follows = {
   __typename?: 'Follows';
   id: Scalars['Float'];
@@ -38,9 +32,9 @@ export type Mutation = {
   register: Scalars['Boolean'];
   login: LoginResponse;
   logout: Scalars['Boolean'];
-  followUser?: Maybe<FollowUserResult>;
   createPost: Scalars['Boolean'];
   likePost?: Maybe<Array<Post>>;
+  followUser?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -58,12 +52,6 @@ export type MutationLoginArgs = {
 };
 
 
-export type MutationFollowUserArgs = {
-  userToBeFollowed: Scalars['Float'];
-  loggedInUser: Scalars['Float'];
-};
-
-
 export type MutationCreatePostArgs = {
   body: Scalars['String'];
   title: Scalars['String'];
@@ -74,6 +62,13 @@ export type MutationCreatePostArgs = {
 export type MutationLikePostArgs = {
   userId: Scalars['Float'];
   postId: Scalars['Float'];
+};
+
+
+export type MutationFollowUserArgs = {
+  isAlreadyFollowing: Scalars['Boolean'];
+  userToBeFollowed: Scalars['Float'];
+  loggedInUser: Scalars['Float'];
 };
 
 export type Post = {
@@ -154,28 +149,13 @@ export type CreatePostMutation = (
 export type FollowUserMutationVariables = Exact<{
   userToBeFollowed: Scalars['Float'];
   loggedInUser: Scalars['Float'];
+  isAlreadyFollowing: Scalars['Boolean'];
 }>;
 
 
 export type FollowUserMutation = (
   { __typename?: 'Mutation' }
-  & { followUser?: Maybe<(
-    { __typename?: 'FollowUserResult' }
-    & { user: (
-      { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
-    ), followedUser: (
-      { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
-      & { followers?: Maybe<Array<(
-        { __typename?: 'Follows' }
-        & { follower?: Maybe<(
-          { __typename?: 'User' }
-          & Pick<User, 'id'>
-        )> }
-      )>> }
-    ) }
-  )> }
+  & Pick<Mutation, 'followUser'>
 );
 
 export type GetFollowersQueryVariables = Exact<{
@@ -187,6 +167,7 @@ export type GetFollowersQuery = (
   { __typename?: 'Query' }
   & { getFollowers?: Maybe<Array<(
     { __typename?: 'Follows' }
+    & Pick<Follows, 'id'>
     & { follower?: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id' | 'firstName' | 'lastName'>
@@ -349,26 +330,12 @@ export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutati
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
 export const FollowUserDocument = gql`
-    mutation FollowUser($userToBeFollowed: Float!, $loggedInUser: Float!) {
-  followUser(userToBeFollowed: $userToBeFollowed, loggedInUser: $loggedInUser) {
-    user {
-      id
-      firstName
-      lastName
-      email
-    }
-    followedUser {
-      id
-      firstName
-      lastName
-      email
-      followers {
-        follower {
-          id
-        }
-      }
-    }
-  }
+    mutation FollowUser($userToBeFollowed: Float!, $loggedInUser: Float!, $isAlreadyFollowing: Boolean!) {
+  followUser(
+    userToBeFollowed: $userToBeFollowed
+    loggedInUser: $loggedInUser
+    isAlreadyFollowing: $isAlreadyFollowing
+  )
 }
     `;
 export type FollowUserMutationFn = Apollo.MutationFunction<FollowUserMutation, FollowUserMutationVariables>;
@@ -388,6 +355,7 @@ export type FollowUserMutationFn = Apollo.MutationFunction<FollowUserMutation, F
  *   variables: {
  *      userToBeFollowed: // value for 'userToBeFollowed'
  *      loggedInUser: // value for 'loggedInUser'
+ *      isAlreadyFollowing: // value for 'isAlreadyFollowing'
  *   },
  * });
  */
@@ -401,6 +369,7 @@ export type FollowUserMutationOptions = Apollo.BaseMutationOptions<FollowUserMut
 export const GetFollowersDocument = gql`
     query GetFollowers($userId: Float!) {
   getFollowers(userId: $userId) {
+    id
     follower {
       id
       firstName

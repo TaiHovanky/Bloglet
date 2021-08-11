@@ -24,7 +24,8 @@ const FollowButton = ({
     await followUser({
       variables: {
         loggedInUser,
-        userToBeFollowed
+        userToBeFollowed,
+        isAlreadyFollowing: isLoggedInUserFollowing
       }
     });
     refetchFollowers();

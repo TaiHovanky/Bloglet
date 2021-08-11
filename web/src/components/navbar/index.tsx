@@ -1,7 +1,7 @@
 import React from 'react';
 import { Divider, Drawer, List, ListItem, ListItemText, makeStyles } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import Logout from '../logout/Logout'
+import Logout from '../logout'
 
 const drawerWidth = 240;
 
