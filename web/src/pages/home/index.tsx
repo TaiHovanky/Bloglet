@@ -1,9 +1,6 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography } from '@material-ui/core';
 import { useQuery } from '@apollo/client';
-import NewPostForm from '../components/new-post-form/NewPostForm';
-import PostList from '../components/post-list/PostList';
-import SplashPage from '../components/splash-page/SplashPage';
 import {
   useCreatePostMutation,
   useHomePageLazyQuery,
@@ -13,12 +10,15 @@ import {
   UserLikesPosts,
   useGetFollowingQuery,
   useGetFollowersQuery
-} from '../generated/graphql';
-import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
-import getCurrentUserProfile from '../cache-queries/current-user-profile';
-import { currentUserProfileVar } from '../cache';
-import FollowButton from '../components/follow-button/FollowButton';
-import UserFollows from '../components/user-follows/UserFollows';
+} from '../../generated/graphql';
+import { currentUserProfileVar } from '../../cache';
+import NewPostForm from '../../components/new-post-form';
+import PostList from '../../components/post-list';
+import SplashPage from '../../components/splash-page';
+import PrimaryAppBar from '../../components/primary-app-bar';
+import getCurrentUserProfile from '../../cache-queries/current-user-profile';
+import FollowButton from '../../components/follow-button';
+import UserFollows from '../../components/user-follows';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -134,7 +134,7 @@ const Home: React.FC<any> = () => {
                 followingLoading={followingLoading}
               />
             </>
-            <NewPostForm handleSubmit={handleSubmit} />
+            {currentUserProfileVar().id === userData.homePage.id && <NewPostForm handleSubmit={handleSubmit} />}
             {postsData && postsData.getUserPosts &&
               <PostList
                 posts={postsData?.getUserPosts}

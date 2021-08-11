@@ -1,10 +1,10 @@
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
-import { errorHandler } from '../utils/errorHandler';
 import { Post } from '../entity/Post';
-import { requestContext } from '../types/context';
-import { isAuthenticated } from '../utils/isAuthenticated';
 import { User } from '../entity/User';
 import { UserLikesPosts } from '../entity/Likes';
+import { requestContext } from '../types/context.interface';
+import { isAuthenticated } from '../utils/is-authenticated.util';
+import { errorHandler } from '../utils/error-handler.util';
 
 
 @Resolver()
