@@ -1,12 +1,12 @@
 import bcrypt, { compare } from 'bcryptjs';
-import { errorHandler } from '../utils/errorHandler';
+import { Like } from 'typeorm';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { User } from '../entity/User';
-import { sendRefreshToken } from '../utils/sendRefreshToken';
-import { createAccessToken, createRefreshToken } from '../utils/createTokens';
-import { requestContext } from '../types/context';
-import { isAuthenticated } from '../utils/isAuthenticated';
-import { Like } from 'typeorm';
+import { requestContext } from '../types/context.interface';
+import { sendRefreshToken } from '../utils/send-refresh-token.util';
+import { errorHandler } from '../utils/error-handler.util';
+import { createAccessToken, createRefreshToken } from '../utils/create-tokens.util';
+import { isAuthenticated } from '../utils/is-authenticated.util';
 
 @ObjectType()
 class LoginResponse {
@@ -21,14 +21,11 @@ class LoginResponse {
 export class UserResolver {
 
   @Query(() => [User])
-  users() {
+  users(
+    @Ctx() { res }: requestContext
+  ) {
     return User.find({ relations: ['likedPosts']})
-      .catch((err) => console.log(err));
-  }
-
-  @Query(() => String)
-  hello() {
-    return 'hello';
+      .catch((err) => errorHandler(`Failed to get users: ${err}`, res));
   }
 
   @Mutation(() => Boolean)
@@ -36,7 +33,8 @@ export class UserResolver {
     @Arg('firstName') firstName: string,
     @Arg('lastName') lastName: string,
     @Arg('email') email: string,
-    @Arg('password') password: string
+    @Arg('password') password: string,
+    @Ctx() { res }: requestContext
   ) {
     /* Hash the password and then insert the user data and hashed password into db. */
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -48,7 +46,7 @@ export class UserResolver {
       password: hashedPassword
     })
     .catch((err) => {
-      errorHandler('User registration failed', err);
+      errorHandler(`User registration failed: ${err}`, res);
       return false;
     });
     return true;
@@ -89,12 +87,12 @@ export class UserResolver {
   @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type
   @UseMiddleware(isAuthenticated)
   async homePage(
-    @Ctx() { payload }: requestContext
+    @Ctx() { payload, res }: requestContext
   ) {
     if (payload) {
       return User.findOne({ where: { email: payload.email }})
         .catch((err) => {
-          console.log('catch err', err);
+          errorHandler(`Home page user query failed: ${err}`, res);
           return null;
         });
     }
@@ -104,12 +102,13 @@ export class UserResolver {
   @Query(() => [User], { nullable: true })
   @UseMiddleware(isAuthenticated)
   async searchUsers(
-    @Arg('name') name: string
+    @Arg('name') name: string,
+    @Ctx() { res }: requestContext
   ) {
     if (name) {
       return User.find({ where: { firstName: Like(`%${name}%`) }})
         .catch((err) => {
-          console.log('error finding user', err);
+          errorHandler(`Search user query failed: ${err}`, res);
         });
     }
     return null;

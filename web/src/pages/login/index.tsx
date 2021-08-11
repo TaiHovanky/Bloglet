@@ -1,18 +1,19 @@
 import React from 'react';
-import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
+import { Button, TextField, makeStyles, Paper, Container, Typography } from '@material-ui/core';
 import { RouteComponentProps } from 'react-router';
-import { useRegisterMutation } from '../generated/graphql';
-import { useFormField } from '../hooks/useFormField';
+import { useFormField } from '../../hooks/use-form-field.hook';
+import { useLoginMutation } from '../../generated/graphql';
+import { setAccessToken } from '../../accessToken';
 
 const useStyles = makeStyles((theme) => ({
-  registerPageContainer: {
+  loginPageContainer: {
     paddingTop: '1px',
     height: '100vh',
   },
-  registerPaper: {
+  loginPaper: {
     margin: theme.spacing(32),
     paddingBottom: theme.spacing(4),
-    paddingTop: theme.spacing(4),
+    paddingTop: theme.spacing(4)
   },
   textField: {
     width: '100%'
@@ -22,58 +23,39 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const Register: React.FC<RouteComponentProps> = ({ history }) => {
+const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
-  const firstName = useFormField('', 'text');
-  const lastName = useFormField('', 'text');
   const email = useFormField('', 'email');
   const password = useFormField('', 'text');
-
-  const [register] = useRegisterMutation();
+  const [login] = useLoginMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    await register({
+    const response = await login({
       variables: {
-        firstName: formData.get('firstName') as string,
-        lastName: formData.get('lastName') as string,
         email: formData.get('email') as string,
         password: formData.get('password') as string
       }
     });
 
+    if (response && response.data) {
+      setAccessToken(response.data.login.token);
+    }
+
     history.push('/');
-  };
+  }
 
   return (
-    <div className={classes.registerPageContainer}>
-      <Paper elevation={3} className={classes.registerPaper}>
+    <div className={classes.loginPageContainer}>
+      <Paper elevation={3} className={classes.loginPaper}>
         <Container maxWidth="md">
-          <Typography variant="h3" noWrap>Sign Up</Typography>
+          <Typography variant="h3" noWrap>Log In</Typography>
           <form noValidate autoComplete="off" onSubmit={handleSubmit}>
             <div>
               <TextField
-                id="input_firstName"
-                label="First Name"
-                name="firstName"
-                className={classes.textField}
-                {...firstName}
-              />
-            </div>
-            <div>
-              <TextField
-                id="input_lastName"
-                label="Last Name"
-                name="lastName"
-                className={classes.textField}
-                {...lastName}
-              />
-            </div>
-            <div>
-              <TextField
-                id="input_email"
+                id="input-email"
                 label="Email"
                 name="email"
                 className={classes.textField}
@@ -82,7 +64,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
             </div>
             <div>
               <TextField
-                id="input_password"
+                id="input-password"
                 label="Password"
                 type="password"
                 name="password"
@@ -98,4 +80,4 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
   );
 }
 
-export default Register;
+export default Login;

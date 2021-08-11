@@ -1,0 +1,9 @@
+query GetFollowing ($userId: Float!) {
+  getFollowing(userId: $userId) {
+    following {
+      id
+      firstName
+      lastName
+    }
+  }
+}

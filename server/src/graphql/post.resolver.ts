@@ -1,17 +1,18 @@
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
-import { errorHandler } from '../utils/errorHandler';
 import { Post } from '../entity/Post';
-import { requestContext } from '../types/context';
-import { isAuthenticated } from '../utils/isAuthenticated';
 import { User } from '../entity/User';
 import { UserLikesPosts } from '../entity/Likes';
+import { requestContext } from '../types/context.interface';
+import { isAuthenticated } from '../utils/is-authenticated.util';
+import { errorHandler } from '../utils/error-handler.util';
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post], { nullable: true })
   @UseMiddleware(isAuthenticated)
   async getUserPosts(
-    @Arg('userId') userId: number
+    @Arg('userId') userId: number,
+    @Ctx() { res }: requestContext
   ) {
     return Post
       .createQueryBuilder('posts')
@@ -20,7 +21,7 @@ export class PostResolver {
       .leftJoinAndMapOne('likes.user', 'users', 'users', 'likes.user_id = users.id')
       .getMany()
       .catch((err) => {
-        console.log('err', err);
+        errorHandler(`Failed to get user posts: ${err}`, res);
         return null;
       });
   }
@@ -31,9 +32,7 @@ export class PostResolver {
     @Ctx() { res }: requestContext
   ) {
     return Post.find({ where: { id: postId }})
-      .catch(() => {
-        errorHandler('Failed to get post', res);
-      });
+      .catch((err) => errorHandler(`Failed to get post: ${err}`, res));
   }
 
   @Mutation(() => Boolean)
@@ -41,14 +40,15 @@ export class PostResolver {
   async createPost(
     @Arg('creatorId') creatorId: number, 
     @Arg('title') title: string,
-    @Arg('body') body: string
+    @Arg('body') body: string,
+    @Ctx() { res }: requestContext
   ) {
     await Post.insert({
       creatorId, 
       title,
       body
     }).catch((err) => {
-      errorHandler('Post creation failed', err);
+      errorHandler(`Post creation failed: ${err}`, res);
       return false;
     });
     return true;
@@ -81,7 +81,7 @@ export class PostResolver {
       }
       return null;
     } catch(err) {
-      errorHandler('Failed to like post', res);
+      errorHandler(`Failed to like post: ${err}`, res);
       return null;
     }
   }

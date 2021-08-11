@@ -1,21 +1,24 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography } from '@material-ui/core';
-import NewPostForm from '../components/new-post-form/NewPostForm';
-import PostList from '../components/post-list/PostList';
-import SplashPage from '../components/splash-page/SplashPage';
+import { useQuery } from '@apollo/client';
 import {
   useCreatePostMutation,
   useHomePageLazyQuery,
   useGetUserPostsQuery,
   useLikePostMutation,
   Post,
-  UserLikesPosts
-} from '../generated/graphql';
-import PrimaryAppBar from '../components/primary-app-bar/PrimaryAppBar';
-import { useQuery } from '@apollo/client';
-import getCurrentUserProfile from '../cache-queries/current-user-profile';
-import { currentUserProfileVar } from '../cache';
-import FollowButton from '../components/follow-button/FollowButton';
+  UserLikesPosts,
+  useGetFollowingQuery,
+  useGetFollowersQuery
+} from '../../generated/graphql';
+import { currentUserProfileVar } from '../../cache';
+import NewPostForm from '../../components/new-post-form';
+import PostList from '../../components/post-list';
+import SplashPage from '../../components/splash-page';
+import PrimaryAppBar from '../../components/primary-app-bar';
+import getCurrentUserProfile from '../../cache-queries/current-user-profile';
+import FollowButton from '../../components/follow-button';
+import UserFollows from '../../components/user-follows';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -40,14 +43,23 @@ const Home: React.FC<any> = () => {
   });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
 
+  // eslint-disable-next-line
   const currentUserProfile = useQuery(getCurrentUserProfile);
-  console.log('current user profile ', currentUserProfile);
 
   const { data: postsData, loading: postsLoading, refetch } = useGetUserPostsQuery({
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err)
   });
+
+  const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
+    variables: { userId: currentUserProfileVar().id }
+  });
+
+  const { data: followerData, loading: followerLoading, refetch: refetchFollowers } = useGetFollowersQuery({
+    variables: { userId: currentUserProfileVar().id }
+  });
+
 
   const [createPost] = useCreatePostMutation();
   const [likePost] = useLikePostMutation();
@@ -106,12 +118,29 @@ const Home: React.FC<any> = () => {
           <PrimaryAppBar user={userData.homePage} />
           <Container maxWidth="sm">
             <>
-              <Typography variant="h3">{`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}</Typography>
-              <FollowButton loggedInUser={userData.homePage.id} userToBeFollowed={currentUserProfileVar().id} />
+              <Typography variant="h3">
+                {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
+              </Typography>
+              <FollowButton
+                followers={followerData}
+                loggedInUser={userData.homePage.id}
+                refetchFollowers={refetchFollowers}
+                userToBeFollowed={currentUserProfileVar().id}
+              />
+              <UserFollows
+                followers={followerData}
+                following={followingData}
+                followerLoading={followerLoading}
+                followingLoading={followingLoading}
+              />
             </>
-            <NewPostForm handleSubmit={handleSubmit} />
+            {currentUserProfileVar().id === userData.homePage.id && <NewPostForm handleSubmit={handleSubmit} />}
             {postsData && postsData.getUserPosts &&
-              <PostList posts={postsData?.getUserPosts} likePost={handleLikePost} user={userData.homePage} />
+              <PostList
+                posts={postsData?.getUserPosts}
+                likePost={handleLikePost}
+                user={userData.homePage}
+              />
             }
           </Container>
         </> :
