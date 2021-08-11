@@ -3,24 +3,41 @@ import { Button } from '@material-ui/core';
 import { useFollowUserMutation } from '../../generated/graphql';
 
 interface Props {
-  loggedInUser: number,
-  userToBeFollowed: number
+  followers: any;
+  loggedInUser: number;
+  refetchFollowers: Function;
+  userToBeFollowed: number;
 }
 
-const FollowButton = ({ loggedInUser, userToBeFollowed }: Props) => {
+const FollowButton = ({
+  followers,
+  loggedInUser,
+  refetchFollowers,
+  userToBeFollowed
+}: Props) => {
   const [followUser] = useFollowUserMutation();
+  const isLoggedInUserFollowing = followers &&
+    followers.getFollowers &&
+    followers.getFollowers.some((follower: any) => follower.follower.id === loggedInUser);
 
-  const handleClick = () => {
-    followUser({
+  const handleClick = async () => {
+    await followUser({
       variables: {
         loggedInUser,
         userToBeFollowed
       }
     });
+    refetchFollowers();
   }
 
   return (
-    <Button variant="contained" color="primary" onClick={handleClick}>Follow</Button>
+    <Button
+      variant={isLoggedInUserFollowing ? "contained" : "outlined"}
+      color="primary"
+      onClick={handleClick}
+    >
+      {isLoggedInUserFollowing ? 'Following' : 'Follow'}
+    </Button>
   );
 }
 
