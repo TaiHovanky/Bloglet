@@ -1,11 +1,12 @@
 import React from 'react';
-import { Button, Card, CardContent, Container, Divider, Grid, makeStyles, Typography } from '@material-ui/core';
-import { GetUserPostsQuery, Post } from '../../generated/graphql';
+import { Card, CardContent, Container, Divider, Grid, makeStyles, Typography } from '@material-ui/core';
+import { GetUserPostsQuery } from '../../generated/graphql';
+import LikeButton from '../like-button';
 
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
-  likePost: (userId: number, post: Post) => void,
-  user: any
+  likePost: any,
+  userId: number
 }
 
 const useStyles = makeStyles({
@@ -21,12 +22,12 @@ const useStyles = makeStyles({
   }
 });
 
-const PostList: React.FC<Props> = (props: any) => {
+const PostList: React.FC<Props> = ({ likePost, posts, userId }: Props) => {
   const classes = useStyles();
 
   return (
     <Container maxWidth="sm">
-      {props.posts.map((post: any) => (
+      {!!posts ? posts.map((post: any) => (
         <Card className={classes.root} variant="outlined" key={post.id}>
           <CardContent>
             <Typography variant="h5" component="h2">
@@ -38,7 +39,7 @@ const PostList: React.FC<Props> = (props: any) => {
             <Divider variant="middle" className={classes.divider} />
             <Grid container spacing={3}>
               <Grid item xs={2}>
-                <Button variant="contained" color="primary" onClick={() => props.likePost(props.user.id, post)}>Like</Button>
+                <LikeButton userId={userId} post={post} likePost={likePost} />
               </Grid>
               <Grid item xs={2}>
                 <Typography variant="h6" color="textSecondary">{post.likes.length}</Typography>
@@ -46,7 +47,7 @@ const PostList: React.FC<Props> = (props: any) => {
             </Grid>
           </CardContent>
         </Card>
-      ))}
+      )) : []}
     </Container>
   )
 };

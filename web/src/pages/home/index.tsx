@@ -7,7 +7,6 @@ import {
   useGetUserPostsQuery,
   useLikePostMutation,
   Post,
-  UserLikesPosts,
   useGetFollowingQuery,
   useGetFollowersQuery
 } from '../../generated/graphql';
@@ -84,26 +83,27 @@ const Home: React.FC<any> = () => {
     refetch(); // is needed to refetch the posts query
   }
 
-  const handleLikePost = (userId: number, post: Post) => {
+  const handleLikePost = (userId: number, post: Post, isAlreadyLiked: boolean) => {
     likePost({
       variables: {
         userId,
-        postId: post.id
+        postId: post.id,
+        isAlreadyLiked
       },
-      optimisticResponse: {
-        likePost: [
-          {
-            __typename: 'Post',
-            id: post.id,
-            title: post.title,
-            body: post.body,
-            likes: [
-              ...post.likes as Array<UserLikesPosts>,
-              { __typename: 'UserLikesPosts', user: { __typename: 'User', id: userId }} as UserLikesPosts
-            ]
-          }
-        ]
-      }
+      // optimisticResponse: {
+      //   likePost: [
+      //     {
+      //       __typename: 'Post',
+      //       id: post.id,
+      //       title: post.title,
+      //       body: post.body,
+      //       likes: [
+      //         ...post.likes as Array<UserLikesPosts>,
+      //         { __typename: 'UserLikesPosts', user: { __typename: 'User', id: userId }} as UserLikesPosts
+      //       ]
+      //     }
+      //   ]
+      // }
     });
   }
 
@@ -139,7 +139,7 @@ const Home: React.FC<any> = () => {
               <PostList
                 posts={postsData?.getUserPosts}
                 likePost={handleLikePost}
-                user={userData.homePage}
+                userId={userData.homePage.id}
               />
             }
           </Container>

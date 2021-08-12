@@ -1,5 +1,5 @@
-mutation LikePost($userId: Float!, $postId: Float!) {
-  likePost(userId: $userId, postId: $postId) {  
+mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
+  likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {  
     id
     title
     body
