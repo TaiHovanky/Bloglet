@@ -89,21 +89,7 @@ const Home: React.FC<any> = () => {
         userId,
         postId: post.id,
         isAlreadyLiked
-      },
-      // optimisticResponse: {
-      //   likePost: [
-      //     {
-      //       __typename: 'Post',
-      //       id: post.id,
-      //       title: post.title,
-      //       body: post.body,
-      //       likes: [
-      //         ...post.likes as Array<UserLikesPosts>,
-      //         { __typename: 'UserLikesPosts', user: { __typename: 'User', id: userId }} as UserLikesPosts
-      //       ]
-      //     }
-      //   ]
-      // }
+      }
     });
   }
 
