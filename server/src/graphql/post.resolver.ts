@@ -59,25 +59,39 @@ export class PostResolver {
   async likePost(
     @Arg('postId') postId: number,
     @Arg('userId') userId: number,
+    @Arg('isAlreadyLiked') isAlreadyLiked: boolean,
     @Ctx() { res }: requestContext
   ) {
     try {
       const postToUpdate: Post | undefined = await Post
-        .findOne({
-          where: { id: postId },
-          relations: ['likes']
-        });
-      const userToUpdate: User | undefined = await User
-        .findOne({
-          where: { id: userId },
-          relations: ['likedPosts']
-        });
+        .createQueryBuilder('posts')
+        .where('posts.id = :postId', { postId })
+        .leftJoinAndMapMany('posts.likes', 'user_likes_posts', 'likes', 'posts.id = likes.post_id')
+        .leftJoinAndMapOne('likes.user', 'users', 'users', 'likes.user_id = users.id')
+        .getOne();
 
-      if (postToUpdate && userToUpdate) {
-        const likePost = new UserLikesPosts(userToUpdate, postToUpdate);
-        const successfulLike = await UserLikesPosts.save(likePost);
-        postToUpdate.likes = [...postToUpdate.likes, successfulLike]
+      if (isAlreadyLiked && postToUpdate) {
+        const existingLikeIndex = postToUpdate.likes.findIndex((like: UserLikesPosts) => like.user.id === userId);
+        postToUpdate.likes.splice(existingLikeIndex, 1);
+        await UserLikesPosts.createQueryBuilder('user_likes_posts')
+          .delete()
+          .where('user_likes_posts.user_id = :userId', { userId })
+          .andWhere('user_likes_posts.post_id = :postId', { postId })
+          .execute();
         return [postToUpdate];
+      } else {
+        const userToUpdate: User | undefined = await User
+          .findOne({
+            where: { id: userId },
+            relations: ['likedPosts']
+          });
+
+        if (postToUpdate && userToUpdate) {
+          const likePost = new UserLikesPosts(userToUpdate, postToUpdate);
+          const successfulLike = await UserLikesPosts.save(likePost);
+          postToUpdate.likes = [...postToUpdate.likes, successfulLike]
+          return [postToUpdate];
+        }
       }
       return null;
     } catch(err) {

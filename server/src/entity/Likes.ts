@@ -18,13 +18,13 @@ export class UserLikesPosts extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn() id: number;
 
-  @Field(() => Post, { nullable: true })
+  @Field(() => Post)
   @ManyToOne(() => Post, (post: Post) => post.likes)
   // one Post can have many likes?
   @JoinColumn({ name: 'post_id' })
   post: Post;
 
-  @Field(() => User, { nullable: true })
+  @Field(() => User)
   @ManyToOne(() => User, (user: User) => user.likedPosts)
   // one User can have many liked posts, hence Many(liked posts)ToOne(user)
   @JoinColumn({ name: 'user_id' })

@@ -60,6 +60,7 @@ export type MutationCreatePostArgs = {
 
 
 export type MutationLikePostArgs = {
+  isAlreadyLiked: Scalars['Boolean'];
   userId: Scalars['Float'];
   postId: Scalars['Float'];
 };
@@ -130,8 +131,8 @@ export type User = {
 export type UserLikesPosts = {
   __typename?: 'UserLikesPosts';
   id: Scalars['Float'];
-  post?: Maybe<Post>;
-  user?: Maybe<User>;
+  post: Post;
+  user: User;
 };
 
 export type CreatePostMutationVariables = Exact<{
@@ -203,10 +204,10 @@ export type GetUserPostsQuery = (
     & Pick<Post, 'id' | 'title' | 'body'>
     & { likes?: Maybe<Array<(
       { __typename?: 'UserLikesPosts' }
-      & { user?: Maybe<(
+      & { user: (
         { __typename?: 'User' }
         & Pick<User, 'id'>
-      )> }
+      ) }
     )>> }
   )>> }
 );
@@ -225,6 +226,7 @@ export type HomePageQuery = (
 export type LikePostMutationVariables = Exact<{
   userId: Scalars['Float'];
   postId: Scalars['Float'];
+  isAlreadyLiked: Scalars['Boolean'];
 }>;
 
 
@@ -235,10 +237,10 @@ export type LikePostMutation = (
     & Pick<Post, 'id' | 'title' | 'body'>
     & { likes?: Maybe<Array<(
       { __typename?: 'UserLikesPosts' }
-      & { user?: Maybe<(
+      & { user: (
         { __typename?: 'User' }
         & Pick<User, 'id'>
-      )> }
+      ) }
     )>> }
   )>> }
 );
@@ -525,8 +527,8 @@ export type HomePageQueryHookResult = ReturnType<typeof useHomePageQuery>;
 export type HomePageLazyQueryHookResult = ReturnType<typeof useHomePageLazyQuery>;
 export type HomePageQueryResult = Apollo.QueryResult<HomePageQuery, HomePageQueryVariables>;
 export const LikePostDocument = gql`
-    mutation LikePost($userId: Float!, $postId: Float!) {
-  likePost(userId: $userId, postId: $postId) {
+    mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
+  likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {
     id
     title
     body
@@ -555,6 +557,7 @@ export type LikePostMutationFn = Apollo.MutationFunction<LikePostMutation, LikeP
  *   variables: {
  *      userId: // value for 'userId'
  *      postId: // value for 'postId'
+ *      isAlreadyLiked: // value for 'isAlreadyLiked'
  *   },
  * });
  */
