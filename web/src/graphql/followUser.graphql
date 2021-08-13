@@ -7,5 +7,12 @@ mutation FollowUser (
     userToBeFollowed: $userToBeFollowed,
     loggedInUser: $loggedInUser,
     isAlreadyFollowing: $isAlreadyFollowing
-  )
+  ) {
+    id
+    follower {
+      id
+      firstName
+      lastName
+    }
+  }
 }

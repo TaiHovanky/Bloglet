@@ -1,34 +1,53 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
-import { useFollowUserMutation } from '../../generated/graphql';
+import { Follows, FollowUserDocument } from '../../generated/graphql';
+import { useMutation } from '@apollo/client';
 
 interface Props {
   followers: any;
   loggedInUser: number;
-  refetchFollowers: Function;
   userToBeFollowed: number;
 }
 
 const FollowButton = ({
   followers,
   loggedInUser,
-  refetchFollowers,
   userToBeFollowed
 }: Props) => {
-  const [followUser] = useFollowUserMutation();
+
+  const [followUser, { loading }] = useMutation(FollowUserDocument, {
+    update(cache, data) {
+      cache.modify({
+        fields: {
+          getFollowers(existingFollowers: Array<Follows>) {
+            const oldFollowers: Array<Follows> = existingFollowers ? [...existingFollowers] : [];
+            if (!data.data.followUser[0]) {
+              const unfollowedIndex = oldFollowers.findIndex((follow) => {
+                return follow && follow.follower ? follow.follower.id === loggedInUser : false;
+              });
+              oldFollowers.splice(unfollowedIndex, 1);
+            }
+            return [...oldFollowers, data.data.followUser[0]];
+          }
+        }
+      })
+    }
+  });
+
   const isLoggedInUserFollowing = followers &&
     followers.getFollowers &&
-    followers.getFollowers.some((follower: any) => follower.follower.id === loggedInUser);
+    followers.getFollowers.some((follower: any) => {
+      return follower && follower.follower ? follower.follower.id === loggedInUser : false;
+    });
 
-  const handleClick = async () => {
-    await followUser({
+  const handleClick = () => {
+    followUser({
       variables: {
         loggedInUser,
         userToBeFollowed,
         isAlreadyFollowing: isLoggedInUserFollowing
       }
     });
-    refetchFollowers();
   }
 
   return (
@@ -36,6 +55,7 @@ const FollowButton = ({
       variant={isLoggedInUserFollowing ? "contained" : "outlined"}
       color="primary"
       onClick={handleClick}
+      disabled={loading}
     >
       {isLoggedInUserFollowing ? 'Following' : 'Follow'}
     </Button>

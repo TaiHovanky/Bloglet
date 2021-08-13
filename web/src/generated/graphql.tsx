@@ -34,7 +34,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   createPost: Scalars['Boolean'];
   likePost?: Maybe<Array<Post>>;
-  followUser?: Maybe<Scalars['Boolean']>;
+  followUser?: Maybe<Array<Follows>>;
 };
 
 
@@ -156,7 +156,14 @@ export type FollowUserMutationVariables = Exact<{
 
 export type FollowUserMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'followUser'>
+  & { followUser?: Maybe<Array<(
+    { __typename?: 'Follows' }
+    & Pick<Follows, 'id'>
+    & { follower?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName'>
+    )> }
+  )>> }
 );
 
 export type GetFollowersQueryVariables = Exact<{
@@ -337,7 +344,14 @@ export const FollowUserDocument = gql`
     userToBeFollowed: $userToBeFollowed
     loggedInUser: $loggedInUser
     isAlreadyFollowing: $isAlreadyFollowing
-  )
+  ) {
+    id
+    follower {
+      id
+      firstName
+      lastName
+    }
+  }
 }
     `;
 export type FollowUserMutationFn = Apollo.MutationFunction<FollowUserMutation, FollowUserMutationVariables>;
