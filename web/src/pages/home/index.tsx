@@ -55,7 +55,7 @@ const Home: React.FC<any> = () => {
     variables: { userId: currentUserProfileVar().id }
   });
 
-  const { data: followerData, loading: followerLoading, refetch: refetchFollowers } = useGetFollowersQuery({
+  const { data: followerData, loading: followerLoading } = useGetFollowersQuery({
     variables: { userId: currentUserProfileVar().id }
   });
 
@@ -110,7 +110,6 @@ const Home: React.FC<any> = () => {
               <FollowButton
                 followers={followerData}
                 loggedInUser={userData.homePage.id}
-                refetchFollowers={refetchFollowers}
                 userToBeFollowed={currentUserProfileVar().id}
               />
               <UserFollows
