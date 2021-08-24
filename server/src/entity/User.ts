@@ -2,6 +2,7 @@ import { Field, ObjectType } from 'type-graphql';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
 import { Follows } from './Follows';
 import { UserLikesPosts } from './Likes';
+import { Comment } from './Comment';
 
 @ObjectType()
 @Entity('users')
@@ -41,4 +42,8 @@ export class User extends BaseEntity {
   @Field(() => [Follows], { nullable: true })
   @OneToMany(() => Follows, (follows: Follows) => follows.follower)
   followers: Array<Follows>;
+
+  @Field(() => [Comment], { nullable: true })
+  @OneToMany(() => Comment, (comment: Comment) => comment.user)
+  comments: Array<Comment>;
 }
