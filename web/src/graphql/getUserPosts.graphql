@@ -8,5 +8,14 @@ query GetUserPosts($userId: Float!) {
         id
       }
     }
+    comments {
+      id
+      comment
+      user {
+        id
+        firstName
+        lastName
+      }
+    }
   }
 }

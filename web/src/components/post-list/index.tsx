@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card, CardContent, Container, Divider, Grid, makeStyles, Typography } from '@material-ui/core';
+import { Card, CardContent, Container, Divider, Grid, makeStyles, Typography, TextField } from '@material-ui/core';
 import { GetUserPostsQuery } from '../../generated/graphql';
 import LikeButton from '../like-button';
+import CommentList from '../comment-list';
 
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
@@ -19,6 +20,9 @@ const useStyles = makeStyles({
   },
   divider: {
     marginBottom: 16
+  },
+  likes: {
+    marginBottom: 4
   }
 });
 
@@ -37,7 +41,7 @@ const PostList: React.FC<Props> = ({ likePost, posts, userId }: Props) => {
               {post.body}
             </Typography>
             <Divider variant="middle" className={classes.divider} />
-            <Grid container spacing={3}>
+            <Grid container spacing={3} className={classes.likes}>
               <Grid item xs={2}>
                 <LikeButton userId={userId} post={post} likePost={likePost} />
               </Grid>
@@ -45,6 +49,18 @@ const PostList: React.FC<Props> = ({ likePost, posts, userId }: Props) => {
                 <Typography variant="h6" color="textSecondary">{post.likes.length}</Typography>
               </Grid>
             </Grid>
+            <Divider variant="middle" className={classes.divider} />
+            <form noValidate autoComplete="off">
+              <div>
+                <TextField
+                  id="input-comment"
+                  label="Comment"
+                  name="comment"
+                />
+              </div>
+            </form>
+            <Divider variant="middle" className={classes.divider} />
+            <CommentList comments={post.comments}/>
           </CardContent>
         </Card>
       )) : []}

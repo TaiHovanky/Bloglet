@@ -14,6 +14,15 @@ export type Scalars = {
   Float: number;
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  id: Scalars['Float'];
+  user?: Maybe<User>;
+  post?: Maybe<Post>;
+  comment: Scalars['String'];
+  createdAt: Scalars['String'];
+};
+
 export type Follows = {
   __typename?: 'Follows';
   id: Scalars['Float'];
@@ -35,6 +44,7 @@ export type Mutation = {
   createPost: Scalars['Boolean'];
   likePost?: Maybe<Array<Post>>;
   followUser?: Maybe<Array<Follows>>;
+  createComment: Comment;
 };
 
 
@@ -72,6 +82,14 @@ export type MutationFollowUserArgs = {
   loggedInUser: Scalars['Float'];
 };
 
+
+export type MutationCreateCommentArgs = {
+  createdAt: Scalars['String'];
+  comment: Scalars['String'];
+  postId: Scalars['Float'];
+  userId: Scalars['Float'];
+};
+
 export type Post = {
   __typename?: 'Post';
   id: Scalars['Float'];
@@ -79,6 +97,7 @@ export type Post = {
   body: Scalars['String'];
   creatorId: Scalars['Float'];
   likes?: Maybe<Array<UserLikesPosts>>;
+  comments?: Maybe<Array<Comment>>;
 };
 
 export type Query = {
@@ -126,6 +145,7 @@ export type User = {
   likedPosts?: Maybe<Array<UserLikesPosts>>;
   following?: Maybe<Array<Follows>>;
   followers?: Maybe<Array<Follows>>;
+  comments?: Maybe<Array<Comment>>;
 };
 
 export type UserLikesPosts = {
@@ -215,6 +235,13 @@ export type GetUserPostsQuery = (
         { __typename?: 'User' }
         & Pick<User, 'id'>
       ) }
+    )>>, comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment'>
+      & { user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )> }
     )>> }
   )>> }
 );
@@ -470,6 +497,15 @@ export const GetUserPostsDocument = gql`
     likes {
       user {
         id
+      }
+    }
+    comments {
+      id
+      comment
+      user {
+        id
+        firstName
+        lastName
       }
     }
   }
