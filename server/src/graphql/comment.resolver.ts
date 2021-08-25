@@ -9,19 +9,33 @@ import { errorHandler } from '../utils/error-handler.util';
 export class CommentResolver {
 
   @Mutation(() => Comment)
-  createComment(
-    @Arg('user') user: User,
-    @Arg('post') post: Post,
+  async createComment(
+    @Arg('userId') userId: number,
+    @Arg('postId') postId: number,
     @Arg('comment') comment: string,
     @Arg('createdAt') createdAt: string,
     @Ctx() { res }: requestContext
   ) {
-    return Comment.insert({
-      user,
-      post,
-      comment,
-      createdAt
-    })
-      .catch((err) => errorHandler(`Comment creation failed: ${err}`, res));
+    const user = await User.findOne({
+      where: { id: userId },
+      relations: ['comments']
+    });
+    const post = await Post.findOne({
+      where: { id: postId },
+      relations: ['comments']
+    });
+
+    if (user && post) {
+      const newComment = new Comment(
+        user,
+        post,
+        comment,
+        createdAt
+      );
+
+      return Comment.save(newComment)
+        .catch((err) => errorHandler(`Comment creation failed: ${err}`, res));
+    }
+    return null;
   }
 }

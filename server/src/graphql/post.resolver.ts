@@ -10,15 +10,17 @@ import { errorHandler } from '../utils/error-handler.util';
 export class PostResolver {
   @Query(() => [Post], { nullable: true })
   @UseMiddleware(isAuthenticated)
-  async getUserPosts(
+  getUserPosts(
     @Arg('userId') userId: number,
     @Ctx() { res }: requestContext
   ) {
     return Post
       .createQueryBuilder('posts')
       .where('posts.creatorId = :creatorId', { creatorId: userId })
+      .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
+      .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
       .leftJoinAndMapMany('posts.likes', 'user_likes_posts', 'likes', 'posts.id = likes.post_id')
-      .leftJoinAndMapOne('likes.user', 'users', 'users', 'likes.user_id = users.id')
+      .leftJoinAndMapOne('likes.user', 'users', 'users2', 'likes.user_id = users2.id')
       .getMany()
       .catch((err) => {
         errorHandler(`Failed to get user posts: ${err}`, res);

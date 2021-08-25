@@ -6,9 +6,10 @@ import { User } from './User';
 @ObjectType()
 @Entity({ name: 'comment' })
 export class Comment extends BaseEntity {
-  constructor(user: User, comment: string, createdAt: string) {
+  constructor(user: User, post: Post, comment: string, createdAt: string) {
     super();
     this.user = user;
+    this.post = post;
     this.comment = comment;
     this.createdAt = createdAt;
   }
@@ -17,12 +18,12 @@ export class Comment extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   @OneToOne(() => User, (user: User) => user.comments)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Field(() => Post)
+  @Field(() => Post, { nullable: true })
   @OneToOne(() => Post, (post: Post) => post.comments)
   @JoinColumn({ name: 'post_id' })
   post: Post;
