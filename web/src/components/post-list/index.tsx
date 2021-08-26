@@ -1,8 +1,9 @@
 import React from 'react';
-import { Card, CardContent, Container, Divider, Grid, makeStyles, Typography, TextField } from '@material-ui/core';
+import { Card, CardContent, Container, Divider, Grid, makeStyles, Typography } from '@material-ui/core';
 import { GetUserPostsQuery } from '../../generated/graphql';
 import LikeButton from '../like-button';
 import CommentList from '../comment-list';
+import CommentInput from '../comment-input';
 
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
@@ -50,15 +51,7 @@ const PostList: React.FC<Props> = ({ likePost, posts, userId }: Props) => {
               </Grid>
             </Grid>
             <Divider variant="middle" className={classes.divider} />
-            <form noValidate autoComplete="off">
-              <div>
-                <TextField
-                  id="input-comment"
-                  label="Comment"
-                  name="comment"
-                />
-              </div>
-            </form>
+            <CommentInput userId={userId} postId={post.id} />
             <Divider variant="middle" className={classes.divider} />
             <CommentList comments={post.comments}/>
           </CardContent>
