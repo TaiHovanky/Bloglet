@@ -19,13 +19,16 @@ const CommentInput = ({ userId, postId }: Props) => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    console.log('submitted', comment, userId, postId);
     createComment({
       variables: {
         comment,
         userId,
         postId,
         createdAt: new Date().toLocaleString()
-      }
+      },
+    }).then((data) => {
+      console.log('data', data);
     });
   }
 
@@ -33,7 +36,6 @@ const CommentInput = ({ userId, postId }: Props) => {
     <form noValidate autoComplete="off" onSubmit={handleSubmit}>
       <div>
         <TextField
-          id="input-comment"
           label="Comment"
           name="comment"
           disabled={loading}

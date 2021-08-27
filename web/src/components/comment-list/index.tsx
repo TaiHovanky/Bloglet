@@ -19,30 +19,25 @@ const CommentList: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
   return (
     <List className={classes.root}>
-      {props.comments.map((comment) => {
+      {props.comments.map((comment, index: number) => {
         return (
-          <>
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                secondary={
-                  <React.Fragment>
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      className={classes.inline}
-                      color="textPrimary"
-                    >
-                      {`${comment.user.firstName} ${comment.user.lastName}`}
-                    </Typography>
-                    <div>
-                      {comment.comment}
-                    </div>
-                  </React.Fragment>
-                }
-              />
-            </ListItem>
-            <Divider variant="middle" component="li" />
-          </>
+          <ListItem alignItems="flex-start" key={`comment-${index}`} id={`comment-${index}`}>
+            <ListItemText
+              secondary={
+                <React.Fragment>
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    className={classes.inline}
+                    color="textPrimary"
+                  >
+                    {`${comment.user.firstName} ${comment.user.lastName} ${comment.comment}`}
+                  </Typography>
+                </React.Fragment>
+              }
+            />
+            <Divider variant="middle" />
+          </ListItem>
         );
       })}
     </List>
