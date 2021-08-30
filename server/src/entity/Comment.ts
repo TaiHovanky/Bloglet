@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Entity, BaseEntity, JoinColumn, PrimaryGeneratedColumn, OneToOne, Column } from 'typeorm';
+import { Entity, BaseEntity, JoinColumn, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Post } from './Post';
 import { User } from './User';
 
@@ -16,15 +16,15 @@ export class Comment extends BaseEntity {
 
   @Field()
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Field(() => User, { nullable: true })
-  @OneToOne(() => User, (user: User) => user.comments)
+  @ManyToOne(() => User, (user: User) => user.comments)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
   @Field(() => Post, { nullable: true })
-  @OneToOne(() => Post, (post: Post) => post.comments)
+  @ManyToOne(() => Post, (post: Post) => post.comments)
   @JoinColumn({ name: 'post_id' })
   post: Post;
 
