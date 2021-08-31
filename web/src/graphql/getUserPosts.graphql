@@ -16,6 +16,9 @@ query GetUserPosts($userId: Float!) {
         firstName
         lastName
       }
+      post {
+        id
+      }
     }
   }
 }
