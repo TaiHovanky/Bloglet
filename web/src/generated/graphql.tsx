@@ -14,6 +14,15 @@ export type Scalars = {
   Float: number;
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  id: Scalars['String'];
+  user?: Maybe<User>;
+  post?: Maybe<Post>;
+  comment: Scalars['String'];
+  createdAt: Scalars['String'];
+};
+
 export type Follows = {
   __typename?: 'Follows';
   id: Scalars['Float'];
@@ -35,6 +44,7 @@ export type Mutation = {
   createPost: Scalars['Boolean'];
   likePost?: Maybe<Array<Post>>;
   followUser?: Maybe<Array<Follows>>;
+  createComment?: Maybe<Array<Post>>;
 };
 
 
@@ -72,6 +82,14 @@ export type MutationFollowUserArgs = {
   loggedInUser: Scalars['Float'];
 };
 
+
+export type MutationCreateCommentArgs = {
+  createdAt: Scalars['String'];
+  comment: Scalars['String'];
+  postId: Scalars['Float'];
+  userId: Scalars['Float'];
+};
+
 export type Post = {
   __typename?: 'Post';
   id: Scalars['Float'];
@@ -79,6 +97,7 @@ export type Post = {
   body: Scalars['String'];
   creatorId: Scalars['Float'];
   likes?: Maybe<Array<UserLikesPosts>>;
+  comments?: Maybe<Array<Comment>>;
 };
 
 export type Query = {
@@ -126,6 +145,7 @@ export type User = {
   likedPosts?: Maybe<Array<UserLikesPosts>>;
   following?: Maybe<Array<Follows>>;
   followers?: Maybe<Array<Follows>>;
+  comments?: Maybe<Array<Comment>>;
 };
 
 export type UserLikesPosts = {
@@ -134,6 +154,33 @@ export type UserLikesPosts = {
   post: Post;
   user: User;
 };
+
+export type CreateCommentMutationVariables = Exact<{
+  userId: Scalars['Float'];
+  postId: Scalars['Float'];
+  comment: Scalars['String'];
+  createdAt: Scalars['String'];
+}>;
+
+
+export type CreateCommentMutation = (
+  { __typename?: 'Mutation' }
+  & { createComment?: Maybe<Array<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'title' | 'body'>
+    & { comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment'>
+      & { user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, post?: Maybe<(
+        { __typename?: 'Post' }
+        & Pick<Post, 'id'>
+      )> }
+    )>> }
+  )>> }
+);
 
 export type CreatePostMutationVariables = Exact<{
   creatorId: Scalars['Float'];
@@ -215,6 +262,16 @@ export type GetUserPostsQuery = (
         { __typename?: 'User' }
         & Pick<User, 'id'>
       ) }
+    )>>, comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment'>
+      & { user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, post?: Maybe<(
+        { __typename?: 'Post' }
+        & Pick<Post, 'id'>
+      )> }
     )>> }
   )>> }
 );
@@ -305,6 +362,61 @@ export type SearchUsersQuery = (
 );
 
 
+export const CreateCommentDocument = gql`
+    mutation CreateComment($userId: Float!, $postId: Float!, $comment: String!, $createdAt: String!) {
+  createComment(
+    userId: $userId
+    postId: $postId
+    comment: $comment
+    createdAt: $createdAt
+  ) {
+    id
+    title
+    body
+    comments {
+      id
+      comment
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
+        id
+      }
+    }
+  }
+}
+    `;
+export type CreateCommentMutationFn = Apollo.MutationFunction<CreateCommentMutation, CreateCommentMutationVariables>;
+
+/**
+ * __useCreateCommentMutation__
+ *
+ * To run a mutation, you first call `useCreateCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCommentMutation, { data, loading, error }] = useCreateCommentMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      postId: // value for 'postId'
+ *      comment: // value for 'comment'
+ *      createdAt: // value for 'createdAt'
+ *   },
+ * });
+ */
+export function useCreateCommentMutation(baseOptions?: Apollo.MutationHookOptions<CreateCommentMutation, CreateCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument, options);
+      }
+export type CreateCommentMutationHookResult = ReturnType<typeof useCreateCommentMutation>;
+export type CreateCommentMutationResult = Apollo.MutationResult<CreateCommentMutation>;
+export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateCommentMutation, CreateCommentMutationVariables>;
 export const CreatePostDocument = gql`
     mutation CreatePost($creatorId: Float!, $title: String!, $body: String!) {
   createPost(creatorId: $creatorId, title: $title, body: $body)
@@ -469,6 +581,18 @@ export const GetUserPostsDocument = gql`
     body
     likes {
       user {
+        id
+      }
+    }
+    comments {
+      id
+      comment
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
         id
       }
     }

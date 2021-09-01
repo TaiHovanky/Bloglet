@@ -1,0 +1,29 @@
+mutation CreateComment(
+  $userId: Float!,
+  $postId: Float!,
+  $comment: String!,
+  $createdAt: String!
+) {
+  createComment(
+    userId: $userId,
+    postId: $postId,
+    comment: $comment,
+    createdAt: $createdAt
+  ) {
+    id
+    title
+    body
+    comments {
+      id
+      comment
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
+        id
+      }
+    }
+  }
+}
