@@ -9,7 +9,7 @@ import { isAuthenticated } from '../utils/is-authenticated.util';
 @Resolver()
 export class CommentResolver {
 
-  @Mutation(() => [Post], { nullable: true })
+  @Mutation(() => Post, { nullable: true })
   @UseMiddleware(isAuthenticated)
   async createComment(
     @Arg('userId') userId: number,
@@ -39,7 +39,7 @@ export class CommentResolver {
         );
         const savedComment = await Comment.save(newComment);
         post.comments = [...post.comments, savedComment];
-        return [post];
+        return post;
       }
       return null;
     } catch(err) {

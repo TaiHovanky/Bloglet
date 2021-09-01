@@ -44,7 +44,7 @@ export type Mutation = {
   createPost: Scalars['Boolean'];
   likePost?: Maybe<Array<Post>>;
   followUser?: Maybe<Array<Follows>>;
-  createComment?: Maybe<Array<Post>>;
+  createComment?: Maybe<Post>;
 };
 
 
@@ -165,7 +165,7 @@ export type CreateCommentMutationVariables = Exact<{
 
 export type CreateCommentMutation = (
   { __typename?: 'Mutation' }
-  & { createComment?: Maybe<Array<(
+  & { createComment?: Maybe<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'title' | 'body'>
     & { comments?: Maybe<Array<(
@@ -179,7 +179,7 @@ export type CreateCommentMutation = (
         & Pick<Post, 'id'>
       )> }
     )>> }
-  )>> }
+  )> }
 );
 
 export type CreatePostMutationVariables = Exact<{
