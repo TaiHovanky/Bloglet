@@ -8,7 +8,7 @@ import { errorHandler } from '../utils/error-handler.util';
 @Resolver()
 export class CommentResolver {
 
-  @Mutation(() => Comment, { nullable: true })
+  @Mutation(() => [Post], { nullable: true })
   async createComment(
     @Arg('userId') userId: number,
     @Arg('postId') postId: number,
@@ -21,11 +21,13 @@ export class CommentResolver {
         where: { id: userId },
         relations: ['comments']
       });
-      const post = await Post.findOne({
-        where: { id: postId },
-        relations: ['comments']
-      });
-      console.log('user and post', !!user, !!post);
+      const post = await Post
+        .createQueryBuilder('posts')
+        .where('posts.id = :postId', { postId })
+        .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
+        .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
+        .getOne();
+
       if (user && post) {
         const newComment = new Comment(
           user,
@@ -33,8 +35,9 @@ export class CommentResolver {
           comment,
           createdAt
         );
-        return await Comment.save(newComment)
-          .catch((err) => errorHandler(`Comment creation failed: ${err}`, res));
+        const savedComment = await Comment.save(newComment);
+        post.comments = [...post.comments, savedComment];
+        return [post];
       }
       return null;
     } catch(err) {

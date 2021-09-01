@@ -44,7 +44,7 @@ export type Mutation = {
   createPost: Scalars['Boolean'];
   likePost?: Maybe<Array<Post>>;
   followUser?: Maybe<Array<Follows>>;
-  createComment?: Maybe<Comment>;
+  createComment?: Maybe<Array<Post>>;
 };
 
 
@@ -165,17 +165,21 @@ export type CreateCommentMutationVariables = Exact<{
 
 export type CreateCommentMutation = (
   { __typename?: 'Mutation' }
-  & { createComment?: Maybe<(
-    { __typename?: 'Comment' }
-    & Pick<Comment, 'id' | 'comment'>
-    & { user?: Maybe<(
-      { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName'>
-    )>, post?: Maybe<(
-      { __typename?: 'Post' }
-      & Pick<Post, 'id'>
-    )> }
-  )> }
+  & { createComment?: Maybe<Array<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'title' | 'body'>
+    & { comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment'>
+      & { user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, post?: Maybe<(
+        { __typename?: 'Post' }
+        & Pick<Post, 'id'>
+      )> }
+    )>> }
+  )>> }
 );
 
 export type CreatePostMutationVariables = Exact<{
@@ -367,14 +371,19 @@ export const CreateCommentDocument = gql`
     createdAt: $createdAt
   ) {
     id
-    comment
-    user {
+    title
+    body
+    comments {
       id
-      firstName
-      lastName
-    }
-    post {
-      id
+      comment
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
+        id
+      }
     }
   }
 }

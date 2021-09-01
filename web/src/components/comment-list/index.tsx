@@ -27,11 +27,19 @@ const CommentList: React.FC<Props> = (props: Props) => {
                 <React.Fragment>
                   <Typography
                     component="span"
-                    variant="body2"
+                    variant="body1"
                     className={classes.inline}
                     color="textPrimary"
                   >
-                    {`${comment.user.firstName} ${comment.user.lastName} ${comment.comment}`}
+                    {`${comment.user.firstName} ${comment.user.lastName} `}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    className={classes.inline}
+                    color="textSecondary"
+                  >
+                    {comment.comment}
                   </Typography>
                 </React.Fragment>
               }
