@@ -6,6 +6,17 @@ import { Comment } from './Comment';
 @ObjectType()
 @Entity('posts')
 export class Post extends BaseEntity {
+  constructor(
+    title: string,
+    body: string,
+    creatorId: number
+  ) {
+    super();
+    this.title = title;
+    this.body = body;
+    this.creatorId = creatorId;
+  }
+
   @Field()
   @PrimaryGeneratedColumn()
   id: number;

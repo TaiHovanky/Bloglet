@@ -37,7 +37,7 @@ export class PostResolver {
       .catch((err) => errorHandler(`Failed to get post: ${err}`, res));
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Post, { nullable: true })
   @UseMiddleware(isAuthenticated)
   async createPost(
     @Arg('creatorId') creatorId: number, 
@@ -45,15 +45,12 @@ export class PostResolver {
     @Arg('body') body: string,
     @Ctx() { res }: requestContext
   ) {
-    await Post.insert({
-      creatorId, 
-      title,
-      body
-    }).catch((err) => {
-      errorHandler(`Post creation failed: ${err}`, res);
-      return false;
-    });
-    return true;
+    const newPost = new Post(title, body, creatorId);
+    return await Post.save(newPost)
+      .catch((err) => {
+        errorHandler(`Post creation failed: ${err}`, res);
+        return null;
+      });
   }
 
   @Mutation(() => [Post], { nullable: true })

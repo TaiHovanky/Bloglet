@@ -41,9 +41,9 @@ export type Mutation = {
   register: Scalars['Boolean'];
   login: LoginResponse;
   logout: Scalars['Boolean'];
-  createPost: Scalars['Boolean'];
+  createPost?: Maybe<Post>;
   likePost?: Maybe<Array<Post>>;
-  followUser?: Maybe<Array<Follows>>;
+  followUser?: Maybe<Follows>;
   createComment?: Maybe<Post>;
 };
 
@@ -191,7 +191,10 @@ export type CreatePostMutationVariables = Exact<{
 
 export type CreatePostMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'createPost'>
+  & { createPost?: Maybe<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'title' | 'body'>
+  )> }
 );
 
 export type FollowUserMutationVariables = Exact<{
@@ -203,14 +206,14 @@ export type FollowUserMutationVariables = Exact<{
 
 export type FollowUserMutation = (
   { __typename?: 'Mutation' }
-  & { followUser?: Maybe<Array<(
+  & { followUser?: Maybe<(
     { __typename?: 'Follows' }
     & Pick<Follows, 'id'>
     & { follower?: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id' | 'firstName' | 'lastName'>
     )> }
-  )>> }
+  )> }
 );
 
 export type GetFollowersQueryVariables = Exact<{
@@ -419,7 +422,11 @@ export type CreateCommentMutationResult = Apollo.MutationResult<CreateCommentMut
 export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateCommentMutation, CreateCommentMutationVariables>;
 export const CreatePostDocument = gql`
     mutation CreatePost($creatorId: Float!, $title: String!, $body: String!) {
-  createPost(creatorId: $creatorId, title: $title, body: $body)
+  createPost(creatorId: $creatorId, title: $title, body: $body) {
+    id
+    title
+    body
+  }
 }
     `;
 export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;

@@ -21,16 +21,16 @@ const FollowButton = ({
         fields: {
           getFollowers(existingFollowers: Array<Follows>) {
             const oldFollowers: Array<Follows> = existingFollowers ? [...existingFollowers] : [];
-            if (!data.data.followUser[0]) {
+            if (!data.data.followUser) {
               const unfollowedIndex = oldFollowers.findIndex((follow) => {
                 return follow && follow.follower ? follow.follower.id === loggedInUser : false;
               });
               oldFollowers.splice(unfollowedIndex, 1);
             }
-            return [...oldFollowers, data.data.followUser[0]];
+            return data.data.followUser ? [...oldFollowers, data.data.followUser] : oldFollowers;
           }
         }
-      })
+      });
     }
   });
 

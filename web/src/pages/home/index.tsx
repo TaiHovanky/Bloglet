@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography } from '@material-ui/core';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import {
-  useCreatePostMutation,
   useHomePageLazyQuery,
   useGetUserPostsQuery,
   useLikePostMutation,
   Post,
   useGetFollowingQuery,
-  useGetFollowersQuery
+  useGetFollowersQuery,
+  CreatePostDocument,
+  GetUserPostsDocument,
 } from '../../generated/graphql';
 import { currentUserProfileVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
@@ -45,7 +46,7 @@ const Home: React.FC<any> = () => {
   // eslint-disable-next-line
   const currentUserProfile = useQuery(getCurrentUserProfile);
 
-  const { data: postsData, loading: postsLoading, refetch } = useGetUserPostsQuery({
+  const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err)
@@ -59,8 +60,27 @@ const Home: React.FC<any> = () => {
     variables: { userId: currentUserProfileVar().id }
   });
 
-
-  const [createPost] = useCreatePostMutation();
+  const [createPost] = useMutation(CreatePostDocument, {
+    update(cache, data) {
+      if (data && data.data && data.data.createPost) {
+        const posts: any = cache.readQuery({
+          query: GetUserPostsDocument,
+          variables: {
+            userId: currentUserProfileVar().id
+          }
+        });
+        cache.modify({
+          fields: {
+            getUserPosts(existingPosts: Array<Post>) {
+              return [...posts.getUserPosts as Array<Post>, data.data.createPost];
+            }
+          }
+        });
+      }
+    } /* To avoid refetching, I can use the cache update function to add the Post instance
+    that was returned by the mutation to the existing array of posts. While this takes more
+    code, it's ultimately faster than refetching because there's not a network call. */
+  });
   const [likePost] = useLikePostMutation();
 
   useEffect(
@@ -80,7 +100,6 @@ const Home: React.FC<any> = () => {
         body: formData.get('bodyText') as string
       }
     });
-    refetch(); // is needed to refetch the posts query
   }
 
   const handleLikePost = (userId: number, post: Post, isAlreadyLiked: boolean) => {
