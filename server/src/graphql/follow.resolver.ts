@@ -42,7 +42,7 @@ export class FollowerResolver {
       });
   }
 
-  @Mutation(() => [Follows], { nullable: true })
+  @Mutation(() => Follows, { nullable: true })
   @UseMiddleware(isAuthenticated)
   async followUser(
     @Arg('loggedInUser') loggedInUser: number,
@@ -57,7 +57,7 @@ export class FollowerResolver {
           .where('user_follows_user.follower_id = :follower_id', { 'follower_id': loggedInUser })
           .andWhere('user_follows_user.following_id = :following_id', { 'following_id': userToBeFollowed })
           .execute();
-        return [];
+        return null;
       } else {
         const updatedLoggedInUser = await User.findOne({
           where: { id: loggedInUser },
@@ -69,8 +69,7 @@ export class FollowerResolver {
         });
         if (updatedLoggedInUser && updatedUserToBeFollowed) {
           const followUser = new Follows(updatedUserToBeFollowed, updatedLoggedInUser)
-          const successfulFollow = await Follows.save(followUser);
-          return [successfulFollow];
+          return await Follows.save(followUser);
         }
       }
       return null;

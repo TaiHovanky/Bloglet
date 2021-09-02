@@ -1,3 +1,7 @@
 mutation CreatePost($creatorId: Float!, $title: String!, $body: String!) {
-  createPost(creatorId: $creatorId, title: $title, body: $body)
+  createPost(creatorId: $creatorId, title: $title, body: $body) {
+    id
+    title
+    body
+  }
 }
