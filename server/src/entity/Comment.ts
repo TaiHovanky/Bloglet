@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Entity, BaseEntity, JoinColumn, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, BaseEntity, JoinColumn, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { CommentLike } from './CommentLike';
 import { Post } from './Post';
 import { User } from './User';
 
@@ -18,6 +19,15 @@ export class Comment extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string;
 
+  
+  @Field()
+  @Column()
+  comment: string;
+  
+  @Field()
+  @Column()
+  createdAt: string;
+
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user: User) => user.comments)
   @JoinColumn({ name: 'user_id' })
@@ -28,11 +38,7 @@ export class Comment extends BaseEntity {
   @JoinColumn({ name: 'post_id' })
   post: Post;
 
-  @Field()
-  @Column()
-  comment: string;
-
-  @Field()
-  @Column()
-  createdAt: string;
+  @Field(() => [CommentLike], { nullable: true })
+  @OneToMany(() => CommentLike, (commentLike: CommentLike) => commentLike.comment)
+  likes: Array<CommentLike>;
 }

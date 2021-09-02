@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 't
 import { Follows } from './Follows';
 import { UserLikesPosts } from './Likes';
 import { Comment } from './Comment';
+import { CommentLike } from './CommentLike';
 
 @ObjectType()
 @Entity('users')
@@ -46,4 +47,8 @@ export class User extends BaseEntity {
   @Field(() => [Comment], { nullable: true })
   @OneToMany(() => Comment, (comment: Comment) => comment.user)
   comments: Array<Comment>;
+
+  @Field(() => [CommentLike], { nullable: true })
+  @OneToMany(() => CommentLike, (commentLike: CommentLike) => commentLike.user)
+  commentLikes: Array<CommentLike>;
 }

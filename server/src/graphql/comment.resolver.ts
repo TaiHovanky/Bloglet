@@ -5,6 +5,7 @@ import { Comment } from '../entity/Comment';
 import { requestContext } from '../types/context.interface';
 import { errorHandler } from '../utils/error-handler.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
+import { CommentLike } from '../entity/CommentLike';
 
 @Resolver()
 export class CommentResolver {
@@ -47,4 +48,31 @@ export class CommentResolver {
       return null;
     }
   }
+
+  @Mutation(() => Comment, { nullable: true })
+  async likeComment(
+    @Arg('userId') userId: number,
+    @Arg('commentId') commentId: number
+  ) {
+    const comment = await Comment
+      .createQueryBuilder('comment')
+      .where('comment.id = :commentId', { commentId })
+      .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
+      .leftJoinAndMapOne('comment_like.user', 'users', 'users', 'comment_like.user_id = users.id')
+      .getOne();
+    console.log('comment found', comment);
+    const user = await User.findOne({
+      where: { id: userId },
+      relations: ['commentLikes']
+    });
+
+    if (user && comment) {
+      const newCommentLike = new CommentLike(user, comment);
+      const savedCommentLike = await CommentLike.save(newCommentLike);
+      comment.likes = [...comment.likes, savedCommentLike];
+      return comment;
+    }
+    return null;
+  }
+
 }
