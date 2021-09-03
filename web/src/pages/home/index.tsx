@@ -49,7 +49,8 @@ const Home: React.FC<any> = () => {
   const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
-    onError: (err) => console.log(err)
+    onError: (err) => console.log(err),
+    onCompleted: (data) => console.log('data posts', data)
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({

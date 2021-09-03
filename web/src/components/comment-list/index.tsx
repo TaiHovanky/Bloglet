@@ -44,6 +44,7 @@ const CommentList: React.FC<Props> = (props: Props) => {
                 </React.Fragment>
               }
             />
+            <span></span>
             <Divider variant="middle" />
           </ListItem>
         );

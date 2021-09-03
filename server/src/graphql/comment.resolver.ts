@@ -69,6 +69,11 @@ export class CommentResolver {
     if (user && comment) {
       const newCommentLike = new CommentLike(user, comment);
       const savedCommentLike = await CommentLike.save(newCommentLike);
+      if (!comment.likeCount) {
+        comment.likeCount = 1;
+      } else {
+        comment.likeCount += 1;
+      }
       comment.likes = [...comment.likes, savedCommentLike];
       return comment;
     }

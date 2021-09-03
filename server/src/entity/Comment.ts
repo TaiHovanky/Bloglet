@@ -28,6 +28,10 @@ export class Comment extends BaseEntity {
   @Column()
   createdAt: string;
 
+  @Field()
+  @Column({ type: 'int', default: 0 })
+  likeCount: number;
+
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user: User) => user.comments)
   @JoinColumn({ name: 'user_id' })
