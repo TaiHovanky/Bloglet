@@ -11,7 +11,12 @@ query GetUserPosts($userId: Float!) {
     comments {
       id
       comment
-      likeCount
+      likes {
+        id
+        user {
+          id
+        }
+      }
       user {
         id
         firstName

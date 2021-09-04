@@ -1,6 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
-import { UserLikesPosts } from './Likes';
+import { PostLike } from './PostLike';
 import { Comment } from './Comment';
 
 @ObjectType()
@@ -33,9 +33,9 @@ export class Post extends BaseEntity {
   @Column({ nullable: true })
   creatorId: number;
 
-  @Field(() => [UserLikesPosts], { nullable: true })
-  @OneToMany(() => UserLikesPosts, (likes: UserLikesPosts) => likes.post)
-  likes: Array<UserLikesPosts>;
+  @Field(() => [PostLike], { nullable: true })
+  @OneToMany(() => PostLike, (likes: PostLike) => likes.post)
+  likes: Array<PostLike>;
 
   @Field(() => [Comment], { nullable: true })
   @OneToMany(() => Comment, (comment: Comment) => comment.post)

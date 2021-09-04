@@ -50,34 +50,51 @@ export class CommentResolver {
   }
 
   @Mutation(() => Comment, { nullable: true })
+  // @UseMiddleware(isAuthenticated)
   async likeComment(
     @Arg('userId') userId: number,
-    @Arg('commentId') commentId: number
+    @Arg('commentId') commentId: number,
+    @Arg('isAlreadyLiked') isAlreadyLiked: boolean
+    // @Ctx() { res }: requestContext
   ) {
-    const comment = await Comment
-      .createQueryBuilder('comment')
-      .where('comment.id = :commentId', { commentId })
-      .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
-      .leftJoinAndMapOne('comment_like.user', 'users', 'users', 'comment_like.user_id = users.id')
-      .getOne();
-    console.log('comment found', comment);
-    const user = await User.findOne({
-      where: { id: userId },
-      relations: ['commentLikes']
-    });
-
-    if (user && comment) {
-      const newCommentLike = new CommentLike(user, comment);
-      const savedCommentLike = await CommentLike.save(newCommentLike);
-      if (!comment.likeCount) {
-        comment.likeCount = 1;
+    console.log('like comment args', userId, commentId, isAlreadyLiked);
+    try {
+      console.log('like comment start')
+      const commentToUpdate: Comment | undefined = await Comment
+        .createQueryBuilder('comment')
+        .where('comment.id = :commentId', { commentId })
+        .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
+        .leftJoinAndMapOne('comment_like.user', 'users', 'users', 'comment_like.user_id = users.id')
+        .getOne();
+  
+      if (isAlreadyLiked && commentToUpdate) {
+        const existingLikeIndex = commentToUpdate.likes.findIndex((like: CommentLike) => like.user.id === userId);
+        commentToUpdate.likes.splice(existingLikeIndex, 1);
+        await CommentLike.createQueryBuilder('comment_like')
+          .delete()
+          .where('comment_like.user_id = :userId', { userId })
+          .andWhere('comment_like.comment_id = :commentId', { commentId })
+          .execute();
+        return commentToUpdate;
       } else {
-        comment.likeCount += 1;
+        const userToUpdate = await User.findOne({
+          where: { id: userId },
+          relations: ['likedComments']
+        });
+    
+        if (userToUpdate && commentToUpdate) {
+          const newCommentLike = new CommentLike(userToUpdate, commentToUpdate);
+          const savedCommentLike = await CommentLike.save(newCommentLike);
+          commentToUpdate.likes = [...commentToUpdate.likes, savedCommentLike];
+          return commentToUpdate;
+        }
       }
-      comment.likes = [...comment.likes, savedCommentLike];
-      return comment;
+      return null;
+    } catch(err) {
+      console.log('err', err);
+      // errorHandler(`Failed to like post: ${err}`, res);
+      return null;
     }
-    return null;
   }
 
 }

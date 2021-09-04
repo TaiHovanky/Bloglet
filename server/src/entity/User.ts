@@ -1,7 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
 import { Follows } from './Follows';
-import { UserLikesPosts } from './Likes';
+import { PostLike } from './PostLike';
 import { Comment } from './Comment';
 import { CommentLike } from './CommentLike';
 
@@ -30,9 +30,9 @@ export class User extends BaseEntity {
   @Column('int', { default: 0, nullable: true })
   tokenVersion: number;
 
-  @Field(() => [UserLikesPosts], { nullable: true })
-  @OneToMany(() => UserLikesPosts, (likes: UserLikesPosts) => likes.user)
-  likedPosts: Array<UserLikesPosts>;
+  @Field(() => [PostLike], { nullable: true })
+  @OneToMany(() => PostLike, (likes: PostLike) => likes.user)
+  likedPosts: Array<PostLike>;
 
   @Field(() => [Follows], { nullable: true })
   @OneToMany(() => Follows, (follows: Follows) => follows.following)
@@ -50,5 +50,5 @@ export class User extends BaseEntity {
 
   @Field(() => [CommentLike], { nullable: true })
   @OneToMany(() => CommentLike, (commentLike: CommentLike) => commentLike.user)
-  commentLikes: Array<CommentLike>;
+  likedComments: Array<CommentLike>;
 }

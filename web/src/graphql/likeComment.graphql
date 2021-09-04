@@ -1,0 +1,15 @@
+mutation LikeComment($userId: Float!, $commentId: Float!, $isAlreadyLiked: Boolean!) {
+  likeComment(userId: $userId, commentId: $commentId, isAlreadyLiked: $isAlreadyLiked) {
+    id
+    comment
+    createdAt
+    likes {
+      id
+      user {
+        id
+        firstName
+        lastName
+      }
+    }
+  }
+}

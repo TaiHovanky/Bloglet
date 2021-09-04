@@ -17,7 +17,7 @@ export class CommentLike extends BaseEntity {
   id: number;
 
   @Field(() => User, { nullable: true })
-  @ManyToOne(() => User, (user: User) => user.commentLikes)
+  @ManyToOne(() => User, (user: User) => user.likedComments)
   @JoinColumn({ name: 'user_id' })
   user: User;
 

@@ -19,7 +19,6 @@ export type Comment = {
   id: Scalars['String'];
   comment: Scalars['String'];
   createdAt: Scalars['String'];
-  likeCount: Scalars['Float'];
   user?: Maybe<User>;
   post?: Maybe<Post>;
   likes?: Maybe<Array<CommentLike>>;
@@ -51,7 +50,7 @@ export type Mutation = {
   login: LoginResponse;
   logout: Scalars['Boolean'];
   createPost?: Maybe<Post>;
-  likePost?: Maybe<Array<Post>>;
+  likePost?: Maybe<Post>;
   followUser?: Maybe<Follows>;
   createComment?: Maybe<Post>;
   likeComment?: Maybe<Comment>;
@@ -102,6 +101,7 @@ export type MutationCreateCommentArgs = {
 
 
 export type MutationLikeCommentArgs = {
+  isAlreadyLiked: Scalars['Boolean'];
   commentId: Scalars['Float'];
   userId: Scalars['Float'];
 };
@@ -112,8 +112,15 @@ export type Post = {
   title: Scalars['String'];
   body: Scalars['String'];
   creatorId: Scalars['Float'];
-  likes?: Maybe<Array<UserLikesPosts>>;
+  likes?: Maybe<Array<PostLike>>;
   comments?: Maybe<Array<Comment>>;
+};
+
+export type PostLike = {
+  __typename?: 'PostLike';
+  id: Scalars['Float'];
+  post: Post;
+  user: User;
 };
 
 export type Query = {
@@ -158,18 +165,11 @@ export type User = {
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   email: Scalars['String'];
-  likedPosts?: Maybe<Array<UserLikesPosts>>;
+  likedPosts?: Maybe<Array<PostLike>>;
   following?: Maybe<Array<Follows>>;
   followers?: Maybe<Array<Follows>>;
   comments?: Maybe<Array<Comment>>;
-  commentLikes?: Maybe<Array<CommentLike>>;
-};
-
-export type UserLikesPosts = {
-  __typename?: 'UserLikesPosts';
-  id: Scalars['Float'];
-  post: Post;
-  user: User;
+  likedComments?: Maybe<Array<CommentLike>>;
 };
 
 export type CreateCommentMutationVariables = Exact<{
@@ -277,15 +277,22 @@ export type GetUserPostsQuery = (
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'title' | 'body'>
     & { likes?: Maybe<Array<(
-      { __typename?: 'UserLikesPosts' }
+      { __typename?: 'PostLike' }
       & { user: (
         { __typename?: 'User' }
         & Pick<User, 'id'>
       ) }
     )>>, comments?: Maybe<Array<(
       { __typename?: 'Comment' }
-      & Pick<Comment, 'id' | 'comment' | 'likeCount'>
-      & { user?: Maybe<(
+      & Pick<Comment, 'id' | 'comment'>
+      & { likes?: Maybe<Array<(
+        { __typename?: 'CommentLike' }
+        & Pick<CommentLike, 'id'>
+        & { user?: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'id'>
+        )> }
+      )>>, user?: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'id' | 'firstName' | 'lastName'>
       )>, post?: Maybe<(
@@ -307,6 +314,29 @@ export type HomePageQuery = (
   )> }
 );
 
+export type LikeCommentMutationVariables = Exact<{
+  userId: Scalars['Float'];
+  commentId: Scalars['Float'];
+  isAlreadyLiked: Scalars['Boolean'];
+}>;
+
+
+export type LikeCommentMutation = (
+  { __typename?: 'Mutation' }
+  & { likeComment?: Maybe<(
+    { __typename?: 'Comment' }
+    & Pick<Comment, 'id' | 'comment' | 'createdAt'>
+    & { likes?: Maybe<Array<(
+      { __typename?: 'CommentLike' }
+      & Pick<CommentLike, 'id'>
+      & { user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )> }
+    )>> }
+  )> }
+);
+
 export type LikePostMutationVariables = Exact<{
   userId: Scalars['Float'];
   postId: Scalars['Float'];
@@ -316,17 +346,17 @@ export type LikePostMutationVariables = Exact<{
 
 export type LikePostMutation = (
   { __typename?: 'Mutation' }
-  & { likePost?: Maybe<Array<(
+  & { likePost?: Maybe<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'title' | 'body'>
     & { likes?: Maybe<Array<(
-      { __typename?: 'UserLikesPosts' }
+      { __typename?: 'PostLike' }
       & { user: (
         { __typename?: 'User' }
         & Pick<User, 'id'>
       ) }
     )>> }
-  )>> }
+  )> }
 );
 
 export type LoginMutationVariables = Exact<{
@@ -611,7 +641,12 @@ export const GetUserPostsDocument = gql`
     comments {
       id
       comment
-      likeCount
+      likes {
+        id
+        user {
+          id
+        }
+      }
       user {
         id
         firstName
@@ -689,6 +724,55 @@ export function useHomePageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<H
 export type HomePageQueryHookResult = ReturnType<typeof useHomePageQuery>;
 export type HomePageLazyQueryHookResult = ReturnType<typeof useHomePageLazyQuery>;
 export type HomePageQueryResult = Apollo.QueryResult<HomePageQuery, HomePageQueryVariables>;
+export const LikeCommentDocument = gql`
+    mutation LikeComment($userId: Float!, $commentId: Float!, $isAlreadyLiked: Boolean!) {
+  likeComment(
+    userId: $userId
+    commentId: $commentId
+    isAlreadyLiked: $isAlreadyLiked
+  ) {
+    id
+    comment
+    createdAt
+    likes {
+      id
+      user {
+        id
+        firstName
+        lastName
+      }
+    }
+  }
+}
+    `;
+export type LikeCommentMutationFn = Apollo.MutationFunction<LikeCommentMutation, LikeCommentMutationVariables>;
+
+/**
+ * __useLikeCommentMutation__
+ *
+ * To run a mutation, you first call `useLikeCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLikeCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [likeCommentMutation, { data, loading, error }] = useLikeCommentMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      commentId: // value for 'commentId'
+ *      isAlreadyLiked: // value for 'isAlreadyLiked'
+ *   },
+ * });
+ */
+export function useLikeCommentMutation(baseOptions?: Apollo.MutationHookOptions<LikeCommentMutation, LikeCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LikeCommentMutation, LikeCommentMutationVariables>(LikeCommentDocument, options);
+      }
+export type LikeCommentMutationHookResult = ReturnType<typeof useLikeCommentMutation>;
+export type LikeCommentMutationResult = Apollo.MutationResult<LikeCommentMutation>;
+export type LikeCommentMutationOptions = Apollo.BaseMutationOptions<LikeCommentMutation, LikeCommentMutationVariables>;
 export const LikePostDocument = gql`
     mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
   likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {

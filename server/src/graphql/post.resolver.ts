@@ -1,7 +1,7 @@
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { Post } from '../entity/Post';
 import { User } from '../entity/User';
-import { UserLikesPosts } from '../entity/Likes';
+import { PostLike } from '../entity/PostLike';
 import { requestContext } from '../types/context.interface';
 import { isAuthenticated } from '../utils/is-authenticated.util';
 import { errorHandler } from '../utils/error-handler.util';
@@ -12,18 +12,21 @@ export class PostResolver {
   @UseMiddleware(isAuthenticated)
   getUserPosts(
     @Arg('userId') userId: number,
-    @Ctx() { res }: requestContext
+    // @Ctx() { res }: requestContext
   ) {
     return Post
       .createQueryBuilder('posts')
       .where('posts.creatorId = :creatorId', { creatorId: userId })
       .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
       .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
-      .leftJoinAndMapMany('posts.likes', 'user_likes_posts', 'likes', 'posts.id = likes.post_id')
-      .leftJoinAndMapOne('likes.user', 'users', 'users2', 'likes.user_id = users2.id')
+      .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
+      .leftJoinAndMapOne('comment_like.user', 'users', 'users2', 'comment_like.user_id = users2.id')
+      .leftJoinAndMapMany('posts.likes', 'post_like', 'likes', 'posts.id = likes.post_id')
+      .leftJoinAndMapOne('likes.user', 'users', 'users3', 'likes.user_id = users3.id')
       .getMany()
       .catch((err) => {
-        errorHandler(`Failed to get user posts: ${err}`, res);
+        console.log('err------------------------', err);
+        // errorHandler(`Failed to get user posts: ${err}`, res);
         return null;
       });
   }
@@ -53,7 +56,7 @@ export class PostResolver {
       });
   }
 
-  @Mutation(() => [Post], { nullable: true })
+  @Mutation(() => Post, { nullable: true })
   @UseMiddleware(isAuthenticated)
   async likePost(
     @Arg('postId') postId: number,
@@ -65,19 +68,19 @@ export class PostResolver {
       const postToUpdate: Post | undefined = await Post
         .createQueryBuilder('posts')
         .where('posts.id = :postId', { postId })
-        .leftJoinAndMapMany('posts.likes', 'user_likes_posts', 'likes', 'posts.id = likes.post_id')
+        .leftJoinAndMapMany('posts.likes', 'post_like', 'likes', 'posts.id = likes.post_id')
         .leftJoinAndMapOne('likes.user', 'users', 'users', 'likes.user_id = users.id')
         .getOne();
 
       if (isAlreadyLiked && postToUpdate) {
-        const existingLikeIndex = postToUpdate.likes.findIndex((like: UserLikesPosts) => like.user.id === userId);
+        const existingLikeIndex = postToUpdate.likes.findIndex((like: PostLike) => like.user.id === userId);
         postToUpdate.likes.splice(existingLikeIndex, 1);
-        await UserLikesPosts.createQueryBuilder('user_likes_posts')
+        await PostLike.createQueryBuilder('post_like')
           .delete()
-          .where('user_likes_posts.user_id = :userId', { userId })
-          .andWhere('user_likes_posts.post_id = :postId', { postId })
+          .where('post_like.user_id = :userId', { userId })
+          .andWhere('post_like.post_id = :postId', { postId })
           .execute();
-        return [postToUpdate];
+        return postToUpdate;
       } else {
         const userToUpdate: User | undefined = await User
           .findOne({
@@ -86,10 +89,10 @@ export class PostResolver {
           });
 
         if (postToUpdate && userToUpdate) {
-          const likePost = new UserLikesPosts(userToUpdate, postToUpdate);
-          const successfulLike = await UserLikesPosts.save(likePost);
+          const likePost = new PostLike(userToUpdate, postToUpdate);
+          const successfulLike = await PostLike.save(likePost);
           postToUpdate.likes = [...postToUpdate.likes, successfulLike]
-          return [postToUpdate];
+          return postToUpdate;
         }
       }
       return null;
