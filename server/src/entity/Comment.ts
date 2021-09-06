@@ -17,7 +17,7 @@ export class Comment extends BaseEntity {
 
   @Field()
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   
   @Field()

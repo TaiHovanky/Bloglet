@@ -16,7 +16,7 @@ export type Scalars = {
 
 export type Comment = {
   __typename?: 'Comment';
-  id: Scalars['String'];
+  id: Scalars['Float'];
   comment: Scalars['String'];
   createdAt: Scalars['String'];
   user?: Maybe<User>;

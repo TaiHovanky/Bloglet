@@ -50,16 +50,14 @@ export class CommentResolver {
   }
 
   @Mutation(() => Comment, { nullable: true })
-  // @UseMiddleware(isAuthenticated)
+  @UseMiddleware(isAuthenticated)
   async likeComment(
     @Arg('userId') userId: number,
     @Arg('commentId') commentId: number,
-    @Arg('isAlreadyLiked') isAlreadyLiked: boolean
-    // @Ctx() { res }: requestContext
+    @Arg('isAlreadyLiked') isAlreadyLiked: boolean,
+    @Ctx() { res }: requestContext
   ) {
-    console.log('like comment args', userId, commentId, isAlreadyLiked);
     try {
-      console.log('like comment start')
       const commentToUpdate: Comment | undefined = await Comment
         .createQueryBuilder('comment')
         .where('comment.id = :commentId', { commentId })
@@ -91,8 +89,7 @@ export class CommentResolver {
       }
       return null;
     } catch(err) {
-      console.log('err', err);
-      // errorHandler(`Failed to like post: ${err}`, res);
+      errorHandler(`Failed to like post: ${err}`, res);
       return null;
     }
   }

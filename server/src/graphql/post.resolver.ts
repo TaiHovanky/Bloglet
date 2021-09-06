@@ -12,7 +12,7 @@ export class PostResolver {
   @UseMiddleware(isAuthenticated)
   getUserPosts(
     @Arg('userId') userId: number,
-    // @Ctx() { res }: requestContext
+    @Ctx() { res }: requestContext
   ) {
     return Post
       .createQueryBuilder('posts')
@@ -25,8 +25,7 @@ export class PostResolver {
       .leftJoinAndMapOne('likes.user', 'users', 'users3', 'likes.user_id = users3.id')
       .getMany()
       .catch((err) => {
-        console.log('err------------------------', err);
-        // errorHandler(`Failed to get user posts: ${err}`, res);
+        errorHandler(`Failed to get user posts: ${err}`, res);
         return null;
       });
   }

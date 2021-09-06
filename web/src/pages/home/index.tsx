@@ -50,8 +50,7 @@ const Home: React.FC<any> = () => {
   const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
-    onError: (err) => console.log(err),
-    onCompleted: (data) => console.log('data posts', data)
+    onError: (err) => console.log(err)
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
@@ -116,7 +115,6 @@ const Home: React.FC<any> = () => {
   }
 
   const handleLikeComment = (userId: number, commentId: number, isAlreadyLiked: boolean) => {
-    console.log('handle like comment', userId, commentId, isAlreadyLiked);
     likeComment({
       variables: {
         userId,
