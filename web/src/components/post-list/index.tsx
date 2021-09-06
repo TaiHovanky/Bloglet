@@ -8,6 +8,7 @@ import CommentInput from '../comment-input';
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
   likePost: any,
+  likeComment: any,
   userId: number
 }
 
@@ -27,7 +28,7 @@ const useStyles = makeStyles({
   }
 });
 
-const PostList: React.FC<Props> = ({ likePost, posts, userId }: Props) => {
+const PostList: React.FC<Props> = ({ likePost, likeComment, posts, userId }: Props) => {
   const classes = useStyles();
 
   return (
@@ -44,7 +45,7 @@ const PostList: React.FC<Props> = ({ likePost, posts, userId }: Props) => {
             <Divider variant="middle" className={classes.divider} />
             <Grid container spacing={3} className={classes.likes}>
               <Grid item xs={2}>
-                <LikeButton userId={userId} post={post} likePost={likePost} />
+                <LikeButton userId={userId} item={post} likeMutation={likePost} />
               </Grid>
               <Grid item xs={2}>
                 <Typography variant="h6" color="textSecondary">{post.likes.length}</Typography>
@@ -53,7 +54,7 @@ const PostList: React.FC<Props> = ({ likePost, posts, userId }: Props) => {
             <Divider variant="middle" className={classes.divider} />
             <CommentInput userId={userId} postId={post.id} />
             <Divider variant="middle" className={classes.divider} />
-            <CommentList comments={post.comments}/>
+            <CommentList comments={post.comments} userId={userId} likeComment={likeComment} />
           </CardContent>
         </Card>
       )) : []}

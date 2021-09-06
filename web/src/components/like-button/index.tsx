@@ -1,22 +1,22 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
-import { Post, UserLikesPosts } from '../../generated/graphql';
+import { CommentLike, PostLike } from '../../generated/graphql';
 
 interface Props {
-  post: Post;
+  item: any;
   userId: number,
-  likePost: any
+  likeMutation: any
 }
 
-const LikeButton = ({ post, userId, likePost}: Props) => {
-  const isAlreadyLiked: boolean = post && post.likes ?
-    post.likes.some((like: UserLikesPosts) => like.user.id === userId) : false;
+const LikeButton = ({ item, userId, likeMutation}: Props) => {
+  const isAlreadyLiked: boolean = item && item.likes ?
+    item.likes.some((like: PostLike | CommentLike) => like.user && like.user.id === userId) : false;
 
   return (
     <Button
       variant={isAlreadyLiked ? "contained" : "outlined"}
       color="primary"
-      onClick={() => likePost(userId, post, isAlreadyLiked)}
+      onClick={() => likeMutation(userId, item.id, isAlreadyLiked)}
     >
       {isAlreadyLiked ? 'Liked' : 'Like'}
     </Button>

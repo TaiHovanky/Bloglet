@@ -10,6 +10,7 @@ import {
   useGetFollowersQuery,
   CreatePostDocument,
   GetUserPostsDocument,
+  useLikeCommentMutation,
 } from '../../generated/graphql';
 import { currentUserProfileVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
@@ -82,6 +83,7 @@ const Home: React.FC<any> = () => {
     code, it's ultimately faster than refetching because there's not a network call. */
   });
   const [likePost] = useLikePostMutation();
+  const [likeComment] = useLikeCommentMutation();
 
   useEffect(
     () => {
@@ -102,11 +104,21 @@ const Home: React.FC<any> = () => {
     });
   }
 
-  const handleLikePost = (userId: number, post: Post, isAlreadyLiked: boolean) => {
+  const handleLikePost = (userId: number, postId: number, isAlreadyLiked: boolean) => {
     likePost({
       variables: {
         userId,
-        postId: post.id,
+        postId,
+        isAlreadyLiked
+      }
+    });
+  }
+
+  const handleLikeComment = (userId: number, commentId: number, isAlreadyLiked: boolean) => {
+    likeComment({
+      variables: {
+        userId,
+        commentId,
         isAlreadyLiked
       }
     });
@@ -143,6 +155,7 @@ const Home: React.FC<any> = () => {
               <PostList
                 posts={postsData?.getUserPosts}
                 likePost={handleLikePost}
+                likeComment={handleLikeComment}
                 userId={userData.homePage.id}
               />
             }

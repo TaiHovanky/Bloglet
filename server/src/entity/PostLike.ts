@@ -4,8 +4,8 @@ import { Post } from './Post';
 import { User } from './User';
 
 @ObjectType()
-@Entity({ name: 'user_likes_posts' })
-export class UserLikesPosts extends BaseEntity {
+@Entity({ name: 'post_like' })
+export class PostLike extends BaseEntity {
   constructor(
     user: User,
     post: Post

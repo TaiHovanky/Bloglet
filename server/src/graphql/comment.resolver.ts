@@ -5,6 +5,7 @@ import { Comment } from '../entity/Comment';
 import { requestContext } from '../types/context.interface';
 import { errorHandler } from '../utils/error-handler.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
+import { CommentLike } from '../entity/CommentLike';
 
 @Resolver()
 export class CommentResolver {
@@ -47,4 +48,50 @@ export class CommentResolver {
       return null;
     }
   }
+
+  @Mutation(() => Comment, { nullable: true })
+  @UseMiddleware(isAuthenticated)
+  async likeComment(
+    @Arg('userId') userId: number,
+    @Arg('commentId') commentId: number,
+    @Arg('isAlreadyLiked') isAlreadyLiked: boolean,
+    @Ctx() { res }: requestContext
+  ) {
+    try {
+      const commentToUpdate: Comment | undefined = await Comment
+        .createQueryBuilder('comment')
+        .where('comment.id = :commentId', { commentId })
+        .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
+        .leftJoinAndMapOne('comment_like.user', 'users', 'users', 'comment_like.user_id = users.id')
+        .getOne();
+  
+      if (isAlreadyLiked && commentToUpdate) {
+        const existingLikeIndex = commentToUpdate.likes.findIndex((like: CommentLike) => like.user.id === userId);
+        commentToUpdate.likes.splice(existingLikeIndex, 1);
+        await CommentLike.createQueryBuilder('comment_like')
+          .delete()
+          .where('comment_like.user_id = :userId', { userId })
+          .andWhere('comment_like.comment_id = :commentId', { commentId })
+          .execute();
+        return commentToUpdate;
+      } else {
+        const userToUpdate = await User.findOne({
+          where: { id: userId },
+          relations: ['likedComments']
+        });
+    
+        if (userToUpdate && commentToUpdate) {
+          const newCommentLike = new CommentLike(userToUpdate, commentToUpdate);
+          const savedCommentLike = await CommentLike.save(newCommentLike);
+          commentToUpdate.likes = [...commentToUpdate.likes, savedCommentLike];
+          return commentToUpdate;
+        }
+      }
+      return null;
+    } catch(err) {
+      errorHandler(`Failed to like post: ${err}`, res);
+      return null;
+    }
+  }
+
 }

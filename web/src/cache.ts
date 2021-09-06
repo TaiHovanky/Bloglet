@@ -11,7 +11,7 @@ const cache = new InMemoryCache({
           read() {
             return currentUserProfileVar();
           }
-        },
+        }
       }
     },
     Post: {
@@ -19,7 +19,16 @@ const cache = new InMemoryCache({
         likes: {
           merge(existing, incoming) {
             return incoming;
-          },
+          }
+        }
+      }
+    },
+    Comment: {
+      fields: {
+        likes: {
+          merge(existing, incoming) {
+            return incoming;
+          }
         }
       }
     }
