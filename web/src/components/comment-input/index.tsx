@@ -36,6 +36,8 @@ const CommentInput = ({ userId, postId }: Props) => {
         <TextField
           label="Comment"
           name="comment"
+          fullWidth
+          multiline
           disabled={loading}
           value={comment}
           onChange={handleChange}

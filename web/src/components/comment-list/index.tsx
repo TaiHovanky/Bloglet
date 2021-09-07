@@ -11,7 +11,7 @@ interface Props {
 const useStyles = makeStyles({
   root: {
     minWidth: 400,
-    marginTop: 30
+    marginTop: 10
   },
   inline: {
     display: 'inline',
@@ -29,13 +29,13 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
         return (
           <ListItem alignItems="flex-start" key={`comment-${index}`} id={`comment-${index}`}>
             <Grid container spacing={2} className={classes.likes}>
-              <Grid item xs={9}> 
+              <Grid item xs={10}> 
                 <ListItemText
                   secondary={
                     <React.Fragment>
                       <Typography
                         component="span"
-                        variant="body1"
+                        variant="subtitle2"
                         className={classes.inline}
                         color="textPrimary"
                       >
@@ -45,7 +45,6 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                         component="span"
                         variant="body2"
                         className={classes.inline}
-                        color="textSecondary"
                       >
                         {comment.comment}
                       </Typography>
@@ -53,11 +52,11 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                   }
                 />
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <LikeButton userId={userId} item={comment} likeMutation={likeComment} />
               </Grid>
               <Grid item xs={1}>
-                <Typography variant="h6" color="textSecondary">{comment.likes.length}</Typography>
+                <Typography variant="subtitle1" color="textSecondary">{comment.likes.length}</Typography>
               </Grid>
             </Grid>
           </ListItem>
