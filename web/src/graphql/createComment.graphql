@@ -11,8 +11,7 @@ mutation CreateComment(
     createdAt: $createdAt
   ) {
     id
-    title
-    body
+    content
     comments {
       id
       comment

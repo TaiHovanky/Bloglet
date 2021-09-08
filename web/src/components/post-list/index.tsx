@@ -15,6 +15,7 @@ const PostList: React.FC<Props> = ({ likePost, likeComment, posts, userId }: Pro
     <Container maxWidth="sm">
       {!!posts ? posts.map((post: any) => (
         <Post
+          key={post.id}
           post={post}
           userId={userId}
           likePost={likePost}

@@ -40,10 +40,10 @@ const Post: React.FC<Props> = ({ post, userId, likePost, likeComment }: Props) =
     <Card className={classes.root} variant="outlined" key={post.id}>
       <CardContent>
         {/* <Typography variant="h5" component="h2">
-          {post.title}
+          {post.content}
         </Typography> */}
         <Typography variant="subtitle1" className={classes.post}>
-          {post.title}
+          {post.content}
         </Typography>
         {/* <Divider variant="middle" className={classes.divider} /> */}
         <Grid container spacing={3} className={classes.likes}>

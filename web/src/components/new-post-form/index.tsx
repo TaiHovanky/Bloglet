@@ -21,30 +21,20 @@ const useStyles = makeStyles((theme) => ({
 
 const NewPostForm: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
-  const title = useFormField('', 'title');
-  const bodyText = useFormField('', 'title');
+  const content = useFormField('', 'content');
 
   return (
     <Paper elevation={3} className={classes.newPostPaper}>
       <Container maxWidth="md">
-        <Typography variant="h3" noWrap>Create a new post</Typography>
+        <Typography variant="h5" noWrap>Create Post</Typography>
         <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => props.handleSubmit(e)}>
           <div>
             <TextField
-              id="input-title"
-              label="Title"
-              name="title"
+              id="input-content"
+              label="What's on your mind?"
+              name="content"
               className={classes.newPostTextField}
-              {...title}
-            />
-          </div>
-          <div>
-            <TextField
-              id="input-bodyText"
-              label="Content"
-              name="bodyText"
-              className={classes.newPostTextField}
-              {...bodyText}
+              {...content}
             />
           </div>
           <Button

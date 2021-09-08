@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 
 interface Props {
   followers: any;
@@ -21,8 +21,14 @@ const UserFollows = ({
 
   return (
     <>
-      <Typography variant="h5">Following: {following ? following?.getFollowing?.length : 0}</Typography>
-      <Typography variant="h5">Followers: {followers ? followers?.getFollowers?.length : 0}</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={3}>
+          <Typography variant="subtitle1">Following: {following ? following?.getFollowing?.length : 0}</Typography>
+        </Grid>
+        <Grid item xs={3}>
+          <Typography variant="subtitle1">Followers: {followers ? followers?.getFollowers?.length : 0}</Typography>
+        </Grid>
+      </Grid>
     </>
   );
 }

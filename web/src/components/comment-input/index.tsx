@@ -37,7 +37,6 @@ const CommentInput = ({ userId, postId }: Props) => {
           label="Comment"
           name="comment"
           fullWidth
-          multiline
           disabled={loading}
           value={comment}
           onChange={handleChange}
