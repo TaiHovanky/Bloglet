@@ -1,5 +1,6 @@
-import React from 'react';
-import { Divider, Drawer, List, ListItem, ListItemText, makeStyles } from '@material-ui/core';
+import React, { useState } from 'react';
+import { Divider, Drawer, List, ListItem, ListItemText, makeStyles, IconButton } from '@material-ui/core';
+import { Menu } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import Logout from '../logout'
 
@@ -12,43 +13,63 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerPaper: {
     width: drawerWidth,
+    backgroundColor: '#424242'
   },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
+  menuIcon: {
+    fill: '#fff'
+  },
+  menuItemText: {
+    fontWeight: 'bold',
+    color: '#fff'
+  }
 }));
 
 const NavBar = () => {
   const classes = useStyles();
+  const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
+
+  const toggleDrawer = (open: boolean) => {
+    setIsNavDrawerOpen(open);
+  };
+
   return (
-    <Drawer
-      className={classes.drawer}
-      variant="permanent"
-      classes={{
-        paper: classes.drawerPaper,
-      }}
-      anchor="left"
-    >
-      <div className={classes.toolbar} />
-      <Divider />
-      <List>
-        <Link to="/">
-          <ListItem button>
-            <ListItemText primary="Home" />
-          </ListItem>
-        </Link>
-        <Link to="/register">
-          <ListItem button>
-            <ListItemText primary="Register" />
-          </ListItem>
-        </Link>
-        <Link to="/login">
-          <ListItem button>
-            <ListItemText primary="Login" />
-          </ListItem>
-        </Link>
-        <Logout />
-      </List>
-    </Drawer>
+    <>
+      <IconButton onClick={() => toggleDrawer(true)}>
+        <Menu className={classes.menuIcon} />
+      </IconButton>
+      <Drawer
+        className={classes.drawer}
+        open={isNavDrawerOpen}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+        onClose={() => toggleDrawer(false)}
+        anchor="left"
+      >
+        <div className={classes.toolbar} />
+        <Divider />
+        <List>
+          <Link to="/">
+            <ListItem button>
+              <ListItemText className={classes.menuItemText} primary="Home" />
+            </ListItem>
+          </Link>
+          <Link to="/register">
+            <ListItem button>
+              <ListItemText className={classes.menuItemText} primary="Register" />
+            </ListItem>
+          </Link>
+          <Link to="/login">
+            <ListItem button>
+              <ListItemText className={classes.menuItemText} primary="Login" />
+            </ListItem>
+          </Link>
+          <Logout />
+        </List>
+      </Drawer>
+    </>
   );
 }
 

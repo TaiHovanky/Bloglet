@@ -43,11 +43,10 @@ export class PostResolver {
   @UseMiddleware(isAuthenticated)
   async createPost(
     @Arg('creatorId') creatorId: number, 
-    @Arg('title') title: string,
-    @Arg('body') body: string,
+    @Arg('content') content: string,
     @Ctx() { res }: requestContext
   ) {
-    const newPost = new Post(title, body, creatorId);
+    const newPost = new Post(content, creatorId);
     return await Post.save(newPost)
       .catch((err) => {
         errorHandler(`Post creation failed: ${err}`, res);

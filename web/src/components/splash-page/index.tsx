@@ -1,5 +1,7 @@
 import React from 'react';
 import { Container, makeStyles, Paper, Typography } from '@material-ui/core';
+// import NavBar from '../navbar';
+import PrimaryAppBar from '../primary-app-bar';
 
 const useStyles = makeStyles((theme) => ({
   homePaper: {
@@ -16,13 +18,16 @@ const SplashPage = () => {
   const classes = useStyles();
 
   return (
-    <Paper elevation={3} className={classes.homePaper}>
-      <Container maxWidth="md">
-        <Typography className={classes.homePageText} variant="h3">Welcome to my practice social media app</Typography>
-        <Typography className={classes.homePageText} variant="h5">Share your musings with the world through blog posts</Typography>
-        <Typography className={classes.homePageText} variant="h5">To get started, register yourself as a user or login with an existing account</Typography>
-      </Container>
-    </Paper>
+    <>
+      <PrimaryAppBar user={null} />
+      <Paper elevation={3} className={classes.homePaper}>
+        <Container maxWidth="md">
+          <Typography className={classes.homePageText} variant="h3">Welcome to my practice social media app</Typography>
+          <Typography className={classes.homePageText} variant="h5">Share your musings with the world through blog posts</Typography>
+          <Typography className={classes.homePageText} variant="h5">To get started, register yourself as a user or login with an existing account</Typography>
+        </Container>
+      </Paper>
+    </>
   );
 }
 

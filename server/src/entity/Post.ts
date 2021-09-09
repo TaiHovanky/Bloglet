@@ -7,13 +7,11 @@ import { Comment } from './Comment';
 @Entity('posts')
 export class Post extends BaseEntity {
   constructor(
-    title: string,
-    body: string,
+    content: string,
     creatorId: number
   ) {
     super();
-    this.title = title;
-    this.body = body;
+    this.content = content;
     this.creatorId = creatorId;
   }
 
@@ -21,13 +19,9 @@ export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ nullable: true })
-  title: string;
-
-  @Field()
-  @Column({ nullable: true })
-  body: string;
+  content: string;
 
   @Field()
   @Column({ nullable: true })
