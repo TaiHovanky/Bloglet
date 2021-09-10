@@ -8,11 +8,13 @@ import { Comment } from './Comment';
 export class Post extends BaseEntity {
   constructor(
     content: string,
-    creatorId: number
+    creatorId: number,
+    createdAt: string
   ) {
     super();
     this.content = content;
     this.creatorId = creatorId;
+    this.createdAt = createdAt;
   }
 
   @Field()
@@ -26,6 +28,10 @@ export class Post extends BaseEntity {
   @Field()
   @Column({ nullable: true })
   creatorId: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  createdAt: string;
 
   @Field(() => [PostLike], { nullable: true })
   @OneToMany(() => PostLike, (likes: PostLike) => likes.post)

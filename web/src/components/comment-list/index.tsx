@@ -10,8 +10,7 @@ interface Props {
 
 const useStyles = makeStyles({
   root: {
-    minWidth: 400,
-    marginTop: 10
+    minWidth: 400
   },
   inline: {
     display: 'inline',
@@ -23,6 +22,7 @@ const useStyles = makeStyles({
 
 const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) => {
   const classes = useStyles();
+
   return (
     <List className={classes.root}>
       {comments.map((comment, index: number) => {
@@ -48,6 +48,11 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                       >
                         {comment.comment}
                       </Typography>
+                      <div>
+                        <Typography variant="caption">
+                          {comment.createdAt}
+                        </Typography>
+                      </div>
                     </React.Fragment>
                   }
                 />

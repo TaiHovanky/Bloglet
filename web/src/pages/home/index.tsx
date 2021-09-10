@@ -52,7 +52,8 @@ const Home: React.FC<any> = () => {
   const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
-    onError: (err) => console.log(err)
+    onError: (err) => console.log(err),
+    onCompleted: (data) => console.log('posts data', data)
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
@@ -94,15 +95,17 @@ const Home: React.FC<any> = () => {
     [homePageQueryExecutor]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, callback: ()=> void) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     await createPost({
       variables: {
         creatorId: userData && userData.homePage ? userData.homePage.id : 0,
         content: formData.get('content') as string,
+        createdAt: new Date().toLocaleString()
       }
     });
+    callback();
   }
 
   const handleLikePost = (userId: number, postId: number, isAlreadyLiked: boolean) => {

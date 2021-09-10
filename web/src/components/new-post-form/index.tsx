@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
-import { useFormField } from '../../hooks/use-form-field.hook';
 
 interface Props {
-  handleSubmit: (e: React.FormEvent) => Promise<void>
+  handleSubmit: (e: React.FormEvent, callback: () => void) => Promise<void>
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -21,20 +20,30 @@ const useStyles = makeStyles((theme) => ({
 
 const NewPostForm: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
-  const content = useFormField('', 'content');
+  const [postContent, setPostContent] = useState('');
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPostContent(e.target.value);
+  };
+
+  const clearForm = () => {
+    setPostContent('');
+  };
 
   return (
     <Paper elevation={3} className={classes.newPostPaper}>
       <Container maxWidth="md">
         <Typography variant="h5" noWrap>Create Post</Typography>
-        <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => props.handleSubmit(e)}>
+        <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => props.handleSubmit(e, clearForm)}>
           <div>
             <TextField
               id="input-content"
               label="What's on your mind?"
               name="content"
+              multiline
               className={classes.newPostTextField}
-              {...content}
+              value={postContent}
+              onChange={handleChange}
             />
           </div>
           <Button

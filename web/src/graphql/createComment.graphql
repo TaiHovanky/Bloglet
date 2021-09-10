@@ -15,6 +15,7 @@ mutation CreateComment(
     comments {
       id
       comment
+      createdAt
       user {
         id
         firstName
