@@ -23,8 +23,10 @@ import UserFollows from '../../components/user-follows';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
-    paddingTop: '1px',
-    height: '100vh'
+    minHeight: '100vh'
+  },
+  currentUserInfoContainer: {
+    marginBottom: 30
   }
 }));
 
@@ -50,7 +52,7 @@ const Home: React.FC<any> = () => {
   const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
-    onError: (err) => console.log(err)
+    onError: (err) => console.log(err),
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
@@ -92,16 +94,17 @@ const Home: React.FC<any> = () => {
     [homePageQueryExecutor]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, callback: ()=> void) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     await createPost({
       variables: {
         creatorId: userData && userData.homePage ? userData.homePage.id : 0,
-        title: formData.get('title') as string,
-        body: formData.get('bodyText') as string
+        content: formData.get('content') as string,
+        createdAt: new Date().toLocaleString()
       }
     });
+    callback();
   }
 
   const handleLikePost = (userId: number, postId: number, isAlreadyLiked: boolean) => {
@@ -134,22 +137,22 @@ const Home: React.FC<any> = () => {
         <>
           <PrimaryAppBar user={userData.homePage} />
           <Container maxWidth="sm">
-            <>
-              <Typography variant="h3">
+            <div className={classes.currentUserInfoContainer}>
+              <Typography variant="h4">
                 {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
               </Typography>
-              <FollowButton
-                followers={followerData}
-                loggedInUser={userData.homePage.id}
-                userToBeFollowed={currentUserProfileVar().id}
-              />
               <UserFollows
                 followers={followerData}
                 following={followingData}
                 followerLoading={followerLoading}
                 followingLoading={followingLoading}
               />
-            </>
+              <FollowButton
+                followers={followerData}
+                loggedInUser={userData.homePage.id}
+                userToBeFollowed={currentUserProfileVar().id}
+              />
+            </div>
             {currentUserProfileVar().id === userData.homePage.id && <NewPostForm handleSubmit={handleSubmit} />}
             {postsData && postsData.getUserPosts &&
               <PostList

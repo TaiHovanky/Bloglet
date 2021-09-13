@@ -11,11 +11,11 @@ mutation CreateComment(
     createdAt: $createdAt
   ) {
     id
-    title
-    body
+    content
     comments {
       id
       comment
+      createdAt
       user {
         id
         firstName

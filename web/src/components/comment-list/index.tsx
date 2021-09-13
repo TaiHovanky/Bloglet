@@ -10,8 +10,7 @@ interface Props {
 
 const useStyles = makeStyles({
   root: {
-    minWidth: 400,
-    marginTop: 30
+    minWidth: 400
   },
   inline: {
     display: 'inline',
@@ -23,19 +22,20 @@ const useStyles = makeStyles({
 
 const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) => {
   const classes = useStyles();
+
   return (
     <List className={classes.root}>
       {comments.map((comment, index: number) => {
         return (
           <ListItem alignItems="flex-start" key={`comment-${index}`} id={`comment-${index}`}>
             <Grid container spacing={2} className={classes.likes}>
-              <Grid item xs={9}> 
+              <Grid item xs={10}> 
                 <ListItemText
                   secondary={
                     <React.Fragment>
                       <Typography
                         component="span"
-                        variant="body1"
+                        variant="subtitle2"
                         className={classes.inline}
                         color="textPrimary"
                       >
@@ -45,19 +45,23 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                         component="span"
                         variant="body2"
                         className={classes.inline}
-                        color="textSecondary"
                       >
                         {comment.comment}
                       </Typography>
+                      <div>
+                        <Typography variant="caption">
+                          {comment.createdAt}
+                        </Typography>
+                      </div>
                     </React.Fragment>
                   }
                 />
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <LikeButton userId={userId} item={comment} likeMutation={likeComment} />
               </Grid>
               <Grid item xs={1}>
-                <Typography variant="h6" color="textSecondary">{comment.likes.length}</Typography>
+                <Typography variant="subtitle1" color="textSecondary">{comment.likes.length}</Typography>
               </Grid>
             </Grid>
           </ListItem>

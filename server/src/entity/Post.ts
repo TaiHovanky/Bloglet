@@ -7,31 +7,31 @@ import { Comment } from './Comment';
 @Entity('posts')
 export class Post extends BaseEntity {
   constructor(
-    title: string,
-    body: string,
-    creatorId: number
+    content: string,
+    creatorId: number,
+    createdAt: string
   ) {
     super();
-    this.title = title;
-    this.body = body;
+    this.content = content;
     this.creatorId = creatorId;
+    this.createdAt = createdAt;
   }
 
   @Field()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ nullable: true })
-  title: string;
-
-  @Field()
-  @Column({ nullable: true })
-  body: string;
+  content: string;
 
   @Field()
   @Column({ nullable: true })
   creatorId: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  createdAt: string;
 
   @Field(() => [PostLike], { nullable: true })
   @OneToMany(() => PostLike, (likes: PostLike) => likes.post)

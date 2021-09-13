@@ -72,8 +72,8 @@ export type MutationLoginArgs = {
 
 
 export type MutationCreatePostArgs = {
-  body: Scalars['String'];
-  title: Scalars['String'];
+  createdAt: Scalars['String'];
+  content: Scalars['String'];
   creatorId: Scalars['Float'];
 };
 
@@ -109,9 +109,9 @@ export type MutationLikeCommentArgs = {
 export type Post = {
   __typename?: 'Post';
   id: Scalars['Float'];
-  title: Scalars['String'];
-  body: Scalars['String'];
+  content?: Maybe<Scalars['String']>;
   creatorId: Scalars['Float'];
+  createdAt?: Maybe<Scalars['String']>;
   likes?: Maybe<Array<PostLike>>;
   comments?: Maybe<Array<Comment>>;
 };
@@ -184,10 +184,10 @@ export type CreateCommentMutation = (
   { __typename?: 'Mutation' }
   & { createComment?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'body'>
+    & Pick<Post, 'id' | 'content'>
     & { comments?: Maybe<Array<(
       { __typename?: 'Comment' }
-      & Pick<Comment, 'id' | 'comment'>
+      & Pick<Comment, 'id' | 'comment' | 'createdAt'>
       & { user?: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'id' | 'firstName' | 'lastName'>
@@ -201,8 +201,8 @@ export type CreateCommentMutation = (
 
 export type CreatePostMutationVariables = Exact<{
   creatorId: Scalars['Float'];
-  title: Scalars['String'];
-  body: Scalars['String'];
+  content: Scalars['String'];
+  createdAt: Scalars['String'];
 }>;
 
 
@@ -210,7 +210,7 @@ export type CreatePostMutation = (
   { __typename?: 'Mutation' }
   & { createPost?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'body'>
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
   )> }
 );
 
@@ -275,7 +275,7 @@ export type GetUserPostsQuery = (
   { __typename?: 'Query' }
   & { getUserPosts?: Maybe<Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'body'>
+    & Pick<Post, 'id' | 'content' | 'createdAt'>
     & { likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
@@ -284,7 +284,7 @@ export type GetUserPostsQuery = (
       ) }
     )>>, comments?: Maybe<Array<(
       { __typename?: 'Comment' }
-      & Pick<Comment, 'id' | 'comment'>
+      & Pick<Comment, 'id' | 'comment' | 'createdAt'>
       & { likes?: Maybe<Array<(
         { __typename?: 'CommentLike' }
         & Pick<CommentLike, 'id'>
@@ -348,7 +348,7 @@ export type LikePostMutation = (
   { __typename?: 'Mutation' }
   & { likePost?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'body'>
+    & Pick<Post, 'id' | 'content'>
     & { likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
@@ -421,11 +421,11 @@ export const CreateCommentDocument = gql`
     createdAt: $createdAt
   ) {
     id
-    title
-    body
+    content
     comments {
       id
       comment
+      createdAt
       user {
         id
         firstName
@@ -468,11 +468,12 @@ export type CreateCommentMutationHookResult = ReturnType<typeof useCreateComment
 export type CreateCommentMutationResult = Apollo.MutationResult<CreateCommentMutation>;
 export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateCommentMutation, CreateCommentMutationVariables>;
 export const CreatePostDocument = gql`
-    mutation CreatePost($creatorId: Float!, $title: String!, $body: String!) {
-  createPost(creatorId: $creatorId, title: $title, body: $body) {
+    mutation CreatePost($creatorId: Float!, $content: String!, $createdAt: String!) {
+  createPost(creatorId: $creatorId, content: $content, createdAt: $createdAt) {
     id
-    title
-    body
+    creatorId
+    content
+    createdAt
   }
 }
     `;
@@ -492,8 +493,8 @@ export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, C
  * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
  *   variables: {
  *      creatorId: // value for 'creatorId'
- *      title: // value for 'title'
- *      body: // value for 'body'
+ *      content: // value for 'content'
+ *      createdAt: // value for 'createdAt'
  *   },
  * });
  */
@@ -631,8 +632,8 @@ export const GetUserPostsDocument = gql`
     query GetUserPosts($userId: Float!) {
   getUserPosts(userId: $userId) {
     id
-    title
-    body
+    content
+    createdAt
     likes {
       user {
         id
@@ -641,6 +642,7 @@ export const GetUserPostsDocument = gql`
     comments {
       id
       comment
+      createdAt
       likes {
         id
         user {
@@ -777,8 +779,7 @@ export const LikePostDocument = gql`
     mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
   likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {
     id
-    title
-    body
+    content
     likes {
       user {
         id

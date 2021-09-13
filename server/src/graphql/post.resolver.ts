@@ -16,6 +16,7 @@ export class PostResolver {
   ) {
     return Post
       .createQueryBuilder('posts')
+      .orderBy('posts.id', "DESC")
       .where('posts.creatorId = :creatorId', { creatorId: userId })
       .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
       .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
@@ -43,11 +44,11 @@ export class PostResolver {
   @UseMiddleware(isAuthenticated)
   async createPost(
     @Arg('creatorId') creatorId: number, 
-    @Arg('title') title: string,
-    @Arg('body') body: string,
+    @Arg('content') content: string,
+    @Arg('createdAt') createdAt: string,
     @Ctx() { res }: requestContext
   ) {
-    const newPost = new Post(title, body, creatorId);
+    const newPost = new Post(content, creatorId, createdAt);
     return await Post.save(newPost)
       .catch((err) => {
         errorHandler(`Post creation failed: ${err}`, res);

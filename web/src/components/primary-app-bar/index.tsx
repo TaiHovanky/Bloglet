@@ -9,6 +9,7 @@ import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@mat
 import { useSearchUsersQuery } from '../../generated/graphql';
 import { currentUserProfileVar } from '../../cache';
 import User from '../../types/user.interface';
+import NavBar from '../navbar';
 
 interface Props {
   user?: any,
@@ -121,10 +122,11 @@ const PrimaryAppBar = ({ user }: Props) => {
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
+          <NavBar />
           {user && <Typography className={classes.title} variant="h6" noWrap>
             Welcome, {`${user.firstName} ${user.lastName}`}
           </Typography>}
-          <div className={classes.search}>
+          {user && <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
             </div>
@@ -171,7 +173,7 @@ const PrimaryAppBar = ({ user }: Props) => {
                 </Grow>
               )}
             </Popper>
-          </div>
+          </div>}
         </Toolbar>
       </AppBar>
     </div>

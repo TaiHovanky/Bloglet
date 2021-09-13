@@ -4,16 +4,20 @@ import { RouteComponentProps } from 'react-router';
 import { useFormField } from '../../hooks/use-form-field.hook';
 import { useLoginMutation } from '../../generated/graphql';
 import { setAccessToken } from '../../accessToken';
+import PrimaryAppBar from '../../components/primary-app-bar';
 
 const useStyles = makeStyles((theme) => ({
   loginPageContainer: {
-    paddingTop: '1px',
     height: '100vh',
   },
   loginPaper: {
-    margin: theme.spacing(32),
+    width: '40%',
+    margin: '0 auto',
     paddingBottom: theme.spacing(4),
-    paddingTop: theme.spacing(4)
+    paddingTop: theme.spacing(4),
+    marginTop: theme.spacing(32),
+    paddingLeft: 48,
+    paddingRight: 48
   },
   textField: {
     width: '100%'
@@ -49,6 +53,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <div className={classes.loginPageContainer}>
+      <PrimaryAppBar user={null} />
       <Paper elevation={3} className={classes.loginPaper}>
         <Container maxWidth="md">
           <Typography variant="h3" noWrap>Log In</Typography>

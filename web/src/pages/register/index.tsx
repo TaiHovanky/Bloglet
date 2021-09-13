@@ -3,16 +3,20 @@ import { Button, Container, makeStyles, Paper, TextField, Typography } from '@ma
 import { RouteComponentProps } from 'react-router';
 import { useRegisterMutation } from '../../generated/graphql';
 import { useFormField } from '../../hooks/use-form-field.hook';
+import PrimaryAppBar from '../../components/primary-app-bar';
 
 const useStyles = makeStyles((theme) => ({
   registerPageContainer: {
-    paddingTop: '1px',
     height: '100vh',
   },
   registerPaper: {
-    margin: theme.spacing(32),
+    width: '40%',
+    margin: '0 auto',
     paddingBottom: theme.spacing(4),
     paddingTop: theme.spacing(4),
+    marginTop: theme.spacing(32),
+    paddingLeft: 48,
+    paddingRight: 48
   },
   textField: {
     width: '100%'
@@ -49,6 +53,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <div className={classes.registerPageContainer}>
+      <PrimaryAppBar user={null} />
       <Paper elevation={3} className={classes.registerPaper}>
         <Container maxWidth="md">
           <Typography variant="h3" noWrap>Sign Up</Typography>

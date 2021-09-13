@@ -1,8 +1,8 @@
 query GetUserPosts($userId: Float!) {
   getUserPosts(userId: $userId) {
     id
-    title
-    body
+    content
+    createdAt
     likes {
       user {
         id
@@ -11,6 +11,7 @@ query GetUserPosts($userId: Float!) {
     comments {
       id
       comment
+      createdAt
       likes {
         id
         user {

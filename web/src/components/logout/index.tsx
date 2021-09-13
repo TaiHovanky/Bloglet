@@ -1,11 +1,19 @@
 import React from 'react';
-import { ListItem, ListItemText } from '@material-ui/core';
+import { ListItem, ListItemText, makeStyles } from '@material-ui/core';
 import { useLogoutMutation } from '../../generated/graphql';
 import { setAccessToken } from '../../accessToken';
 
 interface Props {}
 
+const useStyles = makeStyles(() => ({
+  logoutItemText: {
+    fontWeight: 'bold',
+    color: '#fff'
+  }
+}));
+
 const Logout: React.FC<Props> = () => {
+  const classes = useStyles();
   const [logout, { client }] = useLogoutMutation();
 
   const handleLogoutClick = async () => {
@@ -16,7 +24,7 @@ const Logout: React.FC<Props> = () => {
 
   return (
     <ListItem button onClick={handleLogoutClick}>
-      <ListItemText primary="Logout" />
+      <ListItemText className={classes.logoutItemText} primary="Logout" />
     </ListItem>
   );
 }
