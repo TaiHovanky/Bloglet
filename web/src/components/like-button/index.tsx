@@ -21,13 +21,6 @@ const LikeButton = ({ item, userId, likeMutation}: Props) => {
     >
       {isAlreadyLiked ? <ThumbUp /> : <ThumbUpOutlined />}
     </IconButton>
-    // <Button
-    //   variant={isAlreadyLiked ? "contained" : "outlined"}
-    //   color="primary"
-    //   onClick={() => likeMutation(userId, item.id, isAlreadyLiked)}
-    // >
-    //   {isAlreadyLiked ? 'Liked' : 'Like'}
-    // </Button>
   );
 };
 

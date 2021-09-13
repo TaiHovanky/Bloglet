@@ -4,7 +4,6 @@ import { makeStyles } from '@material-ui/core';
 import Home from './pages/home';
 import Register from './pages/register';
 import Login from './pages/login';
-// import NavBar from './components/navbar';
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -18,9 +17,6 @@ const Routes = () => {
 
   return (
     <BrowserRouter>
-      {/* <header>
-        <NavBar />
-      </header> */}
       <main className={classes.content}>
         <Switch>
           <Route exact path="/" component={Home} />

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Container, makeStyles, Paper, Typography } from '@material-ui/core';
-// import NavBar from '../navbar';
 import PrimaryAppBar from '../primary-app-bar';
 
 const useStyles = makeStyles((theme) => ({

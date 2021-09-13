@@ -63,7 +63,6 @@ const Post: React.FC<Props> = ({ post, userId, likePost, likeComment }: Props) =
             <Typography variant="subtitle1" color="textSecondary">{post.comments.length}</Typography>
           </Grid>
         </Grid>
-        {/* <Divider variant="middle" /> */}
         {showCommentInput && <CommentInput userId={userId} postId={post.id} />}
         <CommentList comments={post.comments} userId={userId} likeComment={likeComment} />
       </CardContent>
