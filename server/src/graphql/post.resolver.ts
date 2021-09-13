@@ -16,6 +16,7 @@ export class PostResolver {
   ) {
     return Post
       .createQueryBuilder('posts')
+      .orderBy('posts.id', "DESC")
       .where('posts.creatorId = :creatorId', { creatorId: userId })
       .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
       .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
