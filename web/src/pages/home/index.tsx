@@ -53,6 +53,7 @@ const Home: React.FC<any> = () => {
     variables: { userId: currentUserProfileVar().id },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
+    onCompleted: (data) => console.log('got user posts', data)
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
@@ -75,7 +76,7 @@ const Home: React.FC<any> = () => {
         cache.modify({
           fields: {
             getUserPosts(existingPosts: Array<Post>) {
-              return [...posts.getUserPosts as Array<Post>, data.data.createPost];
+              return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
             }
           }
         });

@@ -20,6 +20,20 @@ const cache = new InMemoryCache({
           merge(existing, incoming) {
             return incoming;
           }
+        },
+        comments: {
+          merge(existing, incoming) {
+            const newIncoming = [...incoming];
+            return newIncoming.sort((a: any, b: any) => {
+              if (a.__ref > b.__ref) {
+                return 1;
+              }
+              if (a.__ref < b.__ref) {
+                return -1;
+              }
+              return 0;
+            });
+          }
         }
       }
     },

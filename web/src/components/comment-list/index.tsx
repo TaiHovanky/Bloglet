@@ -17,6 +17,9 @@ const useStyles = makeStyles({
   },
   likes: {
     marginBottom: 4
+  },
+  commentCreatedAt: {
+    display: 'block'
   }
 });
 
@@ -48,11 +51,11 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                       >
                         {comment.comment}
                       </Typography>
-                      <div>
+                      <span className={classes.commentCreatedAt}>
                         <Typography variant="caption">
                           {comment.createdAt}
                         </Typography>
-                      </div>
+                      </span>
                     </React.Fragment>
                   }
                 />
