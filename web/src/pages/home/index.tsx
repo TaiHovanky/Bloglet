@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Container, makeStyles, Typography } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Button, Container, makeStyles, Typography } from '@material-ui/core';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   useHomePageLazyQuery,
@@ -12,7 +12,7 @@ import {
   GetUserPostsDocument,
   useLikeCommentMutation,
 } from '../../generated/graphql';
-import { currentUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
 import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
@@ -20,6 +20,7 @@ import PrimaryAppBar from '../../components/primary-app-bar';
 import getCurrentUserProfile from '../../cache-queries/current-user-profile';
 import FollowButton from '../../components/follow-button';
 import UserFollows from '../../components/user-follows';
+import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -32,6 +33,7 @@ const useStyles = makeStyles(() => ({
 
 const Home: React.FC<any> = () => {
   const classes = useStyles();
+
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({
     fetchPolicy: 'network-only',
     onCompleted: (data: any) => {
@@ -48,12 +50,20 @@ const Home: React.FC<any> = () => {
 
   // eslint-disable-next-line
   const currentUserProfile = useQuery(getCurrentUserProfile);
+  // eslint-disable-next-line
+  const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
 
-  const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
-    variables: { userId: currentUserProfileVar().id },
+  const { data: postsData, loading: postsLoading, fetchMore } = useGetUserPostsQuery({
+    variables: { userId: currentUserProfileVar().id, cursor: userPostsCursor },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
-    onCompleted: (data) => console.log('got user posts', data)
+    onCompleted: (data) => {
+      console.log('got user posts', data, currentGetUserPostsCursor,
+        currentGetUserPostsCursorVar());
+      // if (postsData && postsData.getUserPosts && postsData.getUserPosts.length) {
+      //   setUserPostsCursor(postsData.getUserPosts.length);
+      // }
+    }
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
@@ -132,6 +142,7 @@ const Home: React.FC<any> = () => {
     return <div>Loading...</div>;
   }
 
+  // console.log('user posts cursor', userPostsCursor);
   return (
     <div className={classes.homePageContainer}>
       {userData && userData.homePage ?
@@ -163,6 +174,14 @@ const Home: React.FC<any> = () => {
                 userId={userData.homePage.id}
               />
             }
+            <Button onClick={() => {
+              fetchMore({
+                variables: {
+                  userId: currentUserProfileVar().id,
+                  cursor: currentGetUserPostsCursorVar()
+                }
+              });
+            }}>see more</Button>
           </Container>
         </> :
         <SplashPage />

@@ -1,7 +1,9 @@
 import { InMemoryCache, makeVar, ReactiveVar } from '@apollo/client';
 import User from './types/user.interface';
+// import { offsetFromCursor } from './utils/pagination.util';
 
 export const currentUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
+export const currentGetUserPostsCursorVar: ReactiveVar<number> = makeVar(0);
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -10,6 +12,32 @@ const cache = new InMemoryCache({
         currentUserProfile: {
           read() {
             return currentUserProfileVar();
+          }
+        },
+        currentGetUserPostsCursor: {
+          read() {
+            return currentGetUserPostsCursorVar();
+          }
+        },
+        getUserPosts: {
+          keyArgs: ['type'],
+          merge(existing, incoming) {
+            // const merged = existing ? [...existing] : [];
+            // let offset = offsetFromCursor(merged, cursor, readField);
+            // if (offset < 0) {
+            //   offset = merged.length;
+            // }
+            // for (let i = 0; i < incoming.length; ++i) {
+            //   merged[offset + i] = incoming[i];
+            // }
+            // return merged;
+            console.log('get user post cache existing incoming', existing, incoming);
+            if (existing && existing.length) {
+              currentGetUserPostsCursorVar(existing.length + incoming.length);
+            } else {
+              currentGetUserPostsCursorVar(incoming.length);
+            }
+            return existing ? [...existing, ...incoming] : incoming;
           }
         }
       }

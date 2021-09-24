@@ -12,11 +12,15 @@ export class PostResolver {
   @UseMiddleware(isAuthenticated)
   getUserPosts(
     @Arg('userId') userId: number,
+    @Arg('cursor') cursor: number,
     @Ctx() { res }: requestContext
   ) {
+    console.log('cursor', cursor);
     return Post
       .createQueryBuilder('posts')
       .orderBy('posts.id', "DESC")
+      .skip(cursor)
+      .take(5)
       .where('posts.creatorId = :creatorId', { creatorId: userId })
       .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
       .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')

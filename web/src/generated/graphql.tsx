@@ -141,6 +141,7 @@ export type QuerySearchUsersArgs = {
 
 
 export type QueryGetUserPostsArgs = {
+  cursor: Scalars['Float'];
   userId: Scalars['Float'];
 };
 
@@ -268,6 +269,7 @@ export type GetFollowingQuery = (
 
 export type GetUserPostsQueryVariables = Exact<{
   userId: Scalars['Float'];
+  cursor: Scalars['Float'];
 }>;
 
 
@@ -629,8 +631,8 @@ export type GetFollowingQueryHookResult = ReturnType<typeof useGetFollowingQuery
 export type GetFollowingLazyQueryHookResult = ReturnType<typeof useGetFollowingLazyQuery>;
 export type GetFollowingQueryResult = Apollo.QueryResult<GetFollowingQuery, GetFollowingQueryVariables>;
 export const GetUserPostsDocument = gql`
-    query GetUserPosts($userId: Float!) {
-  getUserPosts(userId: $userId) {
+    query GetUserPosts($userId: Float!, $cursor: Float!) {
+  getUserPosts(userId: $userId, cursor: $cursor) {
     id
     content
     createdAt
@@ -675,6 +677,7 @@ export const GetUserPostsDocument = gql`
  * const { data, loading, error } = useGetUserPostsQuery({
  *   variables: {
  *      userId: // value for 'userId'
+ *      cursor: // value for 'cursor'
  *   },
  * });
  */

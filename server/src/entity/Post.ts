@@ -33,6 +33,9 @@ export class Post extends BaseEntity {
   @Column({ nullable: true })
   createdAt: string;
 
+  // @Field()
+  // cursor: number;
+
   @Field(() => [PostLike], { nullable: true })
   @OneToMany(() => PostLike, (likes: PostLike) => likes.post)
   likes: Array<PostLike>;

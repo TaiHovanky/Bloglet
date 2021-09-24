@@ -1,5 +1,5 @@
-query GetUserPosts($userId: Float!) {
-  getUserPosts(userId: $userId) {
+query GetUserPosts($userId: Float!, $cursor: Float!) {
+  getUserPosts(userId: $userId, cursor: $cursor) {
     id
     content
     createdAt
