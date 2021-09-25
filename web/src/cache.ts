@@ -1,9 +1,11 @@
 import { InMemoryCache, makeVar, ReactiveVar } from '@apollo/client';
+import { Post } from './generated/graphql';
 import User from './types/user.interface';
 // import { offsetFromCursor } from './utils/pagination.util';
 
 export const currentUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
 export const currentGetUserPostsCursorVar: ReactiveVar<number> = makeVar(0);
+export const currentOffsetLimitVar: ReactiveVar<number> = makeVar(5);
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -19,9 +21,14 @@ const cache = new InMemoryCache({
             return currentGetUserPostsCursorVar();
           }
         },
+        currentOffsetLimit: {
+          read() {
+            return currentOffsetLimitVar();
+          }
+        },
         getUserPosts: {
-          keyArgs: ['type'],
-          merge(existing, incoming) {
+          keyArgs: ['type', 'id'],
+          merge(existing = [], incoming, { readField }) {
             // const merged = existing ? [...existing] : [];
             // let offset = offsetFromCursor(merged, cursor, readField);
             // if (offset < 0) {
@@ -31,13 +38,40 @@ const cache = new InMemoryCache({
             //   merged[offset + i] = incoming[i];
             // }
             // return merged;
-            console.log('get user post cache existing incoming', existing, incoming);
-            if (existing && existing.length) {
-              currentGetUserPostsCursorVar(existing.length + incoming.length);
-            } else {
-              currentGetUserPostsCursorVar(incoming.length);
+            const postIdToIndex: any = {};
+            if (existing.length) {
+              existing.forEach((post: Post) => {
+                const postId = readField('id', post);
+                console.log('existing postid', postId);
+                if (postId) {
+                  postIdToIndex[postId?.toString()] = postId;
+                }
+              });
             }
-            return existing ? [...existing, ...incoming] : incoming;
+            console.log('get user post cache existing incoming', existing, incoming, postIdToIndex);
+            let shouldReturnExisting = false;
+            incoming.forEach((post: Post) => {
+              const incomingPostId = readField('id', post);
+              if (incomingPostId && postIdToIndex[incomingPostId?.toString()]) {
+                console.log('incoming postid', incomingPostId, postIdToIndex[incomingPostId?.toString()]);
+                console.log('incoming post id exists');
+                // return existing;
+                shouldReturnExisting = true;
+              }
+            });
+            if (shouldReturnExisting) {
+              console.log('should return existing', incoming);
+              return incoming;
+            }
+            // if (existing.length) {
+            //   console.log('existn len', existing.length + incoming.length);
+            //   currentGetUserPostsCursorVar(existing.length + incoming.length);
+            // } else {
+            //   console.log('esle not exist', incoming.length);
+            //   currentGetUserPostsCursorVar(incoming.length);
+            // }
+            console.log('about to return', existing, incoming);
+            return existing.length ? [...existing, ...incoming] : incoming;
           }
         }
       }

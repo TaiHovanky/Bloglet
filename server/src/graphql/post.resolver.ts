@@ -13,14 +13,15 @@ export class PostResolver {
   getUserPosts(
     @Arg('userId') userId: number,
     @Arg('cursor') cursor: number,
+    @Arg('offsetLimit') offsetLimit: number,
     @Ctx() { res }: requestContext
   ) {
-    console.log('cursor', cursor);
+    console.log('cursor', cursor, offsetLimit);
     return Post
       .createQueryBuilder('posts')
       .orderBy('posts.id', "DESC")
       .skip(cursor)
-      .take(5)
+      .take(offsetLimit)
       .where('posts.creatorId = :creatorId', { creatorId: userId })
       .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
       .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
@@ -53,11 +54,13 @@ export class PostResolver {
     @Ctx() { res }: requestContext
   ) {
     const newPost = new Post(content, creatorId, createdAt);
-    return await Post.save(newPost)
+    const savedPost = await Post.save(newPost)
       .catch((err) => {
         errorHandler(`Post creation failed: ${err}`, res);
         return null;
       });
+    console.log('new post', savedPost);
+    return savedPost;
   }
 
   @Mutation(() => Post, { nullable: true })

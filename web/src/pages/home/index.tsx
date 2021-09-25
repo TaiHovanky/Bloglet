@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Container, makeStyles, Typography } from '@material-ui/core';
+import React, { useEffect } from 'react';
+import { Container, makeStyles, Typography } from '@material-ui/core';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   useHomePageLazyQuery,
@@ -12,7 +12,7 @@ import {
   GetUserPostsDocument,
   useLikeCommentMutation,
 } from '../../generated/graphql';
-import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, currentOffsetLimitVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
 import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
@@ -21,6 +21,8 @@ import getCurrentUserProfile from '../../cache-queries/current-user-profile';
 import FollowButton from '../../components/follow-button';
 import UserFollows from '../../components/user-follows';
 import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
+import { SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
+import getCurrentOffsetLimit from '../../cache-queries/current-offset-limit';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -52,17 +54,19 @@ const Home: React.FC<any> = () => {
   const currentUserProfile = useQuery(getCurrentUserProfile);
   // eslint-disable-next-line
   const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
+  // eslint-disable-next-line
+  const currentOffsetLimit = useQuery(getCurrentOffsetLimit);
 
-  const { data: postsData, loading: postsLoading, fetchMore } = useGetUserPostsQuery({
-    variables: { userId: currentUserProfileVar().id, cursor: userPostsCursor },
+  const { data: postsData, loading: postsLoading, fetchMore, refetch } = useGetUserPostsQuery({
+    variables: {
+      userId: currentUserProfileVar().id,
+      cursor: currentGetUserPostsCursorVar(),
+      offsetLimit: currentOffsetLimitVar()
+    },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
-    onCompleted: (data) => {
-      console.log('got user posts', data, currentGetUserPostsCursor,
-        currentGetUserPostsCursorVar());
-      // if (postsData && postsData.getUserPosts && postsData.getUserPosts.length) {
-      //   setUserPostsCursor(postsData.getUserPosts.length);
-      // }
+    onCompleted: () => {
+      currentOffsetLimitVar(postsData?.getUserPosts?.length);
     }
   });
 
@@ -75,6 +79,7 @@ const Home: React.FC<any> = () => {
   });
 
   const [createPost] = useMutation(CreatePostDocument, {
+    // refetchQueries: [GetUserPostsDocument as any, 'getUserPosts']
     update(cache, data) {
       if (data && data.data && data.data.createPost) {
         const posts: any = cache.readQuery({
@@ -83,6 +88,7 @@ const Home: React.FC<any> = () => {
             userId: currentUserProfileVar().id
           }
         });
+        console.log('data create post', data.data.createPost, posts);
         cache.modify({
           fields: {
             getUserPosts(existingPosts: Array<Post>) {
@@ -108,6 +114,7 @@ const Home: React.FC<any> = () => {
   const handleSubmit = async (e: React.FormEvent, callback: ()=> void) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
+    currentGetUserPostsCursorVar(0);
     await createPost({
       variables: {
         creatorId: userData && userData.homePage ? userData.homePage.id : 0,
@@ -137,12 +144,33 @@ const Home: React.FC<any> = () => {
       }
     });
   }
+  
+  useScrollDirection(async (scrollDirection: string) => {
+    if (
+      scrollDirection === SCROLL_DIRECTION_DOWN &&
+      window.scrollY + window.innerHeight > document.documentElement.scrollHeight - 2 &&
+      !postsLoading &&
+      postsData &&
+      postsData.getUserPosts &&
+      postsData.getUserPosts.length
+    ) {
+      currentGetUserPostsCursorVar(currentOffsetLimitVar())
+      console.log('about to fetch more', currentGetUserPostsCursorVar());
+      await fetchMore({
+        variables: {
+          userId: currentUserProfileVar().id,
+          cursor: currentOffsetLimitVar(),
+          offsetLimit: 5
+        }
+      });
+      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 5);
+    }
+  });
 
   if (loading || postsLoading) {
     return <div>Loading...</div>;
   }
 
-  // console.log('user posts cursor', userPostsCursor);
   return (
     <div className={classes.homePageContainer}>
       {userData && userData.homePage ?
@@ -165,7 +193,13 @@ const Home: React.FC<any> = () => {
                 userToBeFollowed={currentUserProfileVar().id}
               />
             </div>
-            {currentUserProfileVar().id === userData.homePage.id && <NewPostForm handleSubmit={handleSubmit} />}
+            {currentUserProfileVar().id === userData.homePage.id &&
+              <NewPostForm
+                refetch={refetch}
+                handleSubmit={handleSubmit}
+                postsLength={postsData?.getUserPosts?.length}
+              />
+            }
             {postsData && postsData.getUserPosts &&
               <PostList
                 posts={postsData?.getUserPosts}
@@ -174,14 +208,14 @@ const Home: React.FC<any> = () => {
                 userId={userData.homePage.id}
               />
             }
-            <Button onClick={() => {
+            {/* <Button onClick={() => {
               fetchMore({
                 variables: {
                   userId: currentUserProfileVar().id,
                   cursor: currentGetUserPostsCursorVar()
                 }
               });
-            }}>see more</Button>
+            }}>see more</Button> */}
           </Container>
         </> :
         <SplashPage />

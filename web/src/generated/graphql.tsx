@@ -141,6 +141,7 @@ export type QuerySearchUsersArgs = {
 
 
 export type QueryGetUserPostsArgs = {
+  offsetLimit: Scalars['Float'];
   cursor: Scalars['Float'];
   userId: Scalars['Float'];
 };
@@ -270,6 +271,7 @@ export type GetFollowingQuery = (
 export type GetUserPostsQueryVariables = Exact<{
   userId: Scalars['Float'];
   cursor: Scalars['Float'];
+  offsetLimit: Scalars['Float'];
 }>;
 
 
@@ -631,8 +633,8 @@ export type GetFollowingQueryHookResult = ReturnType<typeof useGetFollowingQuery
 export type GetFollowingLazyQueryHookResult = ReturnType<typeof useGetFollowingLazyQuery>;
 export type GetFollowingQueryResult = Apollo.QueryResult<GetFollowingQuery, GetFollowingQueryVariables>;
 export const GetUserPostsDocument = gql`
-    query GetUserPosts($userId: Float!, $cursor: Float!) {
-  getUserPosts(userId: $userId, cursor: $cursor) {
+    query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
+  getUserPosts(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
     id
     content
     createdAt
@@ -678,6 +680,7 @@ export const GetUserPostsDocument = gql`
  *   variables: {
  *      userId: // value for 'userId'
  *      cursor: // value for 'cursor'
+ *      offsetLimit: // value for 'offsetLimit'
  *   },
  * });
  */
