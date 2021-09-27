@@ -11,7 +11,23 @@ interface Props {
 
 const CommentInput = ({ userId, postId }: Props) => {
   const [comment, setComment] = useState('');
-  const [createComment, { loading }] = useMutation(CreateCommentDocument);
+  const [createComment, { loading }] = useMutation(CreateCommentDocument
+  //   , {
+  //   update(cache, data) {
+  //     if (data && data.data) {
+  //       console.log('data create post', data.data);
+  //       cache.modify({
+  //         fields: {
+  //           Comment(existingComments: Array<any>) {
+  //             console.log('moding comments', existingComments);
+  //             return [data.data.createComment, ...existingComments];
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
+  );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);

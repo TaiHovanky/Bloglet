@@ -63,6 +63,8 @@ const Home: React.FC<any> = () => {
       cursor: currentGetUserPostsCursorVar(),
       offsetLimit: currentOffsetLimitVar()
     },
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-only',
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
     onCompleted: () => {
@@ -79,7 +81,6 @@ const Home: React.FC<any> = () => {
   });
 
   const [createPost] = useMutation(CreatePostDocument, {
-    // refetchQueries: [GetUserPostsDocument as any, 'getUserPosts']
     update(cache, data) {
       if (data && data.data && data.data.createPost) {
         const posts: any = cache.readQuery({
