@@ -63,12 +63,11 @@ const Home: React.FC<any> = () => {
       cursor: currentGetUserPostsCursorVar(),
       offsetLimit: currentOffsetLimitVar()
     },
-    fetchPolicy: 'cache-first',
-    nextFetchPolicy: 'cache-only',
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
-    onCompleted: () => {
+    onCompleted: (x) => {
       currentOffsetLimitVar(postsData?.getUserPosts?.length);
+      console.log('got user posts', x);
     }
   });
 

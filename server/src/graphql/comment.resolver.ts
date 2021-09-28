@@ -10,7 +10,7 @@ import { CommentLike } from '../entity/CommentLike';
 @Resolver()
 export class CommentResolver {
 
-  @Mutation(() => Post, { nullable: true })
+  @Mutation(() => Comment, { nullable: true })
   @UseMiddleware(isAuthenticated)
   async createComment(
     @Arg('userId') userId: number,
@@ -36,11 +36,12 @@ export class CommentResolver {
           user,
           post,
           comment,
-          createdAt
+          createdAt,
         );
         const savedComment = await Comment.save(newComment);
-        post.comments = [...post.comments, savedComment];
-        return post;
+        // post.comments = [...post.comments, {...savedComment, likes: []}];
+        // return post;
+        return savedComment;
       }
       return null;
     } catch(err) {

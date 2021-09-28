@@ -42,18 +42,18 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                         className={classes.inline}
                         color="textPrimary"
                       >
-                        {`${comment.user.firstName} ${comment.user.lastName} `}
+                        {comment && comment.user ? `${comment.user.firstName} ${comment.user.lastName} ` : ''}
                       </Typography>
                       <Typography
                         component="span"
                         variant="body2"
                         className={classes.inline}
                       >
-                        {comment.comment}
+                        {comment && comment.comment ? comment.comment : ''}
                       </Typography>
                       <span className={classes.commentCreatedAt}>
                         <Typography variant="caption">
-                          {comment.createdAt}
+                          {comment ? comment.createdAt : ''}
                         </Typography>
                       </span>
                     </React.Fragment>
@@ -64,7 +64,7 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                 <LikeButton userId={userId} item={comment} likeMutation={likeComment} />
               </Grid>
               <Grid item xs={1}>
-                <Typography variant="subtitle1" color="textSecondary">{comment.likes.length}</Typography>
+                <Typography variant="subtitle1" color="textSecondary">{comment && comment.likes ? comment.likes.length : 0}</Typography>
               </Grid>
             </Grid>
           </ListItem>
