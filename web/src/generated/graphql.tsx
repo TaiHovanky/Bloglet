@@ -52,7 +52,7 @@ export type Mutation = {
   createPost?: Maybe<Post>;
   likePost?: Maybe<Post>;
   followUser?: Maybe<Follows>;
-  createComment?: Maybe<Comment>;
+  createComment?: Maybe<Post>;
   likeComment?: Maybe<Comment>;
 };
 
@@ -185,20 +185,24 @@ export type CreateCommentMutationVariables = Exact<{
 export type CreateCommentMutation = (
   { __typename?: 'Mutation' }
   & { createComment?: Maybe<(
-    { __typename?: 'Comment' }
-    & Pick<Comment, 'id' | 'comment' | 'createdAt'>
-    & { user?: Maybe<(
-      { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName'>
-    )>, post?: Maybe<(
-      { __typename?: 'Post' }
-      & Pick<Post, 'id'>
-    )>, likes?: Maybe<Array<(
-      { __typename?: 'CommentLike' }
-      & Pick<CommentLike, 'id'>
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'content'>
+    & { comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment' | 'createdAt'>
       & { user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id'>
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, likes?: Maybe<Array<(
+        { __typename?: 'CommentLike' }
+        & Pick<CommentLike, 'id'>
+        & { user?: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'id'>
+        )> }
+      )>>, post?: Maybe<(
+        { __typename?: 'Post' }
+        & Pick<Post, 'id'>
       )> }
     )>> }
   )> }
@@ -216,6 +220,30 @@ export type CreatePostMutation = (
   & { createPost?: Maybe<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
+    & { likes?: Maybe<Array<(
+      { __typename?: 'PostLike' }
+      & { user: (
+        { __typename?: 'User' }
+        & Pick<User, 'id'>
+      ) }
+    )>>, comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment' | 'createdAt'>
+      & { likes?: Maybe<Array<(
+        { __typename?: 'CommentLike' }
+        & Pick<CommentLike, 'id'>
+        & { user?: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'id'>
+        )> }
+      )>>, user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, post?: Maybe<(
+        { __typename?: 'Post' }
+        & Pick<Post, 'id'>
+      )> }
+    )>> }
   )> }
 );
 
@@ -428,19 +456,23 @@ export const CreateCommentDocument = gql`
     createdAt: $createdAt
   ) {
     id
-    comment
-    createdAt
-    user {
+    content
+    comments {
       id
-      firstName
-      lastName
-    }
-    post {
-      id
-    }
-    likes {
-      id
+      comment
+      createdAt
       user {
+        id
+        firstName
+        lastName
+      }
+      likes {
+        id
+        user {
+          id
+        }
+      }
+      post {
         id
       }
     }
@@ -483,6 +515,30 @@ export const CreatePostDocument = gql`
     creatorId
     content
     createdAt
+    likes {
+      user {
+        id
+      }
+    }
+    comments {
+      id
+      comment
+      createdAt
+      likes {
+        id
+        user {
+          id
+        }
+      }
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
+        id
+      }
+    }
   }
 }
     `;

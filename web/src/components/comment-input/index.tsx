@@ -11,7 +11,21 @@ interface Props {
 
 const CommentInput = ({ userId, postId }: Props) => {
   const [comment, setComment] = useState('');
-  const [createComment, { loading }] = useMutation(CreateCommentDocument, { refetchQueries: ['GetUserPosts']});
+  const [createComment, { loading }] = useMutation(CreateCommentDocument, {
+    // onCompleted: (commentData) => {
+    //   console.log('comment newly created', commentData);
+    // }
+    update(cache, { data }) {
+      cache.modify({
+        fields: {
+          Post(existingPost) {
+            console.log('existing posts in cache mod', existingPost);
+          }
+        }
+      })
+    }
+  });
+    // , { refetchQueries: ['GetUserPosts']});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);

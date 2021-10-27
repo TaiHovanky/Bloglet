@@ -51,15 +51,17 @@ export class PostResolver {
     @Arg('creatorId') creatorId: number, 
     @Arg('content') content: string,
     @Arg('createdAt') createdAt: string,
-    @Ctx() { res }: requestContext
+    // @Ctx() { res }: requestContext
   ) {
     const newPost = new Post(content, creatorId, createdAt);
-    const savedPost = await Post.save(newPost)
-      .catch((err) => {
-        errorHandler(`Post creation failed: ${err}`, res);
-        return null;
-      });
+    const savedPost = await Post.save(newPost);
+      // .catch((err) => {
+      //   errorHandler(`Post creation failed: ${err}`, res);
+      //   return null;
+      // });
     console.log('new post', savedPost);
+    savedPost.comments = [];
+    savedPost.likes = [];
     return savedPost;
   }
 

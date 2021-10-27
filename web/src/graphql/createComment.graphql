@@ -11,19 +11,23 @@ mutation CreateComment(
     createdAt: $createdAt
   ) {
     id
-    comment
-    createdAt
-    user {
+    content
+    comments {
       id
-      firstName
-      lastName
-    }
-    post {
-      id
-    }
-    likes {
-      id
+      comment
+      createdAt
       user {
+        id
+        firstName
+        lastName
+      }
+      likes {
+        id
+        user {
+          id
+        }
+      }
+      post {
         id
       }
     }
