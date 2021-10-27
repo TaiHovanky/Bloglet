@@ -17,7 +17,7 @@ export class CommentResolver {
     @Arg('postId') postId: number,
     @Arg('comment') comment: string,
     @Arg('createdAt') createdAt: string,
-    @Ctx() { res }: requestContext
+    // @Ctx() { res }: requestContext
   ) {
     try {
       const user = await User.findOne({
@@ -29,6 +29,8 @@ export class CommentResolver {
         .where('posts.id = :postId', { postId })
         .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
         .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
+        .leftJoinAndMapMany('posts.likes', 'post_like', 'likes', 'posts.id = likes.post_id')
+        .leftJoinAndMapOne('likes.user', 'users', 'users2', 'likes.user_id = users.id')
         .getOne();
 
       if (user && post) {
@@ -41,12 +43,14 @@ export class CommentResolver {
         const savedComment = await Comment.save(newComment);
         savedComment.likes = [];
         post.comments = [...post.comments, savedComment];
+        post.likes = post.likes && post.likes.length ? post.likes : [];
         return post;
         // return savedComment;
       }
       return null;
     } catch(err) {
-      errorHandler(`Comment creation failed: ${err}`, res);
+      // errorHandler(`Comment creation failed: ${err}`, res);
+      console.log('errrrrrr', err);
       return null;
     }
   }

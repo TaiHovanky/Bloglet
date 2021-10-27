@@ -1,6 +1,7 @@
 query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
   getUserPosts(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
     id
+    creatorId
     content
     createdAt
     likes {

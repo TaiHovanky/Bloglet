@@ -1,8 +1,9 @@
 import React, { ChangeEvent } from 'react';
 import { TextField } from '@material-ui/core';
 import { useMutation } from '@apollo/client';
-import { CreateCommentDocument } from '../../generated/graphql';
+import { CreateCommentDocument, GetUserPostsDocument } from '../../generated/graphql';
 import { useState } from 'react';
+import { currentUserProfileVar } from '../../cache';
 
 interface Props {
   userId: number,
@@ -16,10 +17,31 @@ const CommentInput = ({ userId, postId }: Props) => {
     //   console.log('comment newly created', commentData);
     // }
     update(cache, { data }) {
+      const posts: any = cache.readQuery({
+        query: GetUserPostsDocument,
+        variables: {
+          userId: currentUserProfileVar().id
+        }
+      });
+      console.log('updating after create comment', data, posts);
       cache.modify({
         fields: {
-          Post(existingPost) {
-            console.log('existing posts in cache mod', existingPost);
+          getUserPosts(existingPost) {
+            console.log('existing posts in cache mod', existingPost, posts);
+            const updatedPosts = [...posts.getUserPosts];
+            let updatedComments = [];
+            let idx = 0;
+            let updatedPost = {};
+            updatedPosts.forEach((post, index) => {
+              if (post.id === data.createComment.id) {
+                updatedComments = data.createComment.comments
+                idx = index;
+                updatedPost = {...post, comments: updatedComments};
+              }
+            });
+            updatedPosts.splice(idx, 1, updatedPost);
+            console.log('updated posts', updatedPosts);
+            return updatedPosts;
           }
         }
       })

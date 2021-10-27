@@ -186,21 +186,27 @@ export type CreateCommentMutation = (
   { __typename?: 'Mutation' }
   & { createComment?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'content'>
-    & { comments?: Maybe<Array<(
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
+    & { likes?: Maybe<Array<(
+      { __typename?: 'PostLike' }
+      & { user: (
+        { __typename?: 'User' }
+        & Pick<User, 'id'>
+      ) }
+    )>>, comments?: Maybe<Array<(
       { __typename?: 'Comment' }
       & Pick<Comment, 'id' | 'comment' | 'createdAt'>
-      & { user?: Maybe<(
-        { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
-      )>, likes?: Maybe<Array<(
+      & { likes?: Maybe<Array<(
         { __typename?: 'CommentLike' }
         & Pick<CommentLike, 'id'>
         & { user?: Maybe<(
           { __typename?: 'User' }
           & Pick<User, 'id'>
         )> }
-      )>>, post?: Maybe<(
+      )>>, user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, post?: Maybe<(
         { __typename?: 'Post' }
         & Pick<Post, 'id'>
       )> }
@@ -310,7 +316,7 @@ export type GetUserPostsQuery = (
   { __typename?: 'Query' }
   & { getUserPosts?: Maybe<Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'content' | 'createdAt'>
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
     & { likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
@@ -456,21 +462,28 @@ export const CreateCommentDocument = gql`
     createdAt: $createdAt
   ) {
     id
+    creatorId
     content
+    createdAt
+    likes {
+      user {
+        id
+      }
+    }
     comments {
       id
       comment
       createdAt
-      user {
-        id
-        firstName
-        lastName
-      }
       likes {
         id
         user {
           id
         }
+      }
+      user {
+        id
+        firstName
+        lastName
       }
       post {
         id
@@ -697,6 +710,7 @@ export const GetUserPostsDocument = gql`
     query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
   getUserPosts(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
     id
+    creatorId
     content
     createdAt
     likes {

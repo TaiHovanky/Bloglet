@@ -63,15 +63,30 @@ const cache = new InMemoryCache({
     //           console.log('should return existing', incoming);
     //           return incoming;
     //         }
-    //         // if (existing.length) {
+            let newIncoming = [];
+            let uniqueExisting = [];
+            if (existing.length) {
+              console.log('incoming', incoming, existing);
+              uniqueExisting = existing.filter((post: any, postIdx: number) => {
+                const x = existing.findIndex((existpost: any) => {
+                  console.log('exist post', existpost, post);
+                  return existpost.__ref === post.__ref;
+                });
+                console.log('xxxxxx', x, postIdx);
+                return x === postIdx;
+              })
+              newIncoming = incoming.filter((post: any) => {
+                return !existing.find((existingPost: any) => existingPost.__ref === post.__ref);
+              });
+              
     //         //   console.log('existn len', existing.length + incoming.length);
     //         //   currentGetUserPostsCursorVar(existing.length + incoming.length);
     //         // } else {
     //         //   console.log('esle not exist', incoming.length);
     //         //   currentGetUserPostsCursorVar(incoming.length);
-    //         // }
-            console.log('about to return', existing, incoming);
-            return existing.length ? [...existing, ...incoming] : incoming;
+            }
+            console.log('about to return', uniqueExisting, incoming, newIncoming);
+            return existing.length ? [...uniqueExisting, ...newIncoming] : incoming;
           }
         }
       }
@@ -85,8 +100,8 @@ const cache = new InMemoryCache({
         },
         comments: {
           merge(existing, incoming) {
-            let newIncoming: any = [...incoming];
-            console.log('newincoming', newIncoming, existing);
+            let newIncoming: any = incoming ? [...incoming] : [];
+            // console.log('newincoming', newIncoming, existing);
             const res = newIncoming.sort((a: any, b: any) => {
               if (a.__ref > b.__ref) {
                 return 1;
