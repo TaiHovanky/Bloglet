@@ -57,7 +57,7 @@ const Home: React.FC<any> = () => {
   // eslint-disable-next-line
   const currentOffsetLimit = useQuery(getCurrentOffsetLimit);
 
-  const { data: postsData, loading: postsLoading, fetchMore, refetch } = useGetUserPostsQuery({
+  const { data: postsData, loading: postsLoading, fetchMore } = useGetUserPostsQuery({
     variables: {
       userId: currentUserProfileVar().id,
       cursor: currentGetUserPostsCursorVar(),
@@ -66,7 +66,7 @@ const Home: React.FC<any> = () => {
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
     onCompleted: (x) => {
-      currentOffsetLimitVar(postsData?.getUserPosts?.length);
+      // currentOffsetLimitVar(postsData?.getUserPosts?.length);
       console.log('got user posts', x);
     }
   });
@@ -115,7 +115,7 @@ const Home: React.FC<any> = () => {
   const handleSubmit = async (e: React.FormEvent, callback: ()=> void) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    currentGetUserPostsCursorVar(0);
+    currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 1);
     await createPost({
       variables: {
         creatorId: userData && userData.homePage ? userData.homePage.id : 0,
@@ -155,16 +155,16 @@ const Home: React.FC<any> = () => {
       postsData.getUserPosts &&
       postsData.getUserPosts.length
     ) {
-      currentGetUserPostsCursorVar(currentOffsetLimitVar())
+      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + currentOffsetLimitVar())
       console.log('about to fetch more', currentGetUserPostsCursorVar());
       await fetchMore({
         variables: {
           userId: currentUserProfileVar().id,
-          cursor: currentOffsetLimitVar(),
+          cursor: currentGetUserPostsCursorVar(),
           offsetLimit: 5
         }
       });
-      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 5);
+      // currentGetUserPostsCursorVar(5);
     }
   });
 
@@ -196,7 +196,6 @@ const Home: React.FC<any> = () => {
             </div>
             {currentUserProfileVar().id === userData.homePage.id &&
               <NewPostForm
-                refetch={refetch}
                 handleSubmit={handleSubmit}
                 postsLength={postsData?.getUserPosts?.length}
               />

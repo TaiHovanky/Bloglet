@@ -1,10 +1,8 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
-// import { currentUserProfileVar } from '../../cache';
 
 interface Props {
   handleSubmit: (e: React.FormEvent, callback: () => void) => Promise<void>,
-  refetch: any,
   postsLength: number | undefined
 }
 
@@ -31,15 +29,6 @@ const NewPostForm: React.FC<Props> = (props: Props) => {
 
   const clearForm = () => {
     setPostContent('');
-    // setTimeout(function () {
-    //   props.refetch({
-    //     variables: {
-    //       userId: currentUserProfileVar().id,
-    //       cursor: 0,
-    //       offsetLimit: props.postsLength ? props.postsLength + 1 : 5
-    //     }
-    //   });
-    // }, 3500);
   };
 
   return (
