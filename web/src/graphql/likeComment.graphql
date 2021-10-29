@@ -7,9 +7,15 @@ mutation LikeComment($userId: Float!, $commentId: Float!, $isAlreadyLiked: Boole
       id
       user {
         id
-        firstName
-        lastName
       }
+    }
+    user {
+      id
+      firstName
+      lastName
+    }
+    post {
+      id
     }
   }
 }

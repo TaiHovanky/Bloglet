@@ -101,6 +101,7 @@ const cache = new InMemoryCache({
         },
         comments: {
           merge(existing, incoming) {
+            console.log('comment field policy', incoming);
             let newIncoming: any = incoming ? [...incoming] : [];
             // console.log('newincoming', newIncoming, existing);
             const res = newIncoming.sort((a: any, b: any) => {
@@ -122,7 +123,7 @@ const cache = new InMemoryCache({
       fields: {
         likes: {
           merge(existing, incoming) {
-            // console.log('comment cache', existing, incoming);
+            console.log('comment cache', existing, incoming);
             return incoming;
           }
         }

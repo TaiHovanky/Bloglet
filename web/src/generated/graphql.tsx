@@ -372,9 +372,15 @@ export type LikeCommentMutation = (
       & Pick<CommentLike, 'id'>
       & { user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id'>
       )> }
-    )>> }
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName'>
+    )>, post?: Maybe<(
+      { __typename?: 'Post' }
+      & Pick<Post, 'id'>
+    )> }
   )> }
 );
 
@@ -389,7 +395,7 @@ export type LikePostMutation = (
   { __typename?: 'Mutation' }
   & { likePost?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'content'>
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
     & { likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
@@ -821,9 +827,15 @@ export const LikeCommentDocument = gql`
       id
       user {
         id
-        firstName
-        lastName
       }
+    }
+    user {
+      id
+      firstName
+      lastName
+    }
+    post {
+      id
     }
   }
 }
@@ -860,7 +872,9 @@ export const LikePostDocument = gql`
     mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
   likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {
     id
+    creatorId
     content
+    createdAt
     likes {
       user {
         id

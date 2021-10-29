@@ -10,7 +10,8 @@ import {
   useGetFollowersQuery,
   CreatePostDocument,
   GetUserPostsDocument,
-  useLikeCommentMutation,
+  LikeCommentDocument,
+  Comment,
 } from '../../generated/graphql';
 import { currentGetUserPostsCursorVar, currentUserProfileVar, currentOffsetLimitVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
@@ -93,7 +94,7 @@ const Home: React.FC<any> = () => {
           fields: {
             getUserPosts(existingPosts: Array<Post>) {
               console.log('getuserposts cache', existingPosts, posts.getUserPosts, data, cache)
-              return [data.data.createPost, ...existingPosts as Array<Post>];
+              return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
             }
           }
         });
@@ -103,7 +104,48 @@ const Home: React.FC<any> = () => {
     code, it's ultimately faster than refetching because there's not a network call. */
   });
   const [likePost] = useLikePostMutation();
-  const [likeComment] = useLikeCommentMutation();
+  const [likeComment] = useMutation(LikeCommentDocument, {
+    update(cache, { data }) {
+      const posts: any = cache.readQuery({
+        query: GetUserPostsDocument,
+        variables: {
+          userId: currentUserProfileVar().id
+        }
+      });
+      console.log('updating after create comment', data, posts);
+      cache.modify({
+        fields: {
+          getUserPosts(existingPost) {
+            console.log('existing posts in cache mod', existingPost, posts);
+            const updatedPosts = [...posts.getUserPosts];
+            let updatedComments = [];
+            let postIdx = 0;
+            let updatedPost = {};
+            updatedPosts.forEach((post, index) => {
+              if (post.id === data.likeComment.post.id) {
+                updatedComments = [...post.comments];
+                const idx = post.comments.findIndex((comment: Comment) => comment.id === data.likeComment.id);
+                updatedComments.splice(idx, 1, data.likeComment);
+                postIdx = index;
+                console.log('idx', idx, updatedComments);
+                updatedPost = {...post, comments: updatedComments};
+                // post.comments = updatedComments;
+              }
+            });
+            //     updatedComments = data.createComment.comments
+            //     idx = index;
+            //     updatedPost = {...post, comments: updatedComments};
+            //   }
+            // });
+            updatedPosts.splice(postIdx, 1, updatedPost);
+            console.log('updated posts', updatedPosts);
+            return updatedPosts;
+            // return posts.getUserPosts;
+          }
+        }
+      })
+    }
+  });
 
   useEffect(
     () => {
