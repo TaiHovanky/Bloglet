@@ -4,14 +4,12 @@ import { useMutation, useQuery } from '@apollo/client';
 import {
   useHomePageLazyQuery,
   useGetUserPostsQuery,
-  useLikePostMutation,
   Post,
   useGetFollowingQuery,
   useGetFollowersQuery,
   CreatePostDocument,
-  GetUserPostsDocument,
   LikeCommentDocument,
-  Comment,
+  LikePostDocument,
 } from '../../generated/graphql';
 import { currentGetUserPostsCursorVar, currentUserProfileVar, currentOffsetLimitVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
@@ -24,6 +22,7 @@ import UserFollows from '../../components/user-follows';
 import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
 import { SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import getCurrentOffsetLimit from '../../cache-queries/current-offset-limit';
+import { readGetUserPostsQuery, updatePosts } from '../../utils/update-comments';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -66,10 +65,6 @@ const Home: React.FC<any> = () => {
     },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
-    onCompleted: (x) => {
-      // currentOffsetLimitVar(postsData?.getUserPosts?.length);
-      console.log('got user posts', x);
-    }
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
@@ -82,65 +77,39 @@ const Home: React.FC<any> = () => {
 
   const [createPost] = useMutation(CreatePostDocument, {
     update(cache, data) {
-      if (data && data.data && data.data.createPost) {
-        const posts: any = cache.readQuery({
-          query: GetUserPostsDocument,
-          variables: {
-            userId: currentUserProfileVar().id
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      cache.modify({
+        fields: {
+          getUserPosts(existingPosts: Array<Post>) {
+            return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
           }
-        });
-        console.log('data create post', data.data.createPost, posts);
-        cache.modify({
-          fields: {
-            getUserPosts(existingPosts: Array<Post>) {
-              console.log('getuserposts cache', existingPosts, posts.getUserPosts, data, cache)
-              return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
-            }
-          }
-        });
-      }
+        }
+      });
     } /* To avoid refetching, I can use the cache update function to add the Post instance
     that was returned by the mutation to the existing array of posts. While this takes more
     code, it's ultimately faster than refetching because there's not a network call. */
   });
-  const [likePost] = useLikePostMutation();
+
+  const [likePost] = useMutation(LikePostDocument, {
+    update(cache, { data }) {
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      cache.modify({
+        fields: {
+          getUserPosts(existingPosts) {
+            return updatePosts(posts.getUserPosts, 'likes', data.likePost, false);
+          }
+        }
+      })
+    }
+  });
+
   const [likeComment] = useMutation(LikeCommentDocument, {
     update(cache, { data }) {
-      const posts: any = cache.readQuery({
-        query: GetUserPostsDocument,
-        variables: {
-          userId: currentUserProfileVar().id
-        }
-      });
-      console.log('updating after create comment', data, posts);
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
       cache.modify({
         fields: {
           getUserPosts(existingPost) {
-            console.log('existing posts in cache mod', existingPost, posts);
-            const updatedPosts = [...posts.getUserPosts];
-            let updatedComments = [];
-            let postIdx = 0;
-            let updatedPost = {};
-            updatedPosts.forEach((post, index) => {
-              if (post.id === data.likeComment.post.id) {
-                updatedComments = [...post.comments];
-                const idx = post.comments.findIndex((comment: Comment) => comment.id === data.likeComment.id);
-                updatedComments.splice(idx, 1, data.likeComment);
-                postIdx = index;
-                console.log('idx', idx, updatedComments);
-                updatedPost = {...post, comments: updatedComments};
-                // post.comments = updatedComments;
-              }
-            });
-            //     updatedComments = data.createComment.comments
-            //     idx = index;
-            //     updatedPost = {...post, comments: updatedComments};
-            //   }
-            // });
-            updatedPosts.splice(postIdx, 1, updatedPost);
-            console.log('updated posts', updatedPosts);
-            return updatedPosts;
-            // return posts.getUserPosts;
+            return updatePosts(posts.getUserPosts, 'comments', data.likeComment, true);
           }
         }
       })
@@ -198,7 +167,6 @@ const Home: React.FC<any> = () => {
       postsData.getUserPosts.length
     ) {
       currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + currentOffsetLimitVar())
-      console.log('about to fetch more', currentGetUserPostsCursorVar());
       await fetchMore({
         variables: {
           userId: currentUserProfileVar().id,
@@ -206,7 +174,6 @@ const Home: React.FC<any> = () => {
           offsetLimit: 5
         }
       });
-      // currentGetUserPostsCursorVar(5);
     }
   });
 
@@ -250,14 +217,6 @@ const Home: React.FC<any> = () => {
                 userId={userData.homePage.id}
               />
             }
-            {/* <Button onClick={() => {
-              fetchMore({
-                variables: {
-                  userId: currentUserProfileVar().id,
-                  cursor: currentGetUserPostsCursorVar()
-                }
-              });
-            }}>see more</Button> */}
           </Container>
         </> :
         <SplashPage />

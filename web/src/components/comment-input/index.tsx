@@ -1,9 +1,10 @@
 import React, { ChangeEvent } from 'react';
 import { TextField } from '@material-ui/core';
 import { useMutation } from '@apollo/client';
-import { CreateCommentDocument, GetUserPostsDocument } from '../../generated/graphql';
+import { CreateCommentDocument } from '../../generated/graphql';
 import { useState } from 'react';
 import { currentUserProfileVar } from '../../cache';
+import { readGetUserPostsQuery, updatePosts } from '../../utils/update-comments';
 
 interface Props {
   userId: number,
@@ -13,41 +14,17 @@ interface Props {
 const CommentInput = ({ userId, postId }: Props) => {
   const [comment, setComment] = useState('');
   const [createComment, { loading }] = useMutation(CreateCommentDocument, {
-    // onCompleted: (commentData) => {
-    //   console.log('comment newly created', commentData);
-    // }
     update(cache, { data }) {
-      const posts: any = cache.readQuery({
-        query: GetUserPostsDocument,
-        variables: {
-          userId: currentUserProfileVar().id
-        }
-      });
-      console.log('updating after create comment', data, posts);
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
       cache.modify({
         fields: {
           getUserPosts(existingPost) {
-            console.log('existing posts in cache mod', existingPost, posts);
-            const updatedPosts = [...posts.getUserPosts];
-            let updatedComments = [];
-            let idx = 0;
-            let updatedPost = {};
-            updatedPosts.forEach((post, index) => {
-              if (post.id === data.createComment.id) {
-                updatedComments = data.createComment.comments
-                idx = index;
-                updatedPost = {...post, comments: updatedComments};
-              }
-            });
-            updatedPosts.splice(idx, 1, updatedPost);
-            console.log('updated posts', updatedPosts);
-            return updatedPosts;
+            return updatePosts(posts.getUserPosts, 'comments', data.createComment, false);
           }
         }
       })
     }
   });
-    // , { refetchQueries: ['GetUserPosts']});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);

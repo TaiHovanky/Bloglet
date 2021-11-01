@@ -17,7 +17,7 @@ export class CommentResolver {
     @Arg('postId') postId: number,
     @Arg('comment') comment: string,
     @Arg('createdAt') createdAt: string,
-    // @Ctx() { res }: requestContext
+    @Ctx() { res }: requestContext
   ) {
     try {
       const user = await User.findOne({
@@ -30,12 +30,12 @@ export class CommentResolver {
         .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
         .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
         .leftJoinAndMapMany('comment.likes', 'comment_like', 'likes', 'comment.id = likes.comment_id')
-        .leftJoinAndMapOne('likes.user', 'users', 'users2', 'likes.user_id = users.id')
+        .leftJoinAndMapOne('likes.user', 'users', 'users2', 'likes.user_id = users2.id')
         .leftJoinAndMapMany('posts.likes', 'post_like', 'likes2', 'posts.id = likes2.post_id')
-        .leftJoinAndMapOne('likes2.user', 'users', 'users3', 'likes2.user_id = users.id')
+        .leftJoinAndMapOne('likes2.user', 'users', 'users3', 'likes2.user_id = users3.id')
         .leftJoinAndMapOne('comment.post', 'posts', 'posts2', 'comment.post_id = posts2.id')
         .getOne();
-      console.log('post after create comment', post);
+
       if (user && post) {
         const newComment = new Comment(
           user,
@@ -48,12 +48,10 @@ export class CommentResolver {
         post.comments = [...post.comments, savedComment];
         post.likes = post.likes && post.likes.length ? post.likes : [];
         return post;
-        // return savedComment;
       }
       return null;
     } catch(err) {
-      // errorHandler(`Comment creation failed: ${err}`, res);
-      console.log('errrrrrr', err);
+      errorHandler(`Comment creation failed: ${err}`, res);
       return null;
     }
   }
@@ -75,9 +73,8 @@ export class CommentResolver {
         .leftJoinAndMapOne('comment.post', 'posts', 'posts2', 'comment.post_id = posts2.id')
         .leftJoinAndMapOne('comment.user', 'users', 'users2', 'comment.user_id = users2.id')
         .getOne();
-      console.log('comment to update-------------------------', commentToUpdate, isAlreadyLiked);
+
       if (isAlreadyLiked && commentToUpdate) {
-        console.log('if isAlreadyLiked and commenttoupdate');
         const existingLikeIndex = commentToUpdate.likes.findIndex((like: CommentLike) => like.user.id === userId);
         commentToUpdate.likes.splice(existingLikeIndex, 1);
         await CommentLike.createQueryBuilder('comment_like')
@@ -93,11 +90,9 @@ export class CommentResolver {
         });
     
         if (userToUpdate && commentToUpdate) {
-          console.log('if usertoupdate and commenttoupdate');
           const newCommentLike = new CommentLike(userToUpdate, commentToUpdate);
           const savedCommentLike = await CommentLike.save(newCommentLike);
           commentToUpdate.likes = [...commentToUpdate.likes, savedCommentLike];
-          console.log('comment to update after', commentToUpdate);
           return commentToUpdate;
         }
       }
