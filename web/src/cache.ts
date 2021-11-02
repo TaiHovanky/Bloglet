@@ -3,7 +3,6 @@ import User from './types/user.interface';
 
 export const currentUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
 export const currentGetUserPostsCursorVar: ReactiveVar<number> = makeVar(0);
-export const currentOffsetLimitVar: ReactiveVar<number> = makeVar(5);
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -19,14 +18,9 @@ const cache = new InMemoryCache({
             return currentGetUserPostsCursorVar();
           }
         },
-        currentOffsetLimit: {
-          read() {
-            return currentOffsetLimitVar();
-          }
-        },
         getUserPosts: {
           keyArgs: ['type', 'id'],
-          merge(existing = [], incoming, { readField }) {
+          merge(existing = [], incoming) {
             return existing.length ? [...existing, ...incoming] : incoming;
           }
         }

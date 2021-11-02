@@ -11,7 +11,7 @@ import {
   LikeCommentDocument,
   LikePostDocument,
 } from '../../generated/graphql';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, currentOffsetLimitVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
 import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
@@ -20,8 +20,7 @@ import getCurrentUserProfile from '../../cache-queries/current-user-profile';
 import FollowButton from '../../components/follow-button';
 import UserFollows from '../../components/user-follows';
 import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
-import { SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
-import getCurrentOffsetLimit from '../../cache-queries/current-offset-limit';
+import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/update-comments';
 
 const useStyles = makeStyles(() => ({
@@ -54,14 +53,12 @@ const Home: React.FC<any> = () => {
   const currentUserProfile = useQuery(getCurrentUserProfile);
   // eslint-disable-next-line
   const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
-  // eslint-disable-next-line
-  const currentOffsetLimit = useQuery(getCurrentOffsetLimit);
 
   const { data: postsData, loading: postsLoading, fetchMore } = useGetUserPostsQuery({
     variables: {
       userId: currentUserProfileVar().id,
       cursor: currentGetUserPostsCursorVar(),
-      offsetLimit: currentOffsetLimitVar()
+      offsetLimit: OFFSET_LIMIT
     },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
@@ -80,7 +77,7 @@ const Home: React.FC<any> = () => {
       const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
       cache.modify({
         fields: {
-          getUserPosts(existingPosts: Array<Post>) {
+          getUserPosts() {
             return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
           }
         }
@@ -95,7 +92,7 @@ const Home: React.FC<any> = () => {
       const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
       cache.modify({
         fields: {
-          getUserPosts(existingPosts) {
+          getUserPosts() {
             return updatePosts(posts.getUserPosts, 'likes', data.likePost, false);
           }
         }
@@ -108,7 +105,7 @@ const Home: React.FC<any> = () => {
       const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
       cache.modify({
         fields: {
-          getUserPosts(existingPost) {
+          getUserPosts() {
             return updatePosts(posts.getUserPosts, 'comments', data.likeComment, true);
           }
         }
@@ -134,7 +131,7 @@ const Home: React.FC<any> = () => {
         createdAt: new Date().toLocaleString()
       }
     });
-    callback();
+    callback(); // Used to clear the post form after saving a post
   }
 
   const handleLikePost = (userId: number, postId: number, isAlreadyLiked: boolean) => {
@@ -166,12 +163,12 @@ const Home: React.FC<any> = () => {
       postsData.getUserPosts &&
       postsData.getUserPosts.length
     ) {
-      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + currentOffsetLimitVar())
+      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + OFFSET_LIMIT)
       await fetchMore({
         variables: {
           userId: currentUserProfileVar().id,
           cursor: currentGetUserPostsCursorVar(),
-          offsetLimit: 5
+          offsetLimit: OFFSET_LIMIT
         }
       });
     }

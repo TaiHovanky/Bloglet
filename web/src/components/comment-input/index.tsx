@@ -18,7 +18,7 @@ const CommentInput = ({ userId, postId }: Props) => {
       const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
       cache.modify({
         fields: {
-          getUserPosts(existingPost) {
+          getUserPosts() {
             return updatePosts(posts.getUserPosts, 'comments', data.createComment, false);
           }
         }

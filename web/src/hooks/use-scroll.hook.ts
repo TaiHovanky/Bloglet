@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react';
 
-export const SCROLL_DIRECTION_DOWN = "SCROLL_DIRECTION_DOWN"
-export const SCROLL_DIRECTION_UP = "SCROLL_DIRECTION_UP"
-export const SCROLL_DIRECTION_NONE = "SCROLL_DIRECTION_NONE"
+export const SCROLL_DIRECTION_DOWN = 'SCROLL_DIRECTION_DOWN';
+export const SCROLL_DIRECTION_UP = 'SCROLL_DIRECTION_UP';
+export const SCROLL_DIRECTION_NONE = 'SCROLL_DIRECTION_NONE';
+export const OFFSET_LIMIT = 5;
 
 export const useScrollDirection = (callback: any) => {
   const [lastYPosition, setLastYPosition] = useState(window.pageYOffset);
@@ -21,7 +22,7 @@ export const useScrollDirection = (callback: any) => {
   }
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll)
   })
 };
