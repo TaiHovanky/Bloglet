@@ -41,7 +41,7 @@ export class CommentResolver {
           user,
           post,
           comment,
-          createdAt,
+          createdAt
         );
         const savedComment = await Comment.save(newComment);
         savedComment.likes = [];
@@ -70,7 +70,7 @@ export class CommentResolver {
         .where('comment.id = :commentId', { commentId })
         .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
         .leftJoinAndMapOne('comment_like.user', 'users', 'users', 'comment_like.user_id = users.id')
-        .leftJoinAndMapOne('comment.post', 'posts', 'posts2', 'comment.post_id = posts2.id')
+        .leftJoinAndMapOne('comment.post', 'posts', 'posts', 'comment.post_id = posts.id')
         .leftJoinAndMapOne('comment.user', 'users', 'users2', 'comment.user_id = users2.id')
         .getOne();
 

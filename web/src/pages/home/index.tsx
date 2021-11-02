@@ -204,10 +204,7 @@ const Home: React.FC<any> = () => {
               />
             </div>
             {currentUserProfileVar().id === userData.homePage.id &&
-              <NewPostForm
-                handleSubmit={handleSubmit}
-                postsLength={postsData?.getUserPosts?.length}
-              />
+              <NewPostForm handleSubmit={handleSubmit} />
             }
             {postsData && postsData.getUserPosts &&
               <PostList

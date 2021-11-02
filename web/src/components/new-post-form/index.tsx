@@ -2,8 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
 
 interface Props {
-  handleSubmit: (e: React.FormEvent, callback: () => void) => Promise<void>,
-  postsLength: number | undefined
+  handleSubmit: (e: React.FormEvent, callback: () => void) => Promise<void>
 }
 
 const useStyles = makeStyles((theme) => ({
