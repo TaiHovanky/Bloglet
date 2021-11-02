@@ -1,8 +1,9 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { TextField } from '@material-ui/core';
 import { useMutation } from '@apollo/client';
 import { CreateCommentDocument } from '../../generated/graphql';
-import { useState } from 'react';
+import { currentUserProfileVar } from '../../cache';
+import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
 interface Props {
   userId: number,
@@ -11,7 +12,18 @@ interface Props {
 
 const CommentInput = ({ userId, postId }: Props) => {
   const [comment, setComment] = useState('');
-  const [createComment, { loading }] = useMutation(CreateCommentDocument);
+  const [createComment, { loading }] = useMutation(CreateCommentDocument, {
+    update(cache, { data }) {
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      cache.modify({
+        fields: {
+          getUserPosts() {
+            return updatePosts(posts.getUserPosts, 'comments', data.createComment, false);
+          }
+        }
+      })
+    }
+  });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);

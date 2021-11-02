@@ -4,15 +4,13 @@ import { useMutation, useQuery } from '@apollo/client';
 import {
   useHomePageLazyQuery,
   useGetUserPostsQuery,
-  useLikePostMutation,
   Post,
   useGetFollowingQuery,
   useGetFollowersQuery,
   CreatePostDocument,
-  GetUserPostsDocument,
-  useLikeCommentMutation,
+  LikeCommentDocument,
+  LikePostDocument,
 } from '../../generated/graphql';
-import { currentUserProfileVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
 import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
@@ -20,6 +18,10 @@ import PrimaryAppBar from '../../components/primary-app-bar';
 import getCurrentUserProfile from '../../cache-queries/current-user-profile';
 import FollowButton from '../../components/follow-button';
 import UserFollows from '../../components/user-follows';
+import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
+import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
+import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
+import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -32,6 +34,7 @@ const useStyles = makeStyles(() => ({
 
 const Home: React.FC<any> = () => {
   const classes = useStyles();
+
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({
     fetchPolicy: 'network-only',
     onCompleted: (data: any) => {
@@ -48,9 +51,15 @@ const Home: React.FC<any> = () => {
 
   // eslint-disable-next-line
   const currentUserProfile = useQuery(getCurrentUserProfile);
+  // eslint-disable-next-line
+  const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
 
-  const { data: postsData, loading: postsLoading } = useGetUserPostsQuery({
-    variables: { userId: currentUserProfileVar().id },
+  const { data: postsData, loading: postsLoading, fetchMore } = useGetUserPostsQuery({
+    variables: {
+      userId: currentUserProfileVar().id,
+      cursor: currentGetUserPostsCursorVar(),
+      offsetLimit: OFFSET_LIMIT
+    },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
   });
@@ -65,27 +74,44 @@ const Home: React.FC<any> = () => {
 
   const [createPost] = useMutation(CreatePostDocument, {
     update(cache, data) {
-      if (data && data.data && data.data.createPost) {
-        const posts: any = cache.readQuery({
-          query: GetUserPostsDocument,
-          variables: {
-            userId: currentUserProfileVar().id
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      cache.modify({
+        fields: {
+          getUserPosts() {
+            return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
           }
-        });
-        cache.modify({
-          fields: {
-            getUserPosts(existingPosts: Array<Post>) {
-              return [...posts.getUserPosts as Array<Post>, data.data.createPost];
-            }
-          }
-        });
-      }
+        }
+      });
     } /* To avoid refetching, I can use the cache update function to add the Post instance
     that was returned by the mutation to the existing array of posts. While this takes more
     code, it's ultimately faster than refetching because there's not a network call. */
   });
-  const [likePost] = useLikePostMutation();
-  const [likeComment] = useLikeCommentMutation();
+
+  const [likePost] = useMutation(LikePostDocument, {
+    update(cache, { data }) {
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      cache.modify({
+        fields: {
+          getUserPosts() {
+            return updatePosts(posts.getUserPosts, 'likes', data.likePost, false);
+          }
+        }
+      })
+    }
+  });
+
+  const [likeComment] = useMutation(LikeCommentDocument, {
+    update(cache, { data }) {
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      cache.modify({
+        fields: {
+          getUserPosts() {
+            return updatePosts(posts.getUserPosts, 'comments', data.likeComment, true);
+          }
+        }
+      })
+    }
+  });
 
   useEffect(
     () => {
@@ -97,6 +123,7 @@ const Home: React.FC<any> = () => {
   const handleSubmit = async (e: React.FormEvent, callback: ()=> void) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
+    currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 1);
     await createPost({
       variables: {
         creatorId: userData && userData.homePage ? userData.homePage.id : 0,
@@ -104,7 +131,7 @@ const Home: React.FC<any> = () => {
         createdAt: new Date().toLocaleString()
       }
     });
-    callback();
+    callback(); // Used to clear the post form after saving a post
   }
 
   const handleLikePost = (userId: number, postId: number, isAlreadyLiked: boolean) => {
@@ -126,6 +153,26 @@ const Home: React.FC<any> = () => {
       }
     });
   }
+  
+  useScrollDirection(async (scrollDirection: string) => {
+    if (
+      scrollDirection === SCROLL_DIRECTION_DOWN &&
+      window.scrollY + window.innerHeight > document.documentElement.scrollHeight - 2 &&
+      !postsLoading &&
+      postsData &&
+      postsData.getUserPosts &&
+      postsData.getUserPosts.length
+    ) {
+      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + OFFSET_LIMIT)
+      await fetchMore({
+        variables: {
+          userId: currentUserProfileVar().id,
+          cursor: currentGetUserPostsCursorVar(),
+          offsetLimit: OFFSET_LIMIT
+        }
+      });
+    }
+  });
 
   if (loading || postsLoading) {
     return <div>Loading...</div>;
@@ -153,7 +200,9 @@ const Home: React.FC<any> = () => {
                 userToBeFollowed={currentUserProfileVar().id}
               />
             </div>
-            {currentUserProfileVar().id === userData.homePage.id && <NewPostForm handleSubmit={handleSubmit} />}
+            {currentUserProfileVar().id === userData.homePage.id &&
+              <NewPostForm handleSubmit={handleSubmit} />
+            }
             {postsData && postsData.getUserPosts &&
               <PostList
                 posts={postsData?.getUserPosts}

@@ -141,6 +141,8 @@ export type QuerySearchUsersArgs = {
 
 
 export type QueryGetUserPostsArgs = {
+  offsetLimit: Scalars['Float'];
+  cursor: Scalars['Float'];
   userId: Scalars['Float'];
 };
 
@@ -184,11 +186,24 @@ export type CreateCommentMutation = (
   { __typename?: 'Mutation' }
   & { createComment?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'content'>
-    & { comments?: Maybe<Array<(
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
+    & { likes?: Maybe<Array<(
+      { __typename?: 'PostLike' }
+      & { user: (
+        { __typename?: 'User' }
+        & Pick<User, 'id'>
+      ) }
+    )>>, comments?: Maybe<Array<(
       { __typename?: 'Comment' }
       & Pick<Comment, 'id' | 'comment' | 'createdAt'>
-      & { user?: Maybe<(
+      & { likes?: Maybe<Array<(
+        { __typename?: 'CommentLike' }
+        & Pick<CommentLike, 'id'>
+        & { user?: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'id'>
+        )> }
+      )>>, user?: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'id' | 'firstName' | 'lastName'>
       )>, post?: Maybe<(
@@ -211,6 +226,30 @@ export type CreatePostMutation = (
   & { createPost?: Maybe<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
+    & { likes?: Maybe<Array<(
+      { __typename?: 'PostLike' }
+      & { user: (
+        { __typename?: 'User' }
+        & Pick<User, 'id'>
+      ) }
+    )>>, comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment' | 'createdAt'>
+      & { likes?: Maybe<Array<(
+        { __typename?: 'CommentLike' }
+        & Pick<CommentLike, 'id'>
+        & { user?: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'id'>
+        )> }
+      )>>, user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, post?: Maybe<(
+        { __typename?: 'Post' }
+        & Pick<Post, 'id'>
+      )> }
+    )>> }
   )> }
 );
 
@@ -268,6 +307,8 @@ export type GetFollowingQuery = (
 
 export type GetUserPostsQueryVariables = Exact<{
   userId: Scalars['Float'];
+  cursor: Scalars['Float'];
+  offsetLimit: Scalars['Float'];
 }>;
 
 
@@ -275,7 +316,7 @@ export type GetUserPostsQuery = (
   { __typename?: 'Query' }
   & { getUserPosts?: Maybe<Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'content' | 'createdAt'>
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
     & { likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
@@ -331,9 +372,15 @@ export type LikeCommentMutation = (
       & Pick<CommentLike, 'id'>
       & { user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id'>
       )> }
-    )>> }
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName'>
+    )>, post?: Maybe<(
+      { __typename?: 'Post' }
+      & Pick<Post, 'id'>
+    )> }
   )> }
 );
 
@@ -348,7 +395,7 @@ export type LikePostMutation = (
   { __typename?: 'Mutation' }
   & { likePost?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'content'>
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
     & { likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
@@ -421,11 +468,24 @@ export const CreateCommentDocument = gql`
     createdAt: $createdAt
   ) {
     id
+    creatorId
     content
+    createdAt
+    likes {
+      user {
+        id
+      }
+    }
     comments {
       id
       comment
       createdAt
+      likes {
+        id
+        user {
+          id
+        }
+      }
       user {
         id
         firstName
@@ -474,6 +534,30 @@ export const CreatePostDocument = gql`
     creatorId
     content
     createdAt
+    likes {
+      user {
+        id
+      }
+    }
+    comments {
+      id
+      comment
+      createdAt
+      likes {
+        id
+        user {
+          id
+        }
+      }
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
+        id
+      }
+    }
   }
 }
     `;
@@ -629,9 +713,10 @@ export type GetFollowingQueryHookResult = ReturnType<typeof useGetFollowingQuery
 export type GetFollowingLazyQueryHookResult = ReturnType<typeof useGetFollowingLazyQuery>;
 export type GetFollowingQueryResult = Apollo.QueryResult<GetFollowingQuery, GetFollowingQueryVariables>;
 export const GetUserPostsDocument = gql`
-    query GetUserPosts($userId: Float!) {
-  getUserPosts(userId: $userId) {
+    query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
+  getUserPosts(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
     id
+    creatorId
     content
     createdAt
     likes {
@@ -675,6 +760,8 @@ export const GetUserPostsDocument = gql`
  * const { data, loading, error } = useGetUserPostsQuery({
  *   variables: {
  *      userId: // value for 'userId'
+ *      cursor: // value for 'cursor'
+ *      offsetLimit: // value for 'offsetLimit'
  *   },
  * });
  */
@@ -740,9 +827,15 @@ export const LikeCommentDocument = gql`
       id
       user {
         id
-        firstName
-        lastName
       }
+    }
+    user {
+      id
+      firstName
+      lastName
+    }
+    post {
+      id
     }
   }
 }
@@ -779,7 +872,9 @@ export const LikePostDocument = gql`
     mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
   likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {
     id
+    creatorId
     content
+    createdAt
     likes {
       user {
         id

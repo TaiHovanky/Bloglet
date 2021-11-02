@@ -29,6 +29,11 @@ export class CommentResolver {
         .where('posts.id = :postId', { postId })
         .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
         .leftJoinAndMapOne('comment.user', 'users', 'users', 'comment.user_id = users.id')
+        .leftJoinAndMapMany('comment.likes', 'comment_like', 'likes', 'comment.id = likes.comment_id')
+        .leftJoinAndMapOne('likes.user', 'users', 'users2', 'likes.user_id = users2.id')
+        .leftJoinAndMapMany('posts.likes', 'post_like', 'likes2', 'posts.id = likes2.post_id')
+        .leftJoinAndMapOne('likes2.user', 'users', 'users3', 'likes2.user_id = users3.id')
+        .leftJoinAndMapOne('comment.post', 'posts', 'posts2', 'comment.post_id = posts2.id')
         .getOne();
 
       if (user && post) {
@@ -39,7 +44,9 @@ export class CommentResolver {
           createdAt
         );
         const savedComment = await Comment.save(newComment);
+        savedComment.likes = [];
         post.comments = [...post.comments, savedComment];
+        post.likes = post.likes && post.likes.length ? post.likes : [];
         return post;
       }
       return null;
@@ -63,8 +70,10 @@ export class CommentResolver {
         .where('comment.id = :commentId', { commentId })
         .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
         .leftJoinAndMapOne('comment_like.user', 'users', 'users', 'comment_like.user_id = users.id')
+        .leftJoinAndMapOne('comment.post', 'posts', 'posts', 'comment.post_id = posts.id')
+        .leftJoinAndMapOne('comment.user', 'users', 'users2', 'comment.user_id = users2.id')
         .getOne();
-  
+
       if (isAlreadyLiked && commentToUpdate) {
         const existingLikeIndex = commentToUpdate.likes.findIndex((like: CommentLike) => like.user.id === userId);
         commentToUpdate.likes.splice(existingLikeIndex, 1);
