@@ -11,7 +11,6 @@ import {
   LikeCommentDocument,
   LikePostDocument,
 } from '../../generated/graphql';
-import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import NewPostForm from '../../components/new-post-form';
 import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
@@ -20,8 +19,9 @@ import getCurrentUserProfile from '../../cache-queries/current-user-profile';
 import FollowButton from '../../components/follow-button';
 import UserFollows from '../../components/user-follows';
 import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
+import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
-import { readGetUserPostsQuery, updatePosts } from '../../utils/update-comments';
+import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
