@@ -100,6 +100,7 @@ const PrimaryAppBar = ({ user }: Props) => {
 
   const handleMenuClick = (user: User) => {
     currentUserProfileVar(user);
+    console.log('new current profile var', currentUserProfileVar())
     handleClose();
   };
 

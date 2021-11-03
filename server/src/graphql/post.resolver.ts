@@ -8,8 +8,28 @@ import { errorHandler } from '../utils/error-handler.util';
 
 @Resolver()
 export class PostResolver {
+  @Query(() => [Post], { nullable: true})
+  async getUserNewsfeed(
+    @Arg('userId') userId: number,
+    @Arg('cursor') cursor: number,
+    @Arg('offsetLimit') offsetLimit: number,
+    // @Ctx() { res }: requestContext
+  ) {
+    const x = await Post
+      .createQueryBuilder('posts')
+      .orderBy('posts.createdAt', 'DESC')
+      .skip(cursor)
+      .take(offsetLimit)
+      .leftJoinAndSelect('users', 'users', 'posts.creatorId = users.id')
+      .leftJoin('users.following', 'user_follows_user')
+      .where('user_follows_user.follower_id = :userId', { userId })
+      .getMany();
+    // console.log('x', x);
+    return x;
+  }
+
   @Query(() => [Post], { nullable: true })
-  @UseMiddleware(isAuthenticated)
+  // @UseMiddleware(isAuthenticated)
   getUserPosts(
     @Arg('userId') userId: number,
     @Arg('cursor') cursor: number,
@@ -18,7 +38,7 @@ export class PostResolver {
   ) {
     return Post
       .createQueryBuilder('posts')
-      .orderBy('posts.id', "DESC")
+      .orderBy('posts.id', 'DESC')
       .skip(cursor)
       .take(offsetLimit)
       .where('posts.creatorId = :creatorId', { creatorId: userId })
@@ -49,9 +69,8 @@ export class PostResolver {
   async createPost(
     @Arg('creatorId') creatorId: number, 
     @Arg('content') content: string,
-    @Arg('createdAt') createdAt: string,
   ) {
-    const newPost = new Post(content, creatorId, createdAt);
+    const newPost = new Post(content, creatorId);
     const savedPost = await Post.save(newPost);
     savedPost.comments = [];
     savedPost.likes = [];

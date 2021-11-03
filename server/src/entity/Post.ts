@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, CreateDateColumn } from 'typeorm';
 import { PostLike } from './PostLike';
 import { Comment } from './Comment';
 
@@ -9,12 +9,10 @@ export class Post extends BaseEntity {
   constructor(
     content: string,
     creatorId: number,
-    createdAt: string
   ) {
     super();
     this.content = content;
     this.creatorId = creatorId;
-    this.createdAt = createdAt;
   }
 
   @Field()
@@ -30,8 +28,8 @@ export class Post extends BaseEntity {
   creatorId: number;
 
   @Field({ nullable: true })
-  @Column({ nullable: true })
-  createdAt: string;
+  @CreateDateColumn({ nullable: true })
+  createdAt: Date;
 
   @Field(() => [PostLike], { nullable: true })
   @OneToMany(() => PostLike, (likes: PostLike) => likes.post)

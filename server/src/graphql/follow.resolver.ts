@@ -26,7 +26,7 @@ export class FollowerResolver {
   }
 
   @Query(() => [Follows], { nullable: true })
-  @UseMiddleware(isAuthenticated)
+  // @UseMiddleware(isAuthenticated)
   getFollowing(
     @Arg('userId') userId: number,
     @Ctx() { res }: requestContext

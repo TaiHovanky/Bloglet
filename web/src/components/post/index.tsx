@@ -44,7 +44,7 @@ const Post: React.FC<Props> = ({ post, userId, likePost, likeComment }: Props) =
             {post.content}
           </Typography>
           <Typography variant="caption">
-            {post.createdAt}
+            {new Date(post.createdAt).toLocaleString()}
           </Typography>
         </div>
         <Grid container spacing={3} className={classes.likes}>

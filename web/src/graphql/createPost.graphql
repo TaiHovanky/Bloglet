@@ -1,5 +1,5 @@
-mutation CreatePost($creatorId: Float!, $content: String!, $createdAt: String!) {
-  createPost(creatorId: $creatorId, content: $content, createdAt: $createdAt) {
+mutation CreatePost($creatorId: Float!, $content: String!) {
+  createPost(creatorId: $creatorId, content: $content) {
     id
     creatorId
     content

@@ -12,6 +12,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
 };
 
 export type Comment = {
@@ -30,6 +32,7 @@ export type CommentLike = {
   user?: Maybe<User>;
   comment?: Maybe<Comment>;
 };
+
 
 export type Follows = {
   __typename?: 'Follows';
@@ -72,7 +75,6 @@ export type MutationLoginArgs = {
 
 
 export type MutationCreatePostArgs = {
-  createdAt: Scalars['String'];
   content: Scalars['String'];
   creatorId: Scalars['Float'];
 };
@@ -111,7 +113,7 @@ export type Post = {
   id: Scalars['Float'];
   content?: Maybe<Scalars['String']>;
   creatorId: Scalars['Float'];
-  createdAt?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
   likes?: Maybe<Array<PostLike>>;
   comments?: Maybe<Array<Comment>>;
 };
@@ -128,6 +130,7 @@ export type Query = {
   users: Array<User>;
   homePage?: Maybe<User>;
   searchUsers?: Maybe<Array<User>>;
+  getUserNewsfeed?: Maybe<Array<Post>>;
   getUserPosts?: Maybe<Array<Post>>;
   getPost: Post;
   getFollowers?: Maybe<Array<Follows>>;
@@ -137,6 +140,13 @@ export type Query = {
 
 export type QuerySearchUsersArgs = {
   name: Scalars['String'];
+};
+
+
+export type QueryGetUserNewsfeedArgs = {
+  offsetLimit: Scalars['Float'];
+  cursor: Scalars['Float'];
+  userId: Scalars['Float'];
 };
 
 
@@ -217,7 +227,6 @@ export type CreateCommentMutation = (
 export type CreatePostMutationVariables = Exact<{
   creatorId: Scalars['Float'];
   content: Scalars['String'];
-  createdAt: Scalars['String'];
 }>;
 
 
@@ -528,8 +537,8 @@ export type CreateCommentMutationHookResult = ReturnType<typeof useCreateComment
 export type CreateCommentMutationResult = Apollo.MutationResult<CreateCommentMutation>;
 export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateCommentMutation, CreateCommentMutationVariables>;
 export const CreatePostDocument = gql`
-    mutation CreatePost($creatorId: Float!, $content: String!, $createdAt: String!) {
-  createPost(creatorId: $creatorId, content: $content, createdAt: $createdAt) {
+    mutation CreatePost($creatorId: Float!, $content: String!) {
+  createPost(creatorId: $creatorId, content: $content) {
     id
     creatorId
     content
@@ -578,7 +587,6 @@ export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, C
  *   variables: {
  *      creatorId: // value for 'creatorId'
  *      content: // value for 'content'
- *      createdAt: // value for 'createdAt'
  *   },
  * });
  */

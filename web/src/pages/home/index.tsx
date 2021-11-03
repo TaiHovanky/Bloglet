@@ -62,6 +62,9 @@ const Home: React.FC<any> = () => {
     },
     skip: !currentUserProfileVar().id,
     onError: (err) => console.log(err),
+    onCompleted: (data) => {
+      console.log('dataaaaaaa', data);
+    }
   });
 
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
@@ -78,6 +81,7 @@ const Home: React.FC<any> = () => {
       cache.modify({
         fields: {
           getUserPosts() {
+            console.log('created post', data.data.createPost, posts.getUserPosts);
             return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
           }
         }
@@ -128,7 +132,7 @@ const Home: React.FC<any> = () => {
       variables: {
         creatorId: userData && userData.homePage ? userData.homePage.id : 0,
         content: formData.get('content') as string,
-        createdAt: new Date().toLocaleString()
+        // createdAt: new Date().toLocaleString()
       }
     });
     callback(); // Used to clear the post form after saving a post
