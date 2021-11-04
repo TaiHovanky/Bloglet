@@ -11,7 +11,7 @@ import {
   LikeCommentDocument,
   LikePostDocument,
 } from '../../generated/graphql';
-import NewPostForm from '../../components/new-post-form';
+import NewPostForm from '../../components/post-input';
 import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
 import PrimaryAppBar from '../../components/primary-app-bar';

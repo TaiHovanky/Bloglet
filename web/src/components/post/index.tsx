@@ -1,14 +1,15 @@
+import React, { useState } from 'react';
+import CommentListContainer from '../../containers/comment-list-container';
+import CommentInput from '../comment-input';
+// import CommentList from '../comment-list';
+import LikeButton from '../like-button';
 import { Card, CardContent, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
 import { CommentOutlined } from '@material-ui/icons';
-import React, { useState } from 'react';
-import CommentInput from '../comment-input';
-import CommentList from '../comment-list';
-import LikeButton from '../like-button';
 
 interface Props {
   post: any,
   likePost: any,
-  likeComment: any,
+  // likeComment: any,
   userId: number
 }
 
@@ -25,7 +26,12 @@ const useStyles = makeStyles({
   }
 });
 
-const Post: React.FC<Props> = ({ post, userId, likePost, likeComment }: Props) => {
+const Post: React.FC<Props> = ({
+  post,
+  userId,
+  likePost,
+  // likeComment
+}: Props) => {
   const classes = useStyles();
 
   const [showCommentInput, setShowCommentInput] = useState(false);
@@ -64,7 +70,8 @@ const Post: React.FC<Props> = ({ post, userId, likePost, likeComment }: Props) =
           </Grid>
         </Grid>
         {showCommentInput && <CommentInput userId={userId} postId={post.id} />}
-        <CommentList comments={post.comments} userId={userId} likeComment={likeComment} />
+        {/* <CommentList comments={post.comments} userId={userId} likeComment={likeComment} /> */}
+        <CommentListContainer comments={post.comments} />
       </CardContent>
     </Card>
   );

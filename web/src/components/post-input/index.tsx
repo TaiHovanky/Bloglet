@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
 
 interface Props {
-  handleSubmit: (e: React.FormEvent, callback: () => void) => Promise<void>
+  handleCreatePost: (e: React.FormEvent, callback: () => void) => Promise<void>
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const NewPostForm: React.FC<Props> = (props: Props) => {
+const PostInput: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
   const [postContent, setPostContent] = useState('');
 
@@ -34,7 +34,7 @@ const NewPostForm: React.FC<Props> = (props: Props) => {
     <Paper elevation={3} className={classes.newPostPaper}>
       <Container maxWidth="md">
         <Typography variant="h5" noWrap>Create Post</Typography>
-        <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => props.handleSubmit(e, clearForm)}>
+        <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => props.handleCreatePost(e, clearForm)}>
           <div>
             <TextField
               id="input-content"
@@ -60,4 +60,4 @@ const NewPostForm: React.FC<Props> = (props: Props) => {
   );
 }
 
-export default NewPostForm;
+export default PostInput;
