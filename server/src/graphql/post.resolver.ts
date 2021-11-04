@@ -9,13 +9,13 @@ import { errorHandler } from '../utils/error-handler.util';
 @Resolver()
 export class PostResolver {
   @Query(() => [Post], { nullable: true})
-  async getUserNewsfeed(
+  getUserNewsfeed(
     @Arg('userId') userId: number,
     @Arg('cursor') cursor: number,
     @Arg('offsetLimit') offsetLimit: number,
-    // @Ctx() { res }: requestContext
+    @Ctx() { res }: requestContext
   ) {
-    const x = await Post
+    return Post
       .createQueryBuilder('posts')
       .orderBy('posts.createdAt', 'DESC')
       .skip(cursor)
@@ -23,9 +23,17 @@ export class PostResolver {
       .leftJoinAndSelect('users', 'users', 'posts.creatorId = users.id')
       .leftJoin('users.following', 'user_follows_user')
       .where('user_follows_user.follower_id = :userId', { userId })
-      .getMany();
-    // console.log('x', x);
-    return x;
+      .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
+      .leftJoinAndMapOne('comment.user', 'users', 'users2', 'comment.user_id = users2.id')
+      .leftJoinAndMapMany('comment.likes', 'comment_like', 'comment_like', 'comment.id = comment_like.comment_id')
+      .leftJoinAndMapOne('comment_like.user', 'users', 'users3', 'comment_like.user_id = users3.id')
+      .leftJoinAndMapMany('posts.likes', 'post_like', 'likes', 'posts.id = likes.post_id')
+      .leftJoinAndMapOne('likes.user', 'users', 'users4', 'likes.user_id = users4.id')
+      .getMany()
+      .catch((err) => {
+        errorHandler(`Failed to get user posts: ${err}`, res);
+        return null;
+      });
   }
 
   @Query(() => [Post], { nullable: true })

@@ -81,7 +81,6 @@ const Home: React.FC<any> = () => {
       cache.modify({
         fields: {
           getUserPosts() {
-            console.log('created post', data.data.createPost, posts.getUserPosts);
             return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
           }
         }
