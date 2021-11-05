@@ -19,8 +19,13 @@ const cache = new InMemoryCache({
           }
         },
         getUserPosts: {
-          keyArgs: ['type', 'id'],
+          keyArgs: ['type', 'id', '__ref'],
           merge(existing = [], incoming) {
+            console.log('getUserPosts cache', existing, incoming);
+            if (currentGetUserPostsCursorVar() === 0) {
+              console.log('returning incoming', currentGetUserPostsCursorVar(), incoming);
+              return incoming;
+            }
             return existing.length ? [...existing, ...incoming] : incoming;
           }
         }

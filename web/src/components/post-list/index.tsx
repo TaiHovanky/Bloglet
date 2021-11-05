@@ -6,13 +6,11 @@ import Post from '../post';
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
   likePost: any,
-  // likeComment: any,
   userId: number
 }
 
 const PostList: React.FC<Props> = ({
   likePost,
-  // likeComment,
   posts,
   userId
 }: Props) => {
@@ -24,7 +22,6 @@ const PostList: React.FC<Props> = ({
           post={post}
           userId={userId}
           likePost={likePost}
-          // likeComment={likeComment}
         />
       )) : []}
     </Container>

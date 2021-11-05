@@ -39,8 +39,6 @@ const CommentInputContainer = ({ userId, postId }: Props) => {
 
   return (
     <CommentInput
-      userId={userId}
-      postId={postId}
       loading={loading}
       handleCreateComment={handleCreateComment}
     />

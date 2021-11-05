@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import CommentListContainer from '../../containers/comment-list-container';
-import CommentInput from '../comment-input';
-// import CommentList from '../comment-list';
 import LikeButton from '../like-button';
+import CommentInputContainer from '../../containers/comment-input-container';
 import { Card, CardContent, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
 import { CommentOutlined } from '@material-ui/icons';
 
 interface Props {
   post: any,
   likePost: any,
-  // likeComment: any,
   userId: number
 }
 
@@ -30,7 +28,6 @@ const Post: React.FC<Props> = ({
   post,
   userId,
   likePost,
-  // likeComment
 }: Props) => {
   const classes = useStyles();
 
@@ -69,7 +66,7 @@ const Post: React.FC<Props> = ({
             <Typography variant="subtitle1" color="textSecondary">{post.comments.length}</Typography>
           </Grid>
         </Grid>
-        {showCommentInput && <CommentInput userId={userId} postId={post.id} />}
+        {showCommentInput && <CommentInputContainer userId={userId} postId={post.id} />}
         {/* <CommentList comments={post.comments} userId={userId} likeComment={likeComment} /> */}
         <CommentListContainer comments={post.comments} />
       </CardContent>

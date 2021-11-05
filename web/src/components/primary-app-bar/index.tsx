@@ -7,7 +7,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { useSearchUsersQuery } from '../../generated/graphql';
-import { currentUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import User from '../../types/user.interface';
 import NavBar from '../navbar';
 
@@ -99,7 +99,8 @@ const PrimaryAppBar = ({ user }: Props) => {
   };
 
   const handleMenuClick = (user: User) => {
-    currentUserProfileVar(user);
+    currentUserProfileVar({...user});
+    currentGetUserPostsCursorVar(0);
     console.log('new current profile var', currentUserProfileVar())
     handleClose();
   };

@@ -44,6 +44,7 @@ export class PostResolver {
     @Arg('offsetLimit') offsetLimit: number,
     @Ctx() { res }: requestContext
   ) {
+    console.log('gettinguserposts-----', userId, cursor);
     return Post
       .createQueryBuilder('posts')
       .orderBy('posts.id', 'DESC')

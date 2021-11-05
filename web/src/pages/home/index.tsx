@@ -1,27 +1,30 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography } from '@material-ui/core';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import {
   useHomePageLazyQuery,
-  useGetUserPostsQuery,
-  Post,
-  useGetFollowingQuery,
-  useGetFollowersQuery,
-  CreatePostDocument,
-  LikeCommentDocument,
-  LikePostDocument,
+  // useGetUserPostsQuery,
+  // Post,
+  // useGetFollowingQuery,
+  // useGetFollowersQuery,
+  // CreatePostDocument,
+  // LikeCommentDocument,
+  // LikePostDocument,
 } from '../../generated/graphql';
-import NewPostForm from '../../components/post-input';
-import PostList from '../../components/post-list';
+// import NewPostForm from '../../components/post-input';
+// import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
 import PrimaryAppBar from '../../components/primary-app-bar';
 import getCurrentUserProfile from '../../cache-queries/current-user-profile';
-import FollowButton from '../../components/follow-button';
-import UserFollows from '../../components/user-follows';
+// import FollowButton from '../../components/follow-button';
+// import UserFollows from '../../components/user-follows';
 import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
-import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
-import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
-import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
+import { currentUserProfileVar } from '../../cache';
+import UserFollowsContainer from '../../containers/user-follows-container';
+import PostInputContainer from '../../containers/post-input-container';
+import PostListContainer from '../../containers/post-list-container';
+// import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
+// import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -54,67 +57,67 @@ const Home: React.FC<any> = () => {
   // eslint-disable-next-line
   const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
 
-  const { data: postsData, loading: postsLoading, fetchMore } = useGetUserPostsQuery({
-    variables: {
-      userId: currentUserProfileVar().id,
-      cursor: currentGetUserPostsCursorVar(),
-      offsetLimit: OFFSET_LIMIT
-    },
-    skip: !currentUserProfileVar().id,
-    onError: (err) => console.log(err),
-    onCompleted: (data) => {
-      console.log('dataaaaaaa', data);
-    }
-  });
+  // const { data: postsData, loading: postsLoading, fetchMore } = useGetUserPostsQuery({
+  //   variables: {
+  //     userId: currentUserProfileVar().id,
+  //     cursor: currentGetUserPostsCursorVar(),
+  //     offsetLimit: OFFSET_LIMIT
+  //   },
+  //   skip: !currentUserProfileVar().id,
+  //   onError: (err) => console.log(err),
+  //   onCompleted: (data) => {
+  //     console.log('dataaaaaaa', data);
+  //   }
+  // });
 
-  const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
-    variables: { userId: currentUserProfileVar().id }
-  });
+  // const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
+  //   variables: { userId: currentUserProfileVar().id }
+  // });
 
-  const { data: followerData, loading: followerLoading } = useGetFollowersQuery({
-    variables: { userId: currentUserProfileVar().id }
-  });
+  // const { data: followerData, loading: followerLoading } = useGetFollowersQuery({
+  //   variables: { userId: currentUserProfileVar().id }
+  // });
 
-  const [createPost] = useMutation(CreatePostDocument, {
-    update(cache, data) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
-      cache.modify({
-        fields: {
-          getUserPosts() {
-            return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
-          }
-        }
-      });
-    } /* To avoid refetching, I can use the cache update function to add the Post instance
-    that was returned by the mutation to the existing array of posts. While this takes more
-    code, it's ultimately faster than refetching because there's not a network call. */
-  });
+  // const [createPost] = useMutation(CreatePostDocument, {
+  //   update(cache, data) {
+  //     const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+  //     cache.modify({
+  //       fields: {
+  //         getUserPosts() {
+  //           return [data.data.createPost, ...posts.getUserPosts as Array<Post>];
+  //         }
+  //       }
+  //     });
+  //   } /* To avoid refetching, I can use the cache update function to add the Post instance
+  //   that was returned by the mutation to the existing array of posts. While this takes more
+  //   code, it's ultimately faster than refetching because there's not a network call. */
+  // });
 
-  const [likePost] = useMutation(LikePostDocument, {
-    update(cache, { data }) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
-      cache.modify({
-        fields: {
-          getUserPosts() {
-            return updatePosts(posts.getUserPosts, 'likes', data.likePost, false);
-          }
-        }
-      })
-    }
-  });
+  // const [likePost] = useMutation(LikePostDocument, {
+  //   update(cache, { data }) {
+  //     const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+  //     cache.modify({
+  //       fields: {
+  //         getUserPosts() {
+  //           return updatePosts(posts.getUserPosts, 'likes', data.likePost, false);
+  //         }
+  //       }
+  //     })
+  //   }
+  // });
 
-  const [likeComment] = useMutation(LikeCommentDocument, {
-    update(cache, { data }) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
-      cache.modify({
-        fields: {
-          getUserPosts() {
-            return updatePosts(posts.getUserPosts, 'comments', data.likeComment, true);
-          }
-        }
-      })
-    }
-  });
+  // const [likeComment] = useMutation(LikeCommentDocument, {
+  //   update(cache, { data }) {
+  //     const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+  //     cache.modify({
+  //       fields: {
+  //         getUserPosts() {
+  //           return updatePosts(posts.getUserPosts, 'comments', data.likeComment, true);
+  //         }
+  //       }
+  //     })
+  //   }
+  // });
 
   useEffect(
     () => {
@@ -123,61 +126,60 @@ const Home: React.FC<any> = () => {
     [homePageQueryExecutor]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
-  const handleSubmit = async (e: React.FormEvent, callback: ()=> void) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 1);
-    await createPost({
-      variables: {
-        creatorId: userData && userData.homePage ? userData.homePage.id : 0,
-        content: formData.get('content') as string,
-        // createdAt: new Date().toLocaleString()
-      }
-    });
-    callback(); // Used to clear the post form after saving a post
-  }
+  // const handleSubmit = async (e: React.FormEvent, callback: ()=> void) => {
+  //   e.preventDefault();
+  //   const formData = new FormData(e.target as HTMLFormElement);
+  //   currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 1);
+  //   await createPost({
+  //     variables: {
+  //       creatorId: userData && userData.homePage ? userData.homePage.id : 0,
+  //       content: formData.get('content') as string,
+  //     }
+  //   });
+  //   callback(); // Used to clear the post form after saving a post
+  // }
 
-  const handleLikePost = (userId: number, postId: number, isAlreadyLiked: boolean) => {
-    likePost({
-      variables: {
-        userId,
-        postId,
-        isAlreadyLiked
-      }
-    });
-  }
+  // const handleLikePost = (userId: number, postId: number, isAlreadyLiked: boolean) => {
+  //   likePost({
+  //     variables: {
+  //       userId,
+  //       postId,
+  //       isAlreadyLiked
+  //     }
+  //   });
+  // }
 
-  const handleLikeComment = (userId: number, commentId: number, isAlreadyLiked: boolean) => {
-    likeComment({
-      variables: {
-        userId,
-        commentId,
-        isAlreadyLiked
-      }
-    });
-  }
+  // const handleLikeComment = (userId: number, commentId: number, isAlreadyLiked: boolean) => {
+  //   likeComment({
+  //     variables: {
+  //       userId,
+  //       commentId,
+  //       isAlreadyLiked
+  //     }
+  //   });
+  // }
   
-  useScrollDirection(async (scrollDirection: string) => {
-    if (
-      scrollDirection === SCROLL_DIRECTION_DOWN &&
-      window.scrollY + window.innerHeight > document.documentElement.scrollHeight - 2 &&
-      !postsLoading &&
-      postsData &&
-      postsData.getUserPosts &&
-      postsData.getUserPosts.length
-    ) {
-      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + OFFSET_LIMIT)
-      await fetchMore({
-        variables: {
-          userId: currentUserProfileVar().id,
-          cursor: currentGetUserPostsCursorVar(),
-          offsetLimit: OFFSET_LIMIT
-        }
-      });
-    }
-  });
+  // useScrollDirection(async (scrollDirection: string) => {
+  //   if (
+  //     scrollDirection === SCROLL_DIRECTION_DOWN &&
+  //     window.scrollY + window.innerHeight > document.documentElement.scrollHeight - 2 &&
+  //     !postsLoading &&
+  //     postsData &&
+  //     postsData.getUserPosts &&
+  //     postsData.getUserPosts.length
+  //   ) {
+  //     currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + OFFSET_LIMIT)
+  //     await fetchMore({
+  //       variables: {
+  //         userId: currentUserProfileVar().id,
+  //         cursor: currentGetUserPostsCursorVar(),
+  //         offsetLimit: OFFSET_LIMIT
+  //       }
+  //     });
+  //   }
+  // });
 
-  if (loading || postsLoading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
@@ -191,29 +193,36 @@ const Home: React.FC<any> = () => {
               <Typography variant="h4">
                 {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
               </Typography>
-              <UserFollows
+              {/* <UserFollows
                 followers={followerData}
                 following={followingData}
                 followerLoading={followerLoading}
                 followingLoading={followingLoading}
-              />
-              <FollowButton
-                followers={followerData}
+              /> */}
+              <UserFollowsContainer
                 loggedInUser={userData.homePage.id}
                 userToBeFollowed={currentUserProfileVar().id}
               />
+              {/* <FollowButton
+                followers={followerData}
+                loggedInUser={userData.homePage.id}
+                userToBeFollowed={currentUserProfileVar().id}
+              /> */}
+              {/* <FollowButtonContainer /> */}
             </div>
             {currentUserProfileVar().id === userData.homePage.id &&
-              <NewPostForm handleSubmit={handleSubmit} />
+              // <NewPostForm handleSubmit={handleSubmit} />
+              <PostInputContainer userId={userData.homePage.id} />
             }
-            {postsData && postsData.getUserPosts &&
+            {/* {postsData && postsData.getUserPosts &&
               <PostList
                 posts={postsData?.getUserPosts}
                 likePost={handleLikePost}
                 likeComment={handleLikeComment}
                 userId={userData.homePage.id}
               />
-            }
+            } */}
+            <PostListContainer />
           </Container>
         </> :
         <SplashPage />
