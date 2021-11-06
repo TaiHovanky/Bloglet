@@ -14,7 +14,6 @@ import {
 // import NewPostForm from '../../components/post-input';
 // import PostList from '../../components/post-list';
 import SplashPage from '../../components/splash-page';
-import PrimaryAppBar from '../../components/primary-app-bar';
 import getCurrentUserProfile from '../../cache-queries/current-user-profile';
 // import FollowButton from '../../components/follow-button';
 // import UserFollows from '../../components/user-follows';
@@ -23,6 +22,7 @@ import { currentUserProfileVar } from '../../cache';
 import UserFollowsContainer from '../../containers/user-follows-container';
 import PostInputContainer from '../../containers/post-input-container';
 import PostListContainer from '../../containers/post-list-container';
+import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
 // import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 // import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
@@ -187,7 +187,7 @@ const Home: React.FC<any> = () => {
     <div className={classes.homePageContainer}>
       {userData && userData.homePage ?
         <>
-          <PrimaryAppBar user={userData.homePage} />
+          <PrimaryAppBarContainer user={userData.homePage} />
           <Container maxWidth="sm">
             <div className={classes.currentUserInfoContainer}>
               <Typography variant="h4">

@@ -1,22 +1,12 @@
 import React from 'react';
-import getCurrentUserProfile from '../../cache-queries/current-user-profile';
-import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
 import PostList from '../../components/post-list';
-import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import { GetUserPostsDocument, LikePostDocument } from '../../generated/graphql';
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
 const PostListContainer = () => {
-  // // eslint-disable-next-line
-  // const currentUserProfile = useQuery(getCurrentUserProfile);
-  // // eslint-disable-next-line
-  // const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
-  
-  // const user = useReactiveVar(currentUserProfileVar);
-  // const userId = currentUserProfileVar().id;
-  // console.log('currentUserProfileVar( in post list', currentUserProfileVar(), currentGetUserPostsCursorVar());
   const { data: postsData, loading: postsLoading, fetchMore } = useQuery(GetUserPostsDocument, {
     variables: {
       userId: currentUserProfileVar().id,
@@ -24,11 +14,7 @@ const PostListContainer = () => {
       offsetLimit: OFFSET_LIMIT
     },
     skip: !currentUserProfileVar().id,
-    nextFetchPolicy: 'network-only',
     onError: (err: any) => console.log(err),
-    onCompleted: (data: any) => {
-      console.log('dataaaaaaa', data, currentUserProfileVar());
-    }
   });
 
   const [likePost] = useMutation(LikePostDocument, {

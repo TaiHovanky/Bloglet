@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -6,13 +6,17 @@ import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
-import { useSearchUsersQuery } from '../../generated/graphql';
+import { User } from '../../generated/graphql';
 import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
-import User from '../../types/user.interface';
 import NavBar from '../navbar';
+import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
 
 interface Props {
-  user?: any,
+  user?: User | null,
+  searchUsers: any,
+  getUserPosts: any,
+  clearPosts: any,
+  data?: any
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -77,18 +81,20 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const PrimaryAppBar = ({ user }: Props) => {
+const PrimaryAppBar = ({ user, getUserPosts, searchUsers, clearPosts, data }: Props) => {
   const classes = useStyles();
 
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
   const anchorRef: any = useRef(null);
 
-  const { data } = useSearchUsersQuery({
-    variables: {
-      name: value
-    }
-  });
+  useEffect(() => {
+    searchUsers({
+      variables: {
+        name: value
+      }
+    });
+  }, [value, searchUsers])
 
   const handleOpen = () => {
     setOpen(true);
@@ -99,9 +105,16 @@ const PrimaryAppBar = ({ user }: Props) => {
   };
 
   const handleMenuClick = (user: User) => {
+    clearPosts();
     currentUserProfileVar({...user});
     currentGetUserPostsCursorVar(0);
-    console.log('new current profile var', currentUserProfileVar())
+    getUserPosts({
+      variables: {
+        userId: user.id,
+        cursor: 0,
+        offsetLimit: OFFSET_LIMIT
+      }
+    });
     handleClose();
   };
 
@@ -112,8 +125,7 @@ const PrimaryAppBar = ({ user }: Props) => {
     }
   }
 
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     if (data) {
       handleOpen();
@@ -163,7 +175,7 @@ const PrimaryAppBar = ({ user }: Props) => {
                     <ClickAwayListener onClickAway={handleClose}>
                       <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
                         {data && data.searchUsers?.map(
-                          (user, index) => (
+                          (user: any, index: number) => (
                             <MenuItem key={index} onClick={() => handleMenuClick(user)}>
                               {user.firstName} {user.lastName}
                             </MenuItem>
