@@ -6,11 +6,14 @@ import Post from '../post';
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
   likePost: any,
-  likeComment: any,
   userId: number
 }
 
-const PostList: React.FC<Props> = ({ likePost, likeComment, posts, userId }: Props) => {
+const PostList: React.FC<Props> = ({
+  likePost,
+  posts,
+  userId
+}: Props) => {
   return (
     <Container maxWidth="sm">
       {!!posts ? posts.map((post: any) => (
@@ -19,7 +22,6 @@ const PostList: React.FC<Props> = ({ likePost, likeComment, posts, userId }: Pro
           post={post}
           userId={userId}
           likePost={likePost}
-          likeComment={likeComment}
         />
       )) : []}
     </Container>
