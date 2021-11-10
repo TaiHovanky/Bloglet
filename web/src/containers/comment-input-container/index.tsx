@@ -6,11 +6,10 @@ import { CreateCommentDocument } from '../../generated/graphql';
 import CommentInput from '../../components/comment-input';
 
 interface Props {
-  userId: number,
   postId: number
 }
 
-const CommentInputContainer = ({ userId, postId }: Props) => {
+const CommentInputContainer = ({ postId }: Props) => {
   const [createComment, { loading }] = useMutation(CreateCommentDocument, {
     update(cache, { data }) {
       const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
@@ -24,12 +23,12 @@ const CommentInputContainer = ({ userId, postId }: Props) => {
     }
   });
 
-  const handleCreateComment = async (e: React.FormEvent, comment: string, callback: ()=> void): Promise<void> => {
+  const handleCreateComment = async (e: React.FormEvent, comment: string, creatorId: number, callback: ()=> void): Promise<void> => {
     e.preventDefault();
     await createComment({
       variables: {
         comment,
-        userId,
+        userId: creatorId,
         postId,
         createdAt: new Date().toLocaleString()
       },

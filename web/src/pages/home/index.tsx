@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { createContext, useEffect } from 'react';
 import { Container, makeStyles, Typography } from '@material-ui/core';
 import { useQuery } from '@apollo/client';
 import {
@@ -21,6 +21,8 @@ const useStyles = makeStyles(() => ({
     marginBottom: 30
   }
 }));
+
+export const LoggedInUserContext = createContext(0);
 
 const Home: React.FC<any> = () => {
   const classes = useStyles();
@@ -59,22 +61,24 @@ const Home: React.FC<any> = () => {
     <div className={classes.homePageContainer}>
       {userData && userData.homePage ?
         <>
-          <PrimaryAppBarContainer user={userData.homePage} />
-          <Container maxWidth="sm">
-            <div className={classes.currentUserInfoContainer}>
-              <Typography variant="h4">
-                {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
-              </Typography>
-              <UserFollowsContainer
-                loggedInUser={userData.homePage.id}
-                userToBeFollowed={currentUserProfileVar().id}
-              />
-            </div>
-            {currentUserProfileVar().id === userData.homePage.id &&
-              <PostInputContainer userId={userData.homePage.id} />
-            }
-            <PostListContainer />
-          </Container>
+          <LoggedInUserContext.Provider value={userData.homePage.id}>
+            <PrimaryAppBarContainer user={userData.homePage} />
+            <Container maxWidth="sm">
+              <div className={classes.currentUserInfoContainer}>
+                <Typography variant="h4">
+                  {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
+                </Typography>
+                <UserFollowsContainer
+                  loggedInUser={userData.homePage.id}
+                  userToBeFollowed={currentUserProfileVar().id}
+                />
+              </div>
+              {currentUserProfileVar().id === userData.homePage.id &&
+                <PostInputContainer />
+              }
+              <PostListContainer />
+            </Container>
+          </LoggedInUserContext.Provider>
         </> :
         <SplashPage />
       }

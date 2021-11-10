@@ -37,7 +37,6 @@ const CommentListContainer = ({ comments }: Props) => {
     <CommentList
       comments={comments}
       likeComment={handleLikeComment}
-      userId={currentUserProfileVar().id}
     />
   );
 }

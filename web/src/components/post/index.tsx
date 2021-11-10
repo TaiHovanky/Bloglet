@@ -8,7 +8,6 @@ import { CommentOutlined } from '@material-ui/icons';
 interface Props {
   post: any,
   likePost: any,
-  userId: number
 }
 
 const useStyles = makeStyles({
@@ -26,7 +25,6 @@ const useStyles = makeStyles({
 
 const Post: React.FC<Props> = ({
   post,
-  userId,
   likePost,
 }: Props) => {
   const classes = useStyles();
@@ -52,7 +50,7 @@ const Post: React.FC<Props> = ({
         </div>
         <Grid container spacing={3} className={classes.likes}>
           <Grid item xs={1}>
-            <LikeButton userId={userId} item={post} likeMutation={likePost} />
+            <LikeButton item={post} likeMutation={likePost} />
           </Grid>
           <Grid item xs={2}>
             <Typography variant="subtitle1" color="textSecondary">{post.likes.length}</Typography>
@@ -66,7 +64,7 @@ const Post: React.FC<Props> = ({
             <Typography variant="subtitle1" color="textSecondary">{post.comments.length}</Typography>
           </Grid>
         </Grid>
-        {showCommentInput && <CommentInputContainer userId={userId} postId={post.id} />}
+        {showCommentInput && <CommentInputContainer postId={post.id} />}
         <CommentListContainer comments={post.comments} />
       </CardContent>
     </Card>

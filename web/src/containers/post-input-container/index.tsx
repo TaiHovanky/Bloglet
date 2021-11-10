@@ -5,11 +5,7 @@ import { CreatePostDocument, Post } from '../../generated/graphql';
 import { readGetUserPostsQuery } from '../../utils/cache-modification.util';
 import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 
-interface Props {
-  userId: number;
-}
-
-const PostInputContainer = ({ userId }: Props) => {
+const PostInputContainer = () => {
   const [createPost] = useMutation(CreatePostDocument, {
     update(cache, data) {
       const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
@@ -25,13 +21,13 @@ const PostInputContainer = ({ userId }: Props) => {
     code, it's ultimately faster than refetching because there's not a network call. */
   });
 
-  const handleCreatePost = async (e: React.FormEvent, callback: ()=> void): Promise<void> => {
+  const handleCreatePost = async (e: React.FormEvent, creatorId: number, callback: ()=> void): Promise<void> => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 1);
     await createPost({
       variables: {
-        creatorId: userId,
+        creatorId,
         content: formData.get('content') as string,
       }
     });

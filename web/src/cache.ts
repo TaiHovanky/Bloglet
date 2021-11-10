@@ -28,6 +28,16 @@ const cache = new InMemoryCache({
             }
             return existing.length ? [...existing, ...incoming] : incoming;
           }
+        },
+        getFollowers: {
+          merge(existing = [], incoming) {
+            return incoming;
+          }
+        },
+        getFollowing: {
+          merge(existing = [], incoming) {
+            return incoming;
+          }
         }
       }
     },
