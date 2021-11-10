@@ -5,7 +5,6 @@ import LikeButton from '../like-button';
 interface Props {
   comments: Array<any>;
   likeComment: any;
-  userId: number;
 }
 
 const useStyles = makeStyles({
@@ -23,7 +22,7 @@ const useStyles = makeStyles({
   }
 });
 
-const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) => {
+const CommentList: React.FC<Props> = ({ comments, likeComment }: Props) => {
   const classes = useStyles();
 
   return (
@@ -61,7 +60,7 @@ const CommentList: React.FC<Props> = ({ comments, likeComment, userId }: Props) 
                 />
               </Grid>
               <Grid item xs={1}>
-                <LikeButton userId={userId} item={comment} likeMutation={likeComment} />
+                <LikeButton item={comment} likeMutation={likeComment} />
               </Grid>
               <Grid item xs={1}>
                 <Typography variant="subtitle1" color="textSecondary">{comment && comment.likes ? comment.likes.length : 0}</Typography>

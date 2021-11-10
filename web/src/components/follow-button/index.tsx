@@ -2,21 +2,29 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 
 interface Props {
-  isLoggedInUserFollowing: boolean,
   loading: boolean,
-  handleFollowUser: () => void,
+  loggedInUser: number,
+  followers: any,
+  handleFollowUser: (isAlreadyFollowing: boolean) => void,
 }
 
 const FollowButton = ({
-  isLoggedInUserFollowing,
+  followers,
+  loggedInUser,
   loading,
   handleFollowUser
 }: Props) => {
+  const isLoggedInUserFollowing: boolean = !!followers &&
+    !!followers.getFollowers &&
+    followers.getFollowers.some((follower: any) => {
+      return follower && follower.follower ? follower.follower.id === loggedInUser : false;
+    });
+
   return (
     <Button
       variant={isLoggedInUserFollowing ? "contained" : "outlined"}
       color="primary"
-      onClick={handleFollowUser}
+      onClick={() => handleFollowUser(isLoggedInUserFollowing)}
       disabled={loading}
     >
       {isLoggedInUserFollowing ? 'Following' : 'Follow'}

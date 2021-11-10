@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import { ThumbUp, ThumbUpOutlined } from '@material-ui/icons';
 import { CommentLike, PostLike } from '../../generated/graphql';
+import { LoggedInUserContext } from '../../pages/home';
 
 interface Props {
   item: any;
-  userId: number,
   likeMutation: any
 }
 
-const LikeButton = ({ item, userId, likeMutation}: Props) => {
+const LikeButton = ({ item, likeMutation}: Props) => {
+  const loggedInUser = useContext(LoggedInUserContext);
+
   const isAlreadyLiked: boolean = item && item.likes ?
-    item.likes.some((like: PostLike | CommentLike) => like.user && like.user.id === userId) : false;
+    item.likes.some((like: PostLike | CommentLike) => like.user && like.user.id === loggedInUser) : false;
 
   return (
     <IconButton
       color="primary"
       size="small"
-      onClick={() => likeMutation(userId, item.id, isAlreadyLiked)}
+      onClick={() => likeMutation(loggedInUser, item.id, isAlreadyLiked)}
     >
       {isAlreadyLiked ? <ThumbUp /> : <ThumbUpOutlined />}
     </IconButton>

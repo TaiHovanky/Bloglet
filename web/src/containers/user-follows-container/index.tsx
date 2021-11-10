@@ -12,11 +12,13 @@ interface Props {
 
 const UserFollowsContainer = ({ loggedInUser, userToBeFollowed }: Props) => {
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
-    variables: { userId: currentUserProfileVar().id }
+    variables: { userId: currentUserProfileVar().id },
+    fetchPolicy: 'network-only'
   });
 
   const { data: followerData, loading: followerLoading } = useGetFollowersQuery({
-    variables: { userId: currentUserProfileVar().id }
+    variables: { userId: currentUserProfileVar().id },
+    fetchPolicy: 'network-only'
   });
 
   const [followUser, { loading }] = useMutation(FollowUserDocument, {
@@ -38,18 +40,12 @@ const UserFollowsContainer = ({ loggedInUser, userToBeFollowed }: Props) => {
     }
   });
 
-  const isLoggedInUserFollowing: boolean = !!followerData &&
-    !!followerData.getFollowers &&
-    followerData.getFollowers.some((follower: any) => {
-        return follower && follower.follower ? follower.follower.id === loggedInUser : false;
-      });
-
-  const handleFollowUser = () => {
+  const handleFollowUser = (isAlreadyFollowing: boolean) => {
     followUser({
       variables: {
         loggedInUser,
         userToBeFollowed,
-        isAlreadyFollowing: isLoggedInUserFollowing
+        isAlreadyFollowing
       }
     });
   }
@@ -63,7 +59,8 @@ const UserFollowsContainer = ({ loggedInUser, userToBeFollowed }: Props) => {
         followingLoading={followingLoading}
       />
       <FollowButton
-        isLoggedInUserFollowing={isLoggedInUserFollowing}
+        followers={followerData}
+        loggedInUser={loggedInUser}
         loading={loading}
         handleFollowUser={handleFollowUser}
       />

@@ -68,7 +68,6 @@ const PostListContainer = () => {
     <PostList
       posts={postsData?.getUserPosts}
       likePost={handleLikePost}
-      userId={currentUserProfileVar().id}
     />
   );
 }
