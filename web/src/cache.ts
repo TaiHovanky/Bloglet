@@ -1,5 +1,6 @@
-import { InMemoryCache, makeVar, ReactiveVar } from '@apollo/client';
 import User from './types/user.interface';
+import { InMemoryCache, makeVar, ReactiveVar } from '@apollo/client';
+import { checkForDuplicateItems } from './utils/cache-modification.util';
 
 export const currentUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
 export const currentGetUserPostsCursorVar: ReactiveVar<number> = makeVar(0);
@@ -21,6 +22,10 @@ const cache = new InMemoryCache({
         getUserPosts: {
           keyArgs: ['type', 'id'],
           merge(existing = [], incoming) {
+            if (checkForDuplicateItems(existing, incoming)) {
+              // If there are duplicate posts then default to returning the existing posts
+              return existing;
+            }
             return existing.length ? [...existing, ...incoming] : incoming;
           }
         }

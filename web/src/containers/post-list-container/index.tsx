@@ -14,7 +14,7 @@ const PostListContainer = () => {
       offsetLimit: OFFSET_LIMIT
     },
     skip: !currentUserProfileVar().id,
-    onError: (err: any) => console.log(err),
+    onError: (err: any) => console.log('getting user posts error:', err),
   });
 
   const [likePost] = useMutation(LikePostDocument, {

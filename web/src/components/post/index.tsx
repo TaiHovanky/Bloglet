@@ -67,7 +67,6 @@ const Post: React.FC<Props> = ({
           </Grid>
         </Grid>
         {showCommentInput && <CommentInputContainer userId={userId} postId={post.id} />}
-        {/* <CommentList comments={post.comments} userId={userId} likeComment={likeComment} /> */}
         <CommentListContainer comments={post.comments} />
       </CardContent>
     </Card>

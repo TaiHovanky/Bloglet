@@ -23,7 +23,7 @@ const PrimaryAppBarContainer = ({ user }: Props) => {
 
   const [getUserPosts] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
-    onCompleted: (lazydata: any) => console.log('lazzzzzyyyyyy', lazydata),
+    onError: (err) => console.log('get user posts lazy query error', err)
   });
 
   const [searchUsers, { data }] = useSearchUsersLazyQuery();

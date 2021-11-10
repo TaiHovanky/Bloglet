@@ -37,14 +37,13 @@ export class PostResolver {
   }
 
   @Query(() => [Post], { nullable: true })
-  // @UseMiddleware(isAuthenticated)
+  @UseMiddleware(isAuthenticated)
   getUserPosts(
     @Arg('userId') userId: number,
     @Arg('cursor') cursor: number,
     @Arg('offsetLimit') offsetLimit: number,
     @Ctx() { res }: requestContext
   ) {
-    console.log('gettinguserposts-----', userId, cursor);
     return Post
       .createQueryBuilder('posts')
       .orderBy('posts.id', 'DESC')
