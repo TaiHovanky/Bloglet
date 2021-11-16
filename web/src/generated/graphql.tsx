@@ -314,6 +314,45 @@ export type GetFollowingQuery = (
   )>> }
 );
 
+export type GetUserNewsfeedQueryVariables = Exact<{
+  userId: Scalars['Float'];
+  cursor: Scalars['Float'];
+  offsetLimit: Scalars['Float'];
+}>;
+
+
+export type GetUserNewsfeedQuery = (
+  { __typename?: 'Query' }
+  & { getUserNewsfeed?: Maybe<Array<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
+    & { likes?: Maybe<Array<(
+      { __typename?: 'PostLike' }
+      & { user: (
+        { __typename?: 'User' }
+        & Pick<User, 'id'>
+      ) }
+    )>>, comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'comment' | 'createdAt'>
+      & { likes?: Maybe<Array<(
+        { __typename?: 'CommentLike' }
+        & Pick<CommentLike, 'id'>
+        & { user?: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'id'>
+        )> }
+      )>>, user?: Maybe<(
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'firstName' | 'lastName'>
+      )>, post?: Maybe<(
+        { __typename?: 'Post' }
+        & Pick<Post, 'id'>
+      )> }
+    )>> }
+  )>> }
+);
+
 export type GetUserPostsQueryVariables = Exact<{
   userId: Scalars['Float'];
   cursor: Scalars['Float'];
@@ -720,6 +759,70 @@ export function useGetFollowingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetFollowingQueryHookResult = ReturnType<typeof useGetFollowingQuery>;
 export type GetFollowingLazyQueryHookResult = ReturnType<typeof useGetFollowingLazyQuery>;
 export type GetFollowingQueryResult = Apollo.QueryResult<GetFollowingQuery, GetFollowingQueryVariables>;
+export const GetUserNewsfeedDocument = gql`
+    query GetUserNewsfeed($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
+  getUserNewsfeed(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
+    id
+    creatorId
+    content
+    createdAt
+    likes {
+      user {
+        id
+      }
+    }
+    comments {
+      id
+      comment
+      createdAt
+      likes {
+        id
+        user {
+          id
+        }
+      }
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserNewsfeedQuery__
+ *
+ * To run a query within a React component, call `useGetUserNewsfeedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserNewsfeedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserNewsfeedQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      cursor: // value for 'cursor'
+ *      offsetLimit: // value for 'offsetLimit'
+ *   },
+ * });
+ */
+export function useGetUserNewsfeedQuery(baseOptions: Apollo.QueryHookOptions<GetUserNewsfeedQuery, GetUserNewsfeedQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserNewsfeedQuery, GetUserNewsfeedQueryVariables>(GetUserNewsfeedDocument, options);
+      }
+export function useGetUserNewsfeedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserNewsfeedQuery, GetUserNewsfeedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserNewsfeedQuery, GetUserNewsfeedQueryVariables>(GetUserNewsfeedDocument, options);
+        }
+export type GetUserNewsfeedQueryHookResult = ReturnType<typeof useGetUserNewsfeedQuery>;
+export type GetUserNewsfeedLazyQueryHookResult = ReturnType<typeof useGetUserNewsfeedLazyQuery>;
+export type GetUserNewsfeedQueryResult = Apollo.QueryResult<GetUserNewsfeedQuery, GetUserNewsfeedQueryVariables>;
 export const GetUserPostsDocument = gql`
     query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
   getUserPosts(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {

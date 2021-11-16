@@ -12,6 +12,7 @@ import UserFollowsContainer from '../../containers/user-follows-container';
 import PostInputContainer from '../../containers/post-input-container';
 import PostListContainer from '../../containers/post-list-container';
 import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
+import NewsfeedContainer from '../../containers/newsfeed-container';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -76,7 +77,9 @@ const Home: React.FC<any> = () => {
               {currentUserProfileVar().id === userData.homePage.id &&
                 <PostInputContainer />
               }
-              <PostListContainer />
+              {currentUserProfileVar().id === userData.homePage.id ?
+                <NewsfeedContainer loggedInUser={userData.homePage.id} /> : <PostListContainer />
+              }
             </Container>
           </LoggedInUserContext.Provider>
         </> :

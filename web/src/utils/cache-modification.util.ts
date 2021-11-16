@@ -1,4 +1,4 @@
-import { Post, Comment, GetUserPostsDocument } from '../generated/graphql';
+import { Post, Comment, GetUserPostsDocument, GetUserNewsfeedDocument } from '../generated/graphql';
 
 export const updateComments = (post: Post, data: any) => {
   const updatedComments = post && post.comments ? [...post.comments] : [];
@@ -40,6 +40,13 @@ export const updatePosts = (
 export const readGetUserPostsQuery = (cache: any, userId: number) => {
   return cache.readQuery({
     query: GetUserPostsDocument,
+    variables: { userId }
+  });
+}
+
+export const readGetUserNewsfeedQuery = (cache: any, userId: number) => {
+  return cache.readQuery({
+    query: GetUserNewsfeedDocument,
     variables: { userId }
   });
 }

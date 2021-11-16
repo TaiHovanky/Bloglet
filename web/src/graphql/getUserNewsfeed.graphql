@@ -1,0 +1,32 @@
+query GetUserNewsfeed($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
+  getUserNewsfeed(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
+    id
+    creatorId
+    content
+    createdAt
+    likes {
+      user {
+        id
+      }
+    }
+    comments {
+      id
+      comment
+      createdAt
+      likes {
+        id
+        user {
+          id
+        }
+      }
+      user {
+        id
+        firstName
+        lastName
+      }
+      post {
+        id
+      }
+    }
+  }
+}

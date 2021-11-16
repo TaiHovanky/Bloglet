@@ -29,6 +29,16 @@ const cache = new InMemoryCache({
             return existing.length ? [...existing, ...incoming] : incoming;
           }
         },
+        getUserNewsfeed: {
+          keyArgs: ['type', 'id'],
+          merge(existing = [], incoming) {
+            if (checkForDuplicateItems(existing, incoming)) {
+              // If there are duplicate posts then default to returning the existing posts
+              return existing;
+            }
+            return existing.length ? [...existing, ...incoming] : incoming;
+          }
+        },
         getFollowers: {
           merge(existing = [], incoming) {
             return incoming;
