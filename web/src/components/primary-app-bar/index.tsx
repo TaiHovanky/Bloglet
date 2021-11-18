@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -10,6 +10,7 @@ import { User } from '../../generated/graphql';
 import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import NavBar from '../navbar';
 import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
+import { LoggedInUserContext } from '../../pages/home';
 
 interface Props {
   user?: User | null,
@@ -83,6 +84,7 @@ const useStyles = makeStyles((theme) => ({
 
 const PrimaryAppBar = ({ user, getUserPosts, searchUsers, clearPosts, data }: Props) => {
   const classes = useStyles();
+  const loggedInUser = useContext(LoggedInUserContext);
 
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
@@ -112,7 +114,8 @@ const PrimaryAppBar = ({ user, getUserPosts, searchUsers, clearPosts, data }: Pr
       variables: {
         userId: user.id,
         cursor: 0,
-        offsetLimit: OFFSET_LIMIT
+        offsetLimit: OFFSET_LIMIT,
+        isGettingNewsfeed: currentUserProfileVar().id === loggedInUser
       }
     });
     handleClose();

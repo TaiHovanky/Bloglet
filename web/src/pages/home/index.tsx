@@ -76,7 +76,7 @@ const Home: React.FC<any> = () => {
               {currentUserProfileVar().id === userData.homePage.id &&
                 <PostInputContainer />
               }
-              <PostListContainer />
+              <PostListContainer isGettingNewsfeed={currentUserProfileVar().id === userData.homePage.id} />
             </Container>
           </LoggedInUserContext.Provider>
         </> :

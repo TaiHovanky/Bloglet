@@ -1,5 +1,15 @@
-query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
-  getUserPosts(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
+query GetUserPosts(
+  $userId: Float!,
+  $cursor: Float!,
+  $offsetLimit: Float!,
+  $isGettingNewsfeed: Boolean!
+) {
+  getUserPosts(
+    userId: $userId,
+    cursor: $cursor,
+    offsetLimit: $offsetLimit,
+    isGettingNewsfeed: $isGettingNewsfeed
+  ) {
     id
     creatorId
     content
