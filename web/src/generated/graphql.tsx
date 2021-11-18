@@ -130,7 +130,6 @@ export type Query = {
   users: Array<User>;
   homePage?: Maybe<User>;
   searchUsers?: Maybe<Array<User>>;
-  getUserNewsfeed?: Maybe<Array<Post>>;
   getUserPosts?: Maybe<Array<Post>>;
   getPost: Post;
   getFollowers?: Maybe<Array<Follows>>;
@@ -143,14 +142,8 @@ export type QuerySearchUsersArgs = {
 };
 
 
-export type QueryGetUserNewsfeedArgs = {
-  offsetLimit: Scalars['Float'];
-  cursor: Scalars['Float'];
-  userId: Scalars['Float'];
-};
-
-
 export type QueryGetUserPostsArgs = {
+  isGettingNewsfeed: Scalars['Boolean'];
   offsetLimit: Scalars['Float'];
   cursor: Scalars['Float'];
   userId: Scalars['Float'];
@@ -318,6 +311,7 @@ export type GetUserPostsQueryVariables = Exact<{
   userId: Scalars['Float'];
   cursor: Scalars['Float'];
   offsetLimit: Scalars['Float'];
+  isGettingNewsfeed: Scalars['Boolean'];
 }>;
 
 
@@ -721,8 +715,13 @@ export type GetFollowingQueryHookResult = ReturnType<typeof useGetFollowingQuery
 export type GetFollowingLazyQueryHookResult = ReturnType<typeof useGetFollowingLazyQuery>;
 export type GetFollowingQueryResult = Apollo.QueryResult<GetFollowingQuery, GetFollowingQueryVariables>;
 export const GetUserPostsDocument = gql`
-    query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!) {
-  getUserPosts(userId: $userId, cursor: $cursor, offsetLimit: $offsetLimit) {
+    query GetUserPosts($userId: Float!, $cursor: Float!, $offsetLimit: Float!, $isGettingNewsfeed: Boolean!) {
+  getUserPosts(
+    userId: $userId
+    cursor: $cursor
+    offsetLimit: $offsetLimit
+    isGettingNewsfeed: $isGettingNewsfeed
+  ) {
     id
     creatorId
     content
@@ -770,6 +769,7 @@ export const GetUserPostsDocument = gql`
  *      userId: // value for 'userId'
  *      cursor: // value for 'cursor'
  *      offsetLimit: // value for 'offsetLimit'
+ *      isGettingNewsfeed: // value for 'isGettingNewsfeed'
  *   },
  * });
  */

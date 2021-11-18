@@ -6,12 +6,17 @@ import { GetUserPostsDocument, LikePostDocument } from '../../generated/graphql'
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
-const PostListContainer = () => {
+interface Props {
+  isGettingNewsfeed: boolean;
+}
+
+const PostListContainer = ({ isGettingNewsfeed }: Props) => {
   const { data: postsData, loading: postsLoading, fetchMore } = useQuery(GetUserPostsDocument, {
     variables: {
       userId: currentUserProfileVar().id,
       cursor: currentGetUserPostsCursorVar(),
-      offsetLimit: OFFSET_LIMIT
+      offsetLimit: OFFSET_LIMIT,
+      isGettingNewsfeed
     },
     skip: !currentUserProfileVar().id,
     onError: (err: any) => console.log('getting user posts error:', err),
@@ -54,7 +59,8 @@ const PostListContainer = () => {
         variables: {
           userId: currentUserProfileVar().id,
           cursor: currentGetUserPostsCursorVar(),
-          offsetLimit: OFFSET_LIMIT
+          offsetLimit: OFFSET_LIMIT,
+          isGettingNewsfeed
         }
       });
     }
