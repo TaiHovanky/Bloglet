@@ -18,6 +18,7 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
       offsetLimit: OFFSET_LIMIT,
       isGettingNewsfeed
     },
+    fetchPolicy: 'network-only',
     skip: !currentUserProfileVar().id,
     onError: (err: any) => console.log('getting user posts error:', err),
     onCompleted: (d) => console.log('get user posts', d, currentUserProfileVar())

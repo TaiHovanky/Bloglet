@@ -110,17 +110,19 @@ const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts,
   };
 
   const handleMenuClick = (user: User) => {
+    // history.push('/');
     clearPosts();
     currentUserProfileVar({...user});
     currentGetUserPostsCursorVar(0);
-    getUserPosts({
-      variables: {
-        userId: user.id,
-        cursor: 0,
-        offsetLimit: OFFSET_LIMIT,
-        isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
-      }
-    });
+    console.log('app bar currentUserProfileVar', currentUserProfileVar().id);
+    // getUserPosts({
+    //   variables: {
+    //     userId: user.id,
+    //     cursor: 0,
+    //     offsetLimit: OFFSET_LIMIT,
+    //     isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
+    //   }
+    // });
     history.push('/');
     handleClose();
   };

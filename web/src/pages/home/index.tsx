@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography } from '@material-ui/core';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import {
   useHomePageLazyQuery,
 } from '../../generated/graphql';
@@ -14,6 +14,7 @@ import PostListContainer from '../../containers/post-list-container';
 import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
 import getLoggedInUserProfile from '../../cache-queries/logged-in-user-profile';
 import { RouteComponentProps } from 'react-router';
+import clearUserPosts from '../../cache-queries/clear-user-posts';
 
 const useStyles = makeStyles(() => ({
   homePageContainer: {
@@ -51,20 +52,39 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
 
+  const [clearPosts] = useMutation(clearUserPosts, {
+    update(cache) {
+      cache.modify({
+        fields: {
+          getUserPosts() {
+            return [];
+          }
+        }
+      });
+    }
+  });
+
   useEffect(
     () => {
-      homePageQueryExecutor();
+      if (!loggedInUserProfileVar() || !loggedInUserProfileVar().id) {
+        console.log('calling home page query executor');
+        homePageQueryExecutor();
+      }
+      return function cleanupPostsList() {
+        console.log('cleaning up on dismount');
+        clearPosts();
+      }
     },
-    [homePageQueryExecutor]
+    [homePageQueryExecutor, clearPosts]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
   if (loading) {
     return <div>Loading...</div>;
   }
-
+  console.log('home currentUserProfileVar', currentUserProfileVar().id);
   return (
     <div className={classes.homePageContainer}>
-      {userData && userData.homePage ?
+      {(userData && userData.homePage) || (loggedInUserProfileVar() && loggedInUserProfileVar().id) ?
         <>
           {/* <LoggedInUserContext.Provider value={userData.homePage.id}> */}
             <PrimaryAppBarContainer history={history} />
@@ -74,14 +94,14 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
                   {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
                 </Typography>
                 <UserFollowsContainer
-                  loggedInUser={userData.homePage.id}
+                  loggedInUser={loggedInUserProfileVar().id}
                   userToBeFollowed={currentUserProfileVar().id}
                 />
               </div>
-              {currentUserProfileVar().id === userData.homePage.id &&
+              {loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id &&
                 <PostInputContainer />
               }
-              <PostListContainer isGettingNewsfeed={currentUserProfileVar().id === userData.homePage.id} />
+              <PostListContainer isGettingNewsfeed={loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id} />
             </Container>
           {/* </LoggedInUserContext.Provider> */}
         </> :

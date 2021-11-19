@@ -30,36 +30,37 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
   // eslint-disable-next-line
   const loggedInUserProfile = useQuery(getLoggedInUserProfile);
 
-  const [clearPosts] = useMutation(clearUserPosts, {
-    update(cache) {
-      cache.modify({
-        fields: {
-          getUserPosts() {
-            return [];
-          }
-        }
-      });
-    }
-  });
+  // const [clearPosts] = useMutation(clearUserPosts, {
+  //   update(cache) {
+  //     cache.modify({
+  //       fields: {
+  //         getUserPosts() {
+  //           return [];
+  //         }
+  //       }
+  //     });
+  //   }
+  // });
 
-  const [getUserPosts] = useLazyQuery(GetUserPostsDocument, {
-    fetchPolicy: 'network-only',
-    onError: (err) => console.log('get user posts lazy query error', err),
-    onCompleted: (data) => console.log('lazy get user posts', data)
-  });
+  // const [getUserPosts] = useLazyQuery(GetUserPostsDocument, {
+  //   fetchPolicy: 'network-only',
+  //   onError: (err) => console.log('get user posts lazy query error', err),
+  //   onCompleted: (data) => console.log('lazy get user posts', data)
+  // });
 
   useEffect(() => {
-    clearPosts();
+    // clearPosts();
     currentGetUserPostsCursorVar(0);
-    getUserPosts({
-      variables: {
-        userId: loggedInUserProfileVar().id,
-        cursor: 0,
-        offsetLimit: OFFSET_LIMIT,
-        isGettingNewsfeed: false
-      }
-    });
-  }, [clearPosts, getUserPosts]);
+    currentUserProfileVar(loggedInUserProfileVar());
+    // getUserPosts({
+    //   variables: {
+    //     userId: loggedInUserProfileVar().id,
+    //     cursor: 0,
+    //     offsetLimit: OFFSET_LIMIT,
+    //     isGettingNewsfeed: false
+    //   }
+    // });
+  }, []);
 
   return (
     <div className={classes.homePageContainer}>

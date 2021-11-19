@@ -32,7 +32,7 @@ const cache = new InMemoryCache({
               // If there are duplicate posts then default to returning the existing posts
               return existing;
             }
-            return existing.length ? [...existing, ...incoming] : incoming;
+            return existing && existing.length ? [...existing, ...incoming] : incoming;
           }
         },
         getFollowers: {

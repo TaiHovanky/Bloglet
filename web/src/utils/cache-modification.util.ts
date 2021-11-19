@@ -47,18 +47,20 @@ export const readGetUserPostsQuery = (cache: any, userId: number) => {
 export const checkForDuplicateItems = (existing: Array<any>, incoming: Array<any>): boolean => {
   const existingIdMap: any = {};
   let hasDuplicates: boolean = false;
-  existing.forEach((existingItem: any) => {
-    const id = getItemIdentifier(existingItem);
-    existingIdMap[id] = id;
-  });
-  // if (incoming) {
+  if (existing) {
+    existing.forEach((existingItem: any) => {
+      const id = getItemIdentifier(existingItem);
+      existingIdMap[id] = id;
+    });
+  }
+  if (incoming) {
     incoming.forEach((incomingItem: any) => {
       const id = getItemIdentifier(incomingItem);
       if (existingIdMap[id] === id) {
         hasDuplicates = true;
       }
     });
-  // }
+  }
   return hasDuplicates;
 }
 
