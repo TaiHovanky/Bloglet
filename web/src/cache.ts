@@ -4,6 +4,7 @@ import { checkForDuplicateItems } from './utils/cache-modification.util';
 
 export const currentUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
 export const currentGetUserPostsCursorVar: ReactiveVar<number> = makeVar(0);
+export const loggedInUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -17,6 +18,11 @@ const cache = new InMemoryCache({
         currentGetUserPostsCursor: {
           read() {
             return currentGetUserPostsCursorVar();
+          }
+        },
+        loggedInUserProfileVar: {
+          read() {
+            return loggedInUserProfileVar();
           }
         },
         getUserPosts: {

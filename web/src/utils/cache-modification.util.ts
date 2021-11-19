@@ -51,12 +51,14 @@ export const checkForDuplicateItems = (existing: Array<any>, incoming: Array<any
     const id = getItemIdentifier(existingItem);
     existingIdMap[id] = id;
   });
-  incoming.forEach((incomingItem: any) => {
-    const id = getItemIdentifier(incomingItem);
-    if (existingIdMap[id] === id) {
-      hasDuplicates = true;
-    }
-  });
+  // if (incoming) {
+    incoming.forEach((incomingItem: any) => {
+      const id = getItemIdentifier(incomingItem);
+      if (existingIdMap[id] === id) {
+        hasDuplicates = true;
+      }
+    });
+  // }
   return hasDuplicates;
 }
 

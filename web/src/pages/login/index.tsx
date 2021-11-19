@@ -53,7 +53,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <div className={classes.loginPageContainer}>
-      <PrimaryAppBarContainer />
+      <PrimaryAppBarContainer history={history} />
       <Paper elevation={3} className={classes.loginPaper}>
         <Container maxWidth="md">
           <Typography variant="h3" noWrap>Log In</Typography>

@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core';
 import Home from './pages/home';
 import Register from './pages/register';
 import Login from './pages/login';
+import Profile from './pages/profile';
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -20,6 +21,7 @@ const Routes = () => {
       <main className={classes.content}>
         <Switch>
           <Route exact path="/" component={Home} />
+          <Route exact path="/profile" component={Profile} />
           <Route exact path="/register" component={Register} />
           <Route exact path="/login" component={Login} />
         </Switch>

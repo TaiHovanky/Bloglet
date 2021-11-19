@@ -1,6 +1,7 @@
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { TextField } from '@material-ui/core';
-import { LoggedInUserContext } from '../../pages/home';
+import { loggedInUserProfileVar } from '../../cache';
+// import { LoggedInUserContext } from '../../pages/home';
 
 interface Props {
   loading: boolean,
@@ -9,7 +10,7 @@ interface Props {
 
 const CommentInput = ({ loading, handleCreateComment }: Props) => {
   const [comment, setComment] = useState('');
-  const loggedInUser = useContext(LoggedInUserContext);
+  // const loggedInUser = useContext(LoggedInUserContext);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -20,7 +21,7 @@ const CommentInput = ({ loading, handleCreateComment }: Props) => {
   };
 
   return (
-    <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => handleCreateComment(e, comment, loggedInUser, clearForm)}>
+    <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => handleCreateComment(e, comment, loggedInUserProfileVar().id, clearForm)}>
       <div>
         <TextField
           label="Comment"

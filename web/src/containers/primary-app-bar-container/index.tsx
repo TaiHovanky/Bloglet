@@ -1,14 +1,15 @@
 import React from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import PrimaryAppBar from '../../components/primary-app-bar';
-import { GetUserPostsDocument, User, useSearchUsersLazyQuery } from '../../generated/graphql';
+import { GetUserPostsDocument, useSearchUsersLazyQuery } from '../../generated/graphql';
 import clearUserPosts from '../../cache-queries/clear-user-posts';
 
 interface Props {
-  user?: User
+  // user?: User
+  history?: any;
 }
 
-const PrimaryAppBarContainer = ({ user }: Props) => {
+const PrimaryAppBarContainer = ({ history }: Props) => {
   const [clearPosts] = useMutation(clearUserPosts, {
     update(cache) {
       cache.modify({
@@ -30,7 +31,8 @@ const PrimaryAppBarContainer = ({ user }: Props) => {
 
   return (
     <PrimaryAppBar
-      user={user}
+      // user={user}
+      history={history}
       searchUsers={searchUsers}
       getUserPosts={getUserPosts}
       clearPosts={clearPosts}

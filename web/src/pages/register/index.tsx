@@ -53,7 +53,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <div className={classes.registerPageContainer}>
-      <PrimaryAppBarContainer />
+      <PrimaryAppBarContainer history={history} />
       <Paper elevation={3} className={classes.registerPaper}>
         <Container maxWidth="md">
           <Typography variant="h3" noWrap>Sign Up</Typography>
