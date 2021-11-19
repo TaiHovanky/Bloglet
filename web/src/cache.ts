@@ -5,6 +5,7 @@ import { checkForDuplicateItems } from './utils/cache-modification.util';
 export const currentUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
 export const currentGetUserPostsCursorVar: ReactiveVar<number> = makeVar(0);
 export const loggedInUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
+export const isSwitchingBetweenHomeAndProfileVar = makeVar(false);
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -25,12 +26,24 @@ const cache = new InMemoryCache({
             return loggedInUserProfileVar();
           }
         },
+        isSwitchingBetweenHomeAndProfile: {
+          read() {
+            return isSwitchingBetweenHomeAndProfileVar();
+          }
+        },
         getUserPosts: {
           keyArgs: ['type', 'id'],
-          merge(existing = [], incoming) {
-            if (checkForDuplicateItems(existing, incoming)) {
+          merge(existing = [], incoming, { args }) {
+            console.log('existing incoming', existing, incoming, args, currentUserProfileVar());
+            if (
+              (args && args.userId !== currentUserProfileVar().id)
+              || checkForDuplicateItems(existing, incoming)
+              || (args && args.isGettingNewsfeed === true && isSwitchingBetweenHomeAndProfileVar() === true)
+              // || (args && args.userId === currentUserProfileVar().id && isSwitchingBetweenHomeAndProfileVar() === true)
+            ) {
               // If there are duplicate posts then default to returning the existing posts
-              return existing;
+              console.log('has dupes', existing, isSwitchingBetweenHomeAndProfileVar())
+              return [...existing];
             }
             return existing && existing.length ? [...existing, ...incoming] : incoming;
           }

@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import { useFormField } from '../../hooks/use-form-field.hook';
 import { useLoginMutation } from '../../generated/graphql';
 import { setAccessToken } from '../../accessToken';
-import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
+// import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
 
 const useStyles = makeStyles((theme) => ({
   loginPageContainer: {
@@ -53,7 +53,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <div className={classes.loginPageContainer}>
-      <PrimaryAppBarContainer history={history} />
+      {/* <PrimaryAppBarContainer history={history} /> */}
       <Paper elevation={3} className={classes.loginPaper}>
         <Container maxWidth="md">
           <Typography variant="h3" noWrap>Log In</Typography>

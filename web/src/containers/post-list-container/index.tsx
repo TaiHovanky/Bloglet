@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PostList from '../../components/post-list';
 import { useMutation, useQuery } from '@apollo/client';
-import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingBetweenHomeAndProfileVar } from '../../cache';
 import { GetUserPostsDocument, LikePostDocument } from '../../generated/graphql';
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
+import clearUserPosts from '../../cache-queries/clear-user-posts';
 
 interface Props {
   isGettingNewsfeed: boolean;
@@ -18,10 +19,11 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
       offsetLimit: OFFSET_LIMIT,
       isGettingNewsfeed
     },
-    fetchPolicy: 'network-only',
-    skip: !currentUserProfileVar().id,
+    skip: !currentUserProfileVar().id || isSwitchingBetweenHomeAndProfileVar() === true,
     onError: (err: any) => console.log('getting user posts error:', err),
-    onCompleted: (d) => console.log('get user posts', d, currentUserProfileVar())
+    onCompleted: (d) => {
+      console.log('get user posts', d, currentUserProfileVar(), isSwitchingBetweenHomeAndProfileVar());
+    }
   });
 
   const [likePost] = useMutation(LikePostDocument, {
@@ -67,6 +69,29 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
       });
     }
   });
+
+  const [clearPosts] = useMutation(clearUserPosts, {
+    update(cache) {
+      cache.modify({
+        fields: {
+          getUserPosts() {
+            return [];
+          }
+        }
+      });
+    }
+  });
+
+  useEffect(
+    () => {
+      return function cleanupPostsList() {
+        isSwitchingBetweenHomeAndProfileVar(true);
+        clearPosts();
+      }
+    },
+    [clearPosts]
+  ); /* This calls the homePageQuery once to get the currently logged in user */
+
 
   if (postsLoading) {
     return <div>Loading...</div>;
