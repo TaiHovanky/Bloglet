@@ -75,8 +75,9 @@ const Home: React.FC<RouteComponentProps> = () => {
         homePageQueryExecutor();
       }
       if (
-        isSwitchingFromProfileToHomeVar() === true
-        && currentUserProfileVar().id !== loggedInUserProfileVar().id
+        isSwitchingFromProfileToHomeVar() === true &&
+        // Prevents infinite loop when the user navigates to their own newsfeed
+        currentUserProfileVar().id !== loggedInUserProfileVar().id
       ) {
         // Handles change from logged in user's Profile page to Home
         getUserPosts({
