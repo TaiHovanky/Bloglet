@@ -87,7 +87,6 @@ const Home: React.FC<RouteComponentProps> = () => {
             isGettingNewsfeed: false
           }
         });
-        // isSwitchingFromProfileToHomeVar(false);
       }
     },
     [homePageQueryExecutor, getUserPosts]
