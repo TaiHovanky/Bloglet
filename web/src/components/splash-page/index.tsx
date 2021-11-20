@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, makeStyles, Paper, Typography } from '@material-ui/core';
-import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
+// import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
 
 const useStyles = makeStyles((theme) => ({
   homePaper: {

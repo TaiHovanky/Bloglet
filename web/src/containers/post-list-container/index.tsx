@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import PostList from '../../components/post-list';
 import { useMutation, useQuery } from '@apollo/client';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingBetweenHomeAndProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromProfileToHomeVar } from '../../cache';
 import { GetUserPostsDocument, LikePostDocument } from '../../generated/graphql';
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
@@ -19,11 +19,8 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
       offsetLimit: OFFSET_LIMIT,
       isGettingNewsfeed
     },
-    skip: !currentUserProfileVar().id || isSwitchingBetweenHomeAndProfileVar() === true,
+    skip: !currentUserProfileVar().id || isSwitchingFromProfileToHomeVar() === true,
     onError: (err: any) => console.log('getting user posts error:', err),
-    onCompleted: (d) => {
-      console.log('get user posts', d, currentUserProfileVar(), isSwitchingBetweenHomeAndProfileVar());
-    }
   });
 
   const [likePost] = useMutation(LikePostDocument, {
@@ -58,7 +55,7 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
       postsData.getUserPosts &&
       postsData.getUserPosts.length
     ) {
-      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + OFFSET_LIMIT)
+      currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + OFFSET_LIMIT);
       await fetchMore({
         variables: {
           userId: currentUserProfileVar().id,
@@ -85,7 +82,6 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
   useEffect(
     () => {
       return function cleanupPostsList() {
-        isSwitchingBetweenHomeAndProfileVar(true);
         clearPosts();
       }
     },

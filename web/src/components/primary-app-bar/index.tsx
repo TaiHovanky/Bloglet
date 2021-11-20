@@ -7,18 +7,16 @@ import SearchIcon from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { User } from '../../generated/graphql';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingBetweenHomeAndProfileVar, loggedInUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 import NavBar from '../navbar';
 import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
 import { Link } from 'react-router-dom';
 
 interface Props {
-  // user?: User | null,
   searchUsers: any,
   getUserPosts: any,
   clearPosts: any,
   data?: any,
-  // history?: any
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -85,7 +83,6 @@ const useStyles = makeStyles((theme) => ({
 
 const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts, data }: Props) => {
   const classes = useStyles();
-  // const loggedInUser = useContext(LoggedInUserContext);
   const user = loggedInUserProfileVar();
 
   const [value, setValue] = useState('');
@@ -110,11 +107,9 @@ const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts,
 
   const handleMenuClick = (user: User) => {
     clearPosts();
-    isSwitchingBetweenHomeAndProfileVar(false);
     currentUserProfileVar({...user});
     currentGetUserPostsCursorVar(0);
-    console.log('app bar currentUserProfileVar', currentUserProfileVar().id);
-    // handles switching between user profiles while still on Home
+    // Handles switching between user profiles while still on Home
     getUserPosts({
       variables: {
         userId: user.id,
