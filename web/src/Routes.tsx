@@ -6,8 +6,6 @@ import Register from './pages/register';
 import Login from './pages/login';
 import Profile from './pages/profile';
 import PrimaryAppBarContainer from './containers/primary-app-bar-container';
-// import { createBrowserHistory } from 'history';
-// const customHistory = createBrowserHistory();
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -17,7 +15,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Routes = () => {
-  // const history = useHistory();
   const classes = useStyles();
 
   return (

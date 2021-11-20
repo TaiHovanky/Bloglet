@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 import { TextField } from '@material-ui/core';
 import { loggedInUserProfileVar } from '../../cache';
-// import { LoggedInUserContext } from '../../pages/home';
 
 interface Props {
   loading: boolean,
@@ -10,7 +9,6 @@ interface Props {
 
 const CommentInput = ({ loading, handleCreateComment }: Props) => {
   const [comment, setComment] = useState('');
-  // const loggedInUser = useContext(LoggedInUserContext);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);

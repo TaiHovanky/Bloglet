@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
 import { loggedInUserProfileVar } from '../../cache';
-// import { LoggedInUserContext } from '../../pages/home';
 
 interface Props {
   handleCreatePost: (e: React.FormEvent, creatorId: number, callback: () => void) => Promise<void>
@@ -23,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
 const PostInput: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
   const [postContent, setPostContent] = useState('');
-  // const loggedInUser = useContext(LoggedInUserContext);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPostContent(e.target.value);
