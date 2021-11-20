@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Divider, Drawer, List, ListItem, ListItemText, makeStyles, IconButton } from '@material-ui/core';
 import { Menu } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-import Logout from '../logout'
+import Logout from '../logout';
 
 const drawerWidth = 240;
 
@@ -54,6 +54,11 @@ const NavBar = () => {
           <Link to="/">
             <ListItem button>
               <ListItemText className={classes.menuItemText} primary="Home" />
+            </ListItem>
+          </Link>
+          <Link to="/profile">
+            <ListItem button>
+              <ListItemText className={classes.menuItemText} primary="Profile" />
             </ListItem>
           </Link>
           <Link to="/register">

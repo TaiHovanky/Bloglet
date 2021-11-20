@@ -1,6 +1,5 @@
 import React from 'react';
 import { Container, makeStyles, Paper, Typography } from '@material-ui/core';
-import PrimaryAppBarContainer from '../../containers/primary-app-bar-container';
 
 const useStyles = makeStyles((theme) => ({
   homePaper: {
@@ -18,7 +17,6 @@ const SplashPage = () => {
 
   return (
     <>
-      <PrimaryAppBarContainer />
       <Paper elevation={3} className={classes.homePaper}>
         <Container maxWidth="md">
           <Typography className={classes.homePageText} variant="h3">Welcome to my practice social media app</Typography>

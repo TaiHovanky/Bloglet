@@ -1,6 +1,6 @@
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
-import { LoggedInUserContext } from '../../pages/home';
+import { loggedInUserProfileVar } from '../../cache';
 
 interface Props {
   handleCreatePost: (e: React.FormEvent, creatorId: number, callback: () => void) => Promise<void>
@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
 const PostInput: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
   const [postContent, setPostContent] = useState('');
-  const loggedInUser = useContext(LoggedInUserContext);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPostContent(e.target.value);
@@ -36,7 +35,7 @@ const PostInput: React.FC<Props> = (props: Props) => {
     <Paper elevation={3} className={classes.newPostPaper}>
       <Container maxWidth="md">
         <Typography variant="h5" noWrap>Create Post</Typography>
-        <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => props.handleCreatePost(e, loggedInUser, clearForm)}>
+        <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => props.handleCreatePost(e, loggedInUserProfileVar().id, clearForm)}>
           <div>
             <TextField
               id="input-content"

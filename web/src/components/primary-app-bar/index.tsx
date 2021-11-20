@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -7,17 +7,16 @@ import SearchIcon from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { User } from '../../generated/graphql';
-import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 import NavBar from '../navbar';
 import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
-import { LoggedInUserContext } from '../../pages/home';
+import { Link } from 'react-router-dom';
 
 interface Props {
-  user?: User | null,
   searchUsers: any,
   getUserPosts: any,
   clearPosts: any,
-  data?: any
+  data?: any,
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -82,9 +81,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const PrimaryAppBar = ({ user, getUserPosts, searchUsers, clearPosts, data }: Props) => {
+const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts, data }: Props) => {
   const classes = useStyles();
-  const loggedInUser = useContext(LoggedInUserContext);
+  const user = loggedInUserProfileVar();
 
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
@@ -110,12 +109,13 @@ const PrimaryAppBar = ({ user, getUserPosts, searchUsers, clearPosts, data }: Pr
     clearPosts();
     currentUserProfileVar({...user});
     currentGetUserPostsCursorVar(0);
+    // Handles switching between user profiles while still on Home
     getUserPosts({
       variables: {
         userId: user.id,
         cursor: 0,
         offsetLimit: OFFSET_LIMIT,
-        isGettingNewsfeed: currentUserProfileVar().id === loggedInUser
+        isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
       }
     });
     handleClose();
@@ -179,9 +179,11 @@ const PrimaryAppBar = ({ user, getUserPosts, searchUsers, clearPosts, data }: Pr
                       <MenuList id="menu-list-grow" onKeyDown={handleListKeyDown}>
                         {data && data.searchUsers?.map(
                           (user: any, index: number) => (
-                            <MenuItem key={index} onClick={() => handleMenuClick(user)}>
-                              {user.firstName} {user.lastName}
-                            </MenuItem>
+                            <Link to="/" key={index}>
+                              <MenuItem key={index} onClick={() => handleMenuClick(user)}>
+                                {user.firstName} {user.lastName}
+                              </MenuItem>
+                            </Link>
                           )
                         )}
                       </MenuList>

@@ -1,14 +1,11 @@
 import React from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import PrimaryAppBar from '../../components/primary-app-bar';
-import { GetUserPostsDocument, User, useSearchUsersLazyQuery } from '../../generated/graphql';
+import { GetUserPostsDocument, useSearchUsersLazyQuery } from '../../generated/graphql';
 import clearUserPosts from '../../cache-queries/clear-user-posts';
+import { isSwitchingFromProfileToHomeVar } from '../../cache';
 
-interface Props {
-  user?: User
-}
-
-const PrimaryAppBarContainer = ({ user }: Props) => {
+const PrimaryAppBarContainer = () => {
   const [clearPosts] = useMutation(clearUserPosts, {
     update(cache) {
       cache.modify({
@@ -23,14 +20,16 @@ const PrimaryAppBarContainer = ({ user }: Props) => {
 
   const [getUserPosts] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
-    onError: (err) => console.log('get user posts lazy query error', err)
+    onError: (err) => console.log('get user posts lazy query error', err),
+    onCompleted: (data) => {
+      isSwitchingFromProfileToHomeVar(false);
+    }
   });
 
   const [searchUsers, { data }] = useSearchUsersLazyQuery();
 
   return (
     <PrimaryAppBar
-      user={user}
       searchUsers={searchUsers}
       getUserPosts={getUserPosts}
       clearPosts={clearPosts}
