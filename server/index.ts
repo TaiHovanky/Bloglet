@@ -23,8 +23,17 @@ import { createAccessToken, createRefreshToken } from './src/utils/create-tokens
   }));
   app.use(cookieParser());
 
-  await createConnection()
-    .catch(error => console.log(error));
+  let retries = 5;
+  while (retries) {
+    try {
+      await createConnection();
+      break;
+    } catch (err) {
+      console.log(err);
+      retries -= 1;
+      await new Promise(res => setTimeout(res, 5000));
+    }
+  }
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({

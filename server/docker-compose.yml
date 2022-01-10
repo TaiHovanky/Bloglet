@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abc123
+      POSTGRES_DB: social
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  server:
+    image: thovanky/social-media-server
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+  #     "type": "postgres",
+  #  "host": "localhost",
+  #  "port": 5432,
+  #  "username": "postgres",
+  #  "password": "abc123",
+  #  "database": "social",
