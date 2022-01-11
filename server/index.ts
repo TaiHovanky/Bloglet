@@ -27,6 +27,7 @@ import { createAccessToken, createRefreshToken } from './src/utils/create-tokens
   while (retries) {
     try {
       await createConnection();
+      console.log('connected to db');
       break;
     } catch (err) {
       console.log(err);
