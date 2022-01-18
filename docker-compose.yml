@@ -1,0 +1,42 @@
+version: "3"
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abc123
+      POSTGRES_DB: social
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - social-app
+  server:
+    image: thovanky/social-media-server
+    build:
+      dockerfile: Dockerfile
+      context: './server'
+    volumes:
+      - /app/node_modules
+      - /server:/app
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    networks:
+      - social-app
+  web:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile
+      context: './web'
+    volumes:
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    networks:
+      - social-app
+networks:
+  social-app:
+    driver: bridge

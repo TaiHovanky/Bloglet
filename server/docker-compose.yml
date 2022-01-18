@@ -17,9 +17,3 @@ services:
       - "3001:3001"
     depends_on:
       - db
-  #     "type": "postgres",
-  #  "host": "localhost",
-  #  "port": 5432,
-  #  "username": "postgres",
-  #  "password": "abc123",
-  #  "database": "social",
