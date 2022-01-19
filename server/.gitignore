@@ -5,8 +5,6 @@ build/
 tmp/
 temp/
 package-lock.json
-ormconfig.json
-ormconfig.docker.json
 .env
 dist
 pgdata
