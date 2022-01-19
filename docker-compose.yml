@@ -13,7 +13,6 @@ services:
     networks:
       - social-app
   server:
-    image: thovanky/social-media-server
     build:
       dockerfile: Dockerfile
       context: './server'
