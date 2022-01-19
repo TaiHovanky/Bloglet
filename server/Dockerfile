@@ -6,7 +6,6 @@ COPY . .
 
 RUN npm run build
 COPY ormconfig.json ./dist/
-COPY .env ./dist/
 WORKDIR /usr/app/dist
 
 EXPOSE 3001
