@@ -1,2 +1,5 @@
 node_modules
 dist
+pgdata
+package-lock.json
+.git
