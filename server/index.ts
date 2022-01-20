@@ -18,7 +18,7 @@ import { createAccessToken, createRefreshToken } from './src/utils/create-tokens
 (async () => {
   const app = express();
   app.use(cors({
-    origin: 'http://host.docker.internal:3000',
+    origin: 'http://159.223.122.194:3000',
     credentials: true
   }));
   app.use(cookieParser());
