@@ -3,9 +3,9 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: abc123
-      POSTGRES_DB: social
+      - POSTGRES_USER={POSTGRES_USER}
+      - POSTGRES_PASSWORD={POSTGRES_PASSWORD}
+      - POSTGRES_DB={POSTGRES_DB}
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
@@ -23,6 +23,8 @@ services:
       - "3001:3001"
     depends_on:
       - postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - social-app
   web:
@@ -32,10 +34,13 @@ services:
       context: './web'
     volumes:
       - /app/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "3000:3000"
     networks:
       - social-app
+    
 networks:
   social-app:
     driver: bridge
