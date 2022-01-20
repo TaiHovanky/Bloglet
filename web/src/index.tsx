@@ -9,7 +9,7 @@ import './index.css';
 import cache from './cache';
 
 const httpLink = createHttpLink({
-  uri: 'http://host.docker.internal:3001/graphql',
+  uri: 'http://159.223.122.194:3001/graphql',
   credentials: 'include' // need this so that cookie gets set after login response,
 });
 
