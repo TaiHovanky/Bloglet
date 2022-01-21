@@ -68,6 +68,7 @@ export class UserResolver {
       const isPasswordValid: boolean = await compare(password, user.password);
 
       if (isPasswordValid) {
+        console.log('valid password');
         const accessToken = createAccessToken(user);
         const refreshToken = createRefreshToken(user);
 
