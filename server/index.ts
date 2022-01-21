@@ -18,7 +18,7 @@ import { createAccessToken, createRefreshToken } from './src/utils/create-tokens
 (async () => {
   const app = express();
   app.use(cors({
-    origin: 'http://web:3000',
+    origin: 'web:3000',
     credentials: true
   }));
   app.use(cookieParser());
