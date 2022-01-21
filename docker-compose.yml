@@ -28,6 +28,9 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - social-app
+    environment:
+      - ACCESS_TOKEN_SECRET={ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET={REFRESH_TOKEN_SECRET}
   web:
     stdin_open: true
     image: web
