@@ -9,7 +9,7 @@ import './index.css';
 import cache from './cache';
 
 const httpLink = createHttpLink({
-  uri: 'http://159.223.122.194:3001',
+  uri: 'http://server:3001',
   credentials: 'include' // need this so that cookie gets set after login response,
 });
 

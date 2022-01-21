@@ -60,9 +60,11 @@ export class UserResolver {
   ) {
     /* Get the user from database using the email, then compare the password that was entered
     to the password from the db. Sign a JWT and return that. */
+    console.log('login ', email, password);
     const user = await User.findOne({ where: { email }});
 
     if (user) {
+      console.log('user', user);
       const isPasswordValid: boolean = await compare(password, user.password);
 
       if (isPasswordValid) {

@@ -13,6 +13,7 @@ services:
     networks:
       - social-app
   server:
+    image: server
     build:
       dockerfile: Dockerfile
       context: './server'
@@ -29,6 +30,7 @@ services:
       - social-app
   web:
     stdin_open: true
+    image: web
     build:
       dockerfile: Dockerfile
       context: './web'
