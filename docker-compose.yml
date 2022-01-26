@@ -51,4 +51,4 @@ networks:
 
 volumes:
   pgdata:
-    driver: local
+    driver: bridge
