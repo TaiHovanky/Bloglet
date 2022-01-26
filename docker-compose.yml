@@ -19,13 +19,10 @@ services:
       context: './server'
     volumes:
       - /app/node_modules
-      - /server:/app
     ports:
       - "3001:3001"
     depends_on:
       - postgres
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - social-app
     environment:
@@ -39,10 +36,8 @@ services:
       context: './web'
     volumes:
       - /app/node_modules
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
-      - "3000:3000"
+      - "80:3000"
     networks:
       - social-app
     environment:
