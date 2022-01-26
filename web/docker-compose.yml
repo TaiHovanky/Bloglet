@@ -1,3 +1,5 @@
+# docker-compose to only run the server. Not needed for the whole app because I'll use
+# the docker-compose.yml at the project root
 version: "3"
 services:
   react-app:
