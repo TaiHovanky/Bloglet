@@ -22,8 +22,8 @@ services:
       - /app/node_modules
     ports:
       - "3001:3001"
-    depends_on:
-      - postgres
+    # depends_on:
+    #   - postgres
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
