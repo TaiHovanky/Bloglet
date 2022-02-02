@@ -18,11 +18,15 @@ import { createAccessToken, createRefreshToken } from './src/utils/create-tokens
 (async () => {
   const app = express();
   app.use(cors({
+    /* Use IP address of droplet with the exposed port that React app container runs on.
+    Note that port isn't needed because Web container exposes port 80 */
     origin: 'http://159.223.122.194',
     credentials: true
   }));
   app.use(cookieParser());
 
+  /* Retry connecting to postgres database because it might take a while
+  for the database to spin up and be connectable */
   let retries = 5;
   while (retries) {
     try {
