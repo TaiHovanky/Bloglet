@@ -38,6 +38,7 @@ export class UserResolver {
   ) {
     /* Hash the password and then insert the user data and hashed password into db. */
     const hashedPassword = await bcrypt.hash(password, 12);
+    console.log('registering', firstName, lastName, email);
 
     await User.insert({
       firstName,
@@ -62,6 +63,7 @@ export class UserResolver {
     /* Get the user from database using the email, then compare the password that was entered
     to the password from the db. Sign a JWT and return that. */
     const user = await User.findOne({ where: { email }});
+    console.log('found user', user);
 
     if (user) {
       const isPasswordValid: boolean = await compare(password, user.password);
