@@ -20,7 +20,7 @@ import { createAccessToken, createRefreshToken } from './src/utils/create-tokens
   app.use(cors({
     /* Use IP address of droplet with the exposed port that React app container runs on.
     Note that port isn't needed because Web container exposes port 80 */
-    origin: 'http://159.223.122.194',
+    origin: 'http://159.223.122.194:3000',
     credentials: true
   }));
   app.use(cookieParser());
