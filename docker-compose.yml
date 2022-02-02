@@ -54,7 +54,7 @@ services:
       - /app/node_modules
     ports:
       # Use port 80 so that user can go straight to http://159.223.122.194/ w/o adding a port
-      - "3000:3000"
+      - "80:80"
     networks:
       - social-app-network
     environment:
