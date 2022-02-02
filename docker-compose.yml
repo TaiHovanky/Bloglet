@@ -27,7 +27,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - social-app
+      - social-app-network
     environment:
       - ACCESS_TOKEN_SECRET={ACCESS_TOKEN_SECRET}
       - REFRESH_TOKEN_SECRET={REFRESH_TOKEN_SECRET}
