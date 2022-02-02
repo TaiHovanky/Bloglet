@@ -34,7 +34,7 @@ export class UserResolver {
     @Arg('lastName') lastName: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { res }: requestContext
+    // @Ctx() { res }: requestContext
   ) {
     /* Hash the password and then insert the user data and hashed password into db. */
     const hashedPassword = await bcrypt.hash(password, 12);
