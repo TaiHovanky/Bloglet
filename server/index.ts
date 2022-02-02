@@ -18,13 +18,27 @@ import { createAccessToken, createRefreshToken } from './src/utils/create-tokens
 (async () => {
   const app = express();
   app.use(cors({
-    origin: 'http://localhost:3000',
+    /* Use IP address of droplet with the exposed port that React app container runs on.
+    Note that port isn't needed because Web container exposes port 80 */
+    origin: 'http://159.223.122.194',
     credentials: true
   }));
   app.use(cookieParser());
 
-  await createConnection()
-    .catch(error => console.log(error));
+  /* Retry connecting to postgres database because it might take a while
+  for the database to spin up and be connectable */
+  let retries = 5;
+  while (retries) {
+    try {
+      await createConnection();
+      console.log('connected to db');
+      break;
+    } catch (err) {
+      console.log(err);
+      retries -= 1;
+      await new Promise(res => setTimeout(res, 5000));
+    }
+  }
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({

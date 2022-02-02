@@ -1,0 +1,63 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      # Environment variables were setup on droplet
+      - POSTGRES_USER={POSTGRES_USER}
+      - POSTGRES_PASSWORD={POSTGRES_PASSWORD}
+      - POSTGRES_DB={POSTGRES_DB}
+    volumes:
+      # Mount external volume to directory where Postgres stores all tables/DBs
+      - app-pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - social-app-network
+  server:
+    image: server
+    build:
+      dockerfile: Dockerfile
+      context: './server'
+    volumes:
+      # Create volume so that node_modules doesn't have to be rebuilt everytime containers spun up
+      - /app/node_modules
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - social-app-network
+    environment:
+      - ACCESS_TOKEN_SECRET={ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET={REFRESH_TOKEN_SECRET}
+  web:
+    stdin_open: true
+    image: web
+    build:
+      dockerfile: Dockerfile
+      context: './web'
+    volumes:
+      - /app/node_modules
+    ports:
+      # Use port 80 so that user can go straight to http://159.223.122.194/ w/o adding a port
+      - "80:80"
+    networks:
+      - social-app-network
+    environment:
+      # Use polling to watch for file changes in React app (works with react-scripts)
+      - CHOKIDAR_USEPOLLING=true
+    
+networks:
+  # Bridge network allows all of my containers to communicate with each other
+  # Gives me control over what containers are in net, and I can address containers by name
+  social-app-network:
+    driver: bridge
+
+volumes:
+  # external volume is created to persist data after container removal
+  app-pgdata:
+    external: true

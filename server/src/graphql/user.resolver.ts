@@ -72,9 +72,8 @@ export class UserResolver {
         sendRefreshToken(res, refreshToken);
         return { token: accessToken, user };
       }
-    } else {
-      return errorHandler('Invalid password', res);
     }
+
     return errorHandler('Login failed', res);
   }
 

@@ -1,0 +1,12 @@
+# docker-compose to only run the React app. Not needed for the whole app because I'll use
+# the docker-compose.yml at the project root
+version: "3"
+services:
+  react-app:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/app/src
+    environment:
+      - CHOKIDAR_USEPOLLING=true

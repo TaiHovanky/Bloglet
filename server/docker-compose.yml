@@ -1,0 +1,21 @@
+# docker-compose to only run the server. Not needed for the whole app because I'll use
+# the docker-compose.yml at the project root
+version: "3.7"
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER={POSTGRES_USER}
+      - POSTGRES_PASSWORD={POSTGRES_PASSWORD}
+      - POSTGRES_DB={POSTGRES_DB}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  server:
+    image: thovanky/social-media-server
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
