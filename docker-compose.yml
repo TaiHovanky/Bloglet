@@ -1,18 +1,18 @@
 version: "3"
 services:
-  # postgres:
-  #   image: postgres
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=abc123
-  #     - POSTGRES_DB=social
-  #   volumes:
-  #     - app-pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #   networks:
-  #     - social-app
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=abc123
+      - POSTGRES_DB=social
+    volumes:
+      - app-pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - social-app-network
   server:
     image: server
     build:
@@ -22,8 +22,8 @@ services:
       - /app/node_modules
     ports:
       - "3001:3001"
-    # depends_on:
-    #   - postgres
+    depends_on:
+      - db
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -42,12 +42,12 @@ services:
     ports:
       - "80:80"
     networks:
-      - social-app
+      - social-app-network
     environment:
       - CHOKIDAR_USEPOLLING=true
     
 networks:
-  social-app:
+  social-app-network:
     driver: bridge
 
 volumes:
