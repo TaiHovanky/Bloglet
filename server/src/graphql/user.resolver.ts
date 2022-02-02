@@ -34,11 +34,10 @@ export class UserResolver {
     @Arg('lastName') lastName: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
-    // @Ctx() { res }: requestContext
+    @Ctx() { res }: requestContext
   ) {
     /* Hash the password and then insert the user data and hashed password into db. */
     const hashedPassword = await bcrypt.hash(password, 12);
-    console.log('registering', firstName, lastName, email);
 
     await User.insert({
       firstName,
@@ -47,8 +46,7 @@ export class UserResolver {
       password: hashedPassword
     })
     .catch((err) => {
-      // errorHandler(`User registration failed: ${err}`, res);
-      console.log(`User registration failed: ${err}`);
+      errorHandler(`User registration failed: ${err}`, res);
       return false;
     });
     return true;
@@ -63,7 +61,6 @@ export class UserResolver {
     /* Get the user from database using the email, then compare the password that was entered
     to the password from the db. Sign a JWT and return that. */
     const user = await User.findOne({ where: { email }});
-    console.log('found user', user);
 
     if (user) {
       const isPasswordValid: boolean = await compare(password, user.password);
@@ -74,16 +71,10 @@ export class UserResolver {
 
         sendRefreshToken(res, refreshToken);
         return { token: accessToken, user };
-      } else {
-        console.log('invalid password');
       }
-    } else {
-      // return errorHandler('Invalid password', res);
-      console.log('invalid user', res);
     }
-    // return errorHandler('Login failed', res);
-    console.log('login failed', res);
-    return;
+
+    return errorHandler('Login failed', res);
   }
 
   @Mutation(() => Boolean)
