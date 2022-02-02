@@ -46,7 +46,8 @@ export class UserResolver {
       password: hashedPassword
     })
     .catch((err) => {
-      errorHandler(`User registration failed: ${err}`, res);
+      // errorHandler(`User registration failed: ${err}`, res);
+      console.log(`User registration failed: ${err}`);
       return false;
     });
     return true;
@@ -71,11 +72,16 @@ export class UserResolver {
 
         sendRefreshToken(res, refreshToken);
         return { token: accessToken, user };
+      } else {
+        console.log('invalid password');
       }
     } else {
-      return errorHandler('Invalid password', res);
+      // return errorHandler('Invalid password', res);
+      console.log('invalid user', res);
     }
-    return errorHandler('Login failed', res);
+    // return errorHandler('Login failed', res);
+    console.log('login failed', res);
+    return;
   }
 
   @Mutation(() => Boolean)
