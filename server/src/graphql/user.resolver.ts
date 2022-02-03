@@ -5,7 +5,7 @@ import { User } from '../entity/User';
 import { requestContext } from '../types/context.interface';
 import { sendRefreshToken } from '../utils/send-refresh-token.util';
 import { errorHandler } from '../utils/error-handler.util';
-import { createAccessToken, createRefreshToken } from '../utils/create-tokens.util';
+// import { createAccessToken, createRefreshToken } from '../utils/create-tokens.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
 
 @ObjectType()
@@ -66,11 +66,11 @@ export class UserResolver {
       const isPasswordValid: boolean = await compare(password, user.password);
 
       if (isPasswordValid) {
-        const accessToken = createAccessToken(user);
-        const refreshToken = createRefreshToken(user);
+        // const accessToken = createAccessToken(user);
+        // const refreshToken = createRefreshToken(user);
 
-        sendRefreshToken(res, refreshToken);
-        return { token: accessToken, user };
+        // sendRefreshToken(res, refreshToken);
+        // return { token: accessToken, user };
       }
     }
 
