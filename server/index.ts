@@ -22,7 +22,7 @@ const session = require('express-session');
   let RedisStore = require('connect-redis')(session)
   let redisClient = redis.createClient({
     host: process.env.REDIS_URL,
-    port: 6379
+    port: process.env.REDIS_PORT
   })
 
   const app = express();
@@ -40,6 +40,11 @@ const session = require('express-session');
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET,
       resave: false,
+      cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 120000
+      }
     })
   );
 

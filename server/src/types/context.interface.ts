@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { User } from '../entity/User';
 
 export interface requestContext {
-  req: Request,
+  req: any, // was originally
   res: Response,
   payload?: User
 };

@@ -1,6 +1,6 @@
 import bcrypt, { compare } from 'bcryptjs';
 import { Like } from 'typeorm';
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Ctx, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { User } from '../entity/User';
 import { requestContext } from '../types/context.interface';
 import { sendRefreshToken } from '../utils/send-refresh-token.util';
@@ -9,13 +9,13 @@ import { errorHandler } from '../utils/error-handler.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
 
 @ObjectType()
-class LoginResponse {
-  @Field()
-  token: string;
+// class LoginResponse {
+//   @Field()
+//   token: string;
 
-  @Field(() => User)
-  user: User;
-}
+//   @Field(() => User)
+//   user: User;
+// }
 
 @Resolver()
 export class UserResolver {
@@ -52,11 +52,11 @@ export class UserResolver {
     return true;
   }
 
-  @Mutation(() => LoginResponse)
+  @Mutation(() => User)
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { res }: requestContext
+    @Ctx() { req }: requestContext
   ) {
     /* Get the user from database using the email, then compare the password that was entered
     to the password from the db. Sign a JWT and return that. */
@@ -64,17 +64,21 @@ export class UserResolver {
 
     if (user) {
       const isPasswordValid: boolean = await compare(password, user.password);
-
+      console.log('user exists')
       if (isPasswordValid) {
         // const accessToken = createAccessToken(user);
         // const refreshToken = createRefreshToken(user);
 
         // sendRefreshToken(res, refreshToken);
         // return { token: accessToken, user };
+        req.session.user = user;
+        console.log('password valid')
+        return user;
       }
     }
-
-    return errorHandler('Login failed', res);
+    console.log('login failed');
+    return;
+    // return errorHandler('Login failed', res);
   }
 
   @Mutation(() => Boolean)
