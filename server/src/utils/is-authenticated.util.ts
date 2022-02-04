@@ -7,28 +7,13 @@ import { MiddlewareFn } from 'type-graphql';
  * @param next 
  */
 export const isAuthenticated: MiddlewareFn = async ({ context }: any, next: any) => {
-  // const authorization: string | undefined = context.req.headers['authorization'];
-
-  // if (!authorization) {
-  //   return;
-  // }
-
-  // try {
-  //   const accessToken: string = authorization.split(' ')[1];
-  //   const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
-  //   // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
-  //   context.payload = payload;
-  // } catch(err) {
-  //   console.log('Auth validation error:', err);
-  //   return;
-  // }
   const { user } = context.req.session;
 
   if (!user) {
-    return context.res.status(401).json({ status: "fail", message: "unauthorized" });
+    console.log('Auth validation error: no user found');
+  } else {
+    context.req.user = user;
   }
-
-  context.req.user = user;
 
   return next();
 }

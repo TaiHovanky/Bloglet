@@ -1,21 +1,17 @@
 import bcrypt, { compare } from 'bcryptjs';
 import { Like } from 'typeorm';
-import { Arg, Ctx, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { User } from '../entity/User';
 import { requestContext } from '../types/context.interface';
 import { sendRefreshToken } from '../utils/send-refresh-token.util';
 import { errorHandler } from '../utils/error-handler.util';
-// import { createAccessToken, createRefreshToken } from '../utils/create-tokens.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
 
 @ObjectType()
-// class LoginResponse {
-//   @Field()
-//   token: string;
-
-//   @Field(() => User)
-//   user: User;
-// }
+class LoginResponse {
+  @Field(() => User)
+  user: User;
+}
 
 @Resolver()
 export class UserResolver {
@@ -52,7 +48,7 @@ export class UserResolver {
     return true;
   }
 
-  @Mutation(() => User)
+  @Mutation(() => LoginResponse)
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
@@ -64,19 +60,11 @@ export class UserResolver {
 
     if (user) {
       const isPasswordValid: boolean = await compare(password, user.password);
-      console.log('user exists')
       if (isPasswordValid) {
-        // const accessToken = createAccessToken(user);
-        // const refreshToken = createRefreshToken(user);
-
-        // sendRefreshToken(res, refreshToken);
-        // return { token: accessToken, user };
         req.session.user = user;
-        console.log('password valid')
-        return user;
+        return { user };
       }
     }
-    console.log('login failed');
     return;
     // return errorHandler('Login failed', res);
   }
@@ -90,10 +78,10 @@ export class UserResolver {
   @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type
   @UseMiddleware(isAuthenticated)
   async homePage(
-    @Ctx() { payload, res }: requestContext
+    @Ctx() { req, res }: requestContext
   ) {
-    if (payload) {
-      return User.findOne({ where: { email: payload.email }})
+    if (req && req.session && req.session.user) {
+      return User.findOne({ where: { id: req.session.user.id }})
         .catch((err) => {
           errorHandler(`Home page user query failed: ${err}`, res);
           return null;

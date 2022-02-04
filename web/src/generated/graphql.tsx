@@ -41,10 +41,15 @@ export type Follows = {
   following?: Maybe<User>;
 };
 
+export type LoginResponse = {
+  __typename?: 'LoginResponse';
+  user: User;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   register: Scalars['Boolean'];
-  login: User;
+  login: LoginResponse;
   logout: Scalars['Boolean'];
   createPost?: Maybe<Post>;
   likePost?: Maybe<Post>;
@@ -412,8 +417,11 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'email'>
+    { __typename?: 'LoginResponse' }
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'email'>
+    ) }
   ) }
 );
 
@@ -912,8 +920,10 @@ export type LikePostMutationOptions = Apollo.BaseMutationOptions<LikePostMutatio
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
-    id
-    email
+    user {
+      id
+      email
+    }
   }
 }
     `;

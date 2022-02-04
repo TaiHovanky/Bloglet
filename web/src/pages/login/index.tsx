@@ -3,7 +3,6 @@ import { Button, TextField, makeStyles, Paper, Container, Typography } from '@ma
 import { RouteComponentProps } from 'react-router';
 import { useFormField } from '../../hooks/use-form-field.hook';
 import { useLoginMutation } from '../../generated/graphql';
-// import { setAccessToken } from '../../accessToken';
 
 const useStyles = makeStyles((theme) => ({
   loginPageContainer: {
@@ -43,12 +42,9 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
       }
     });
 
-    if (response && response.data) {
-      // setAccessToken(response.data.login.token);
-      console.log('response data', response.data);
+    if (response && response.data && response.data.login) {
+      history.push('/');
     }
-
-    history.push('/');
   }
 
   return (
