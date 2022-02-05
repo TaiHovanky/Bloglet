@@ -38,7 +38,7 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    await register({
+    const response = await register({
       variables: {
         firstName: formData.get('firstName') as string,
         lastName: formData.get('lastName') as string,
@@ -47,7 +47,9 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
       }
     });
 
-    history.push('/');
+    if (response && response.data && response.data.register) {
+      history.push('/');
+    }
   };
 
   return (

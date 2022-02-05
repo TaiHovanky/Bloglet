@@ -6,11 +6,15 @@ import { requestContext } from '../types/context.interface';
 import { sendRefreshToken } from '../utils/send-refresh-token.util';
 import { errorHandler } from '../utils/error-handler.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
+import FieldError from '../types/error.object-type';
 
 @ObjectType()
-class LoginResponse {
-  @Field(() => User)
-  user: User;
+class UserResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+
+  @Field(() => User, { nullable: true })
+  user?: User;
 }
 
 @Resolver()
@@ -24,31 +28,44 @@ export class UserResolver {
       .catch((err) => errorHandler(`Failed to get users: ${err}`, res));
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => UserResponse)
   async register(
     @Arg('firstName') firstName: string,
     @Arg('lastName') lastName: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { res }: requestContext
+    @Ctx() { req, res }: requestContext
   ) {
+    if (password.length <= 2) {
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "password must be greater than 2",
+          },
+        ],
+      };
+    }
     /* Hash the password and then insert the user data and hashed password into db. */
     const hashedPassword = await bcrypt.hash(password, 12);
+    try {
+      const user = await User.create({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword
+      })
+        .save()
 
-    await User.insert({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword
-    })
-    .catch((err) => {
+      req.session.user = user;
+      return { user };
+    } catch(err) {
       errorHandler(`User registration failed: ${err}`, res);
-      return false;
-    });
-    return true;
+      return { errors: [{ field: 'registration', message: 'registration failed' }] };
+    };
   }
 
-  @Mutation(() => LoginResponse)
+  @Mutation(() => UserResponse)
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
@@ -65,8 +82,7 @@ export class UserResolver {
         return { user };
       }
     }
-    return;
-    // return errorHandler('Login failed', res);
+    return { errors: [{ field: 'login', message: 'login failed' }] };
   }
 
   @Mutation(() => Boolean)

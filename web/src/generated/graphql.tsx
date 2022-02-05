@@ -34,6 +34,12 @@ export type CommentLike = {
 };
 
 
+export type FieldError = {
+  __typename?: 'FieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
 export type Follows = {
   __typename?: 'Follows';
   id: Scalars['Float'];
@@ -41,15 +47,10 @@ export type Follows = {
   following?: Maybe<User>;
 };
 
-export type LoginResponse = {
-  __typename?: 'LoginResponse';
-  user: User;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
-  register: Scalars['Boolean'];
-  login: LoginResponse;
+  register: UserResponse;
+  login: UserResponse;
   logout: Scalars['Boolean'];
   createPost?: Maybe<Post>;
   likePost?: Maybe<Post>;
@@ -174,6 +175,12 @@ export type User = {
   followers?: Maybe<Array<Follows>>;
   comments?: Maybe<Array<Comment>>;
   likedComments?: Maybe<Array<CommentLike>>;
+};
+
+export type UserResponse = {
+  __typename?: 'UserResponse';
+  errors?: Maybe<Array<FieldError>>;
+  user: User;
 };
 
 export type CreateCommentMutationVariables = Exact<{
@@ -417,11 +424,14 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
-    { __typename?: 'LoginResponse' }
+    { __typename?: 'UserResponse' }
     & { user: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'email'>
-    ) }
+    ), errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>> }
   ) }
 );
 
@@ -443,7 +453,16 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'register'>
+  & { register: (
+    { __typename?: 'UserResponse' }
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'email'>
+    ), errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>> }
+  ) }
 );
 
 export type SearchUsersQueryVariables = Exact<{
@@ -924,6 +943,10 @@ export const LoginDocument = gql`
       id
       email
     }
+    errors {
+      field
+      message
+    }
   }
 }
     `;
@@ -991,7 +1014,16 @@ export const RegisterDocument = gql`
     lastName: $lastName
     email: $email
     password: $password
-  )
+  ) {
+    user {
+      id
+      email
+    }
+    errors {
+      field
+      message
+    }
+  }
 }
     `;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
