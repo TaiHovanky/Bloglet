@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import { MiddlewareFn } from 'type-graphql';
 
 /**
@@ -7,20 +7,13 @@ import { MiddlewareFn } from 'type-graphql';
  * @param next 
  */
 export const isAuthenticated: MiddlewareFn = async ({ context }: any, next: any) => {
-  const authorization: string | undefined = context.req.headers['authorization'];
+  const { user } = context.req.session;
 
-  if (!authorization) {
+  if (!user) {
+    console.log('Auth validation error: no user found');
     return;
-  }
-
-  try {
-    const accessToken: string = authorization.split(' ')[1];
-    const payload: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string);
-    // need to cast process.env.ACCESS_TOKEN_SECRET as a string or else string | undefined type error
-    context.payload = payload;
-  } catch(err) {
-    console.log('Auth validation error:', err);
-    return;
+  } else {
+    context.req.user = user;
   }
 
   return next();

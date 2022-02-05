@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { ApolloClient, ApolloLink, createHttpLink, from } from '@apollo/client';
+import { ApolloClient, createHttpLink, from } from '@apollo/client';
 import { onError } from "@apollo/client/link/error";
 import Routes from './Routes';
-import { getAccessToken } from './accessToken';
 import './index.css';
 import cache from './cache';
 
@@ -25,23 +24,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
-/**
- * is used to send the access token as a header with each request
- */
-const authLink = new ApolloLink((operation, forward) => {
-  const accessToken = getAccessToken();
-  if (accessToken) {
-    operation.setContext({
-      headers: {
-        authorization: accessToken ? `Bearer ${accessToken}` : ''
-      }
-    });
-  }
-  return forward(operation)
-});
-
 const client = new ApolloClient({
-  link: from([authLink, errorLink, httpLink]),
+  link: from([ errorLink, httpLink ]),
   cache,
 });
 
