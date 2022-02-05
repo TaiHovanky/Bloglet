@@ -20,6 +20,8 @@ services:
       - social-app-network
   redis:
     image: redis
+    networks:
+      - social-app-network
   server:
     image: server
     build:
