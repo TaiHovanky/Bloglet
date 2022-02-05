@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Container, makeStyles, Typography } from '@material-ui/core';
+import { Container, makeStyles, Typography, Backdrop, CircularProgress } from '@material-ui/core';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import {
   GetUserPostsDocument,
@@ -18,13 +18,17 @@ import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
 import getIsSwitchingFromHomeToProfile from '../../cache-queries/is-switching-from-home-to-profile';
 import getIsSwitchingFromProfileToHome from '../../cache-queries/is-switching-from-profile-to-home';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   homePageContainer: {
     minHeight: '100vh'
   },
   currentUserInfoContainer: {
     marginBottom: 30
-  }
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
 }));
 
 const Home: React.FC<RouteComponentProps> = () => {
@@ -59,7 +63,7 @@ const Home: React.FC<RouteComponentProps> = () => {
   });
   /* use the lazy query to prevent the "Can't perform a React state update on an unmounted component." error */
 
-  const [getUserPosts] = useLazyQuery(GetUserPostsDocument, {
+  const [getUserPosts, { loading: postsLoading }] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
     onError: (err) => console.log('get user posts lazy query error', err),
     onCompleted: (data) => {
@@ -93,10 +97,6 @@ const Home: React.FC<RouteComponentProps> = () => {
     [homePageQueryExecutor, getUserPosts]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className={classes.homePageContainer}>
       {(userData && userData.homePage) || (loggedInUserProfileVar() && loggedInUserProfileVar().id) ?
@@ -119,6 +119,9 @@ const Home: React.FC<RouteComponentProps> = () => {
         </> :
         <SplashPage />
       }
+      <Backdrop className={classes.backdrop} open={loading || postsLoading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   );
 }

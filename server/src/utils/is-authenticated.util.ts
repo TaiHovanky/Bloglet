@@ -11,6 +11,7 @@ export const isAuthenticated: MiddlewareFn = async ({ context }: any, next: any)
 
   if (!user) {
     console.log('Auth validation error: no user found');
+    return;
   } else {
     context.req.user = user;
   }

@@ -3,7 +3,6 @@ import { Like } from 'typeorm';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { User } from '../entity/User';
 import { requestContext } from '../types/context.interface';
-import { sendRefreshToken } from '../utils/send-refresh-token.util';
 import { errorHandler } from '../utils/error-handler.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
 import FieldError from '../types/error.object-type';
@@ -34,14 +33,14 @@ export class UserResolver {
     @Arg('lastName') lastName: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { req, res }: requestContext
+    @Ctx() { req }: requestContext
   ) {
     if (password.length <= 2) {
       return {
         errors: [
           {
             field: "password",
-            message: "password must be greater than 2",
+            message: "Password must be greater than 2",
           },
         ],
       };
@@ -49,19 +48,28 @@ export class UserResolver {
     /* Hash the password and then insert the user data and hashed password into db. */
     const hashedPassword = await bcrypt.hash(password, 12);
     try {
-      const user = await User.create({
+      const user = {
         firstName,
         lastName,
         email,
         password: hashedPassword
-      })
-        .save()
-
-      req.session.user = user;
+      };
+      const userInsert = await User.insert(user);
+      const newUser = {...userInsert.raw[0], ...user};
+      req.session.user = newUser;
       return { user };
     } catch(err) {
-      errorHandler(`User registration failed: ${err}`, res);
-      return { errors: [{ field: 'registration', message: 'registration failed' }] };
+      if (err.code === '23505') {
+        return {
+          errors: [
+            {
+              field: 'email',
+              message: 'Email already taken',
+            },
+          ],
+        };
+      }
+      return { errors: [{ field: 'registration', message: `Registration failed` }] };
     };
   }
 
@@ -82,13 +90,25 @@ export class UserResolver {
         return { user };
       }
     }
-    return { errors: [{ field: 'login', message: 'login failed' }] };
+    return { errors: [{ field: 'login', message: 'Login failed' }] };
   }
 
   @Mutation(() => Boolean)
-  async logout(@Ctx() { res }: any) {
-    sendRefreshToken(res, '');
-    return true;
+  async logout(@Ctx() { req, res }: any) {
+    return new Promise((resolve) =>
+      req.session.destroy((err: any) => {
+        res.clearCookie('connect.sid');
+        console.log('req session logout', req.session);
+        req.session = null;
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      })
+    );
   }
 
   @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type

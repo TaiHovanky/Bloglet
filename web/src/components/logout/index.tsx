@@ -1,7 +1,8 @@
 import React from 'react';
 import { ListItem, ListItemText, makeStyles } from '@material-ui/core';
 import { useLogoutMutation } from '../../generated/graphql';
-import { setAccessToken } from '../../accessToken';
+import { loggedInUserProfileVar } from '../../cache';
+import User from '../../types/user.interface';
 
 interface Props {}
 
@@ -18,7 +19,7 @@ const Logout: React.FC<Props> = () => {
 
   const handleLogoutClick = async () => {
     await logout();
-    setAccessToken(''); // clear the global access token variable
+    loggedInUserProfileVar(new User(0, '', '', ''));
     await client.resetStore(); // resets the apollo client store
   };
 

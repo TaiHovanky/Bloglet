@@ -1,5 +1,13 @@
-import React from 'react';
-import { Button, Container, makeStyles, Paper, TextField, Typography } from '@material-ui/core';
+import React, { useState } from 'react';
+import {
+  Button,
+  Container,
+  makeStyles,
+  Paper,
+  TextField,
+  Typography,
+  Snackbar
+} from '@material-ui/core';
 import { RouteComponentProps } from 'react-router';
 import { useRegisterMutation } from '../../generated/graphql';
 import { useFormField } from '../../hooks/use-form-field.hook';
@@ -13,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '0 auto',
     paddingBottom: theme.spacing(4),
     paddingTop: theme.spacing(4),
-    marginTop: theme.spacing(32),
+    marginTop: theme.spacing(24),
     paddingLeft: 48,
     paddingRight: 48
   },
@@ -22,6 +30,16 @@ const useStyles = makeStyles((theme) => ({
   },
   submitBtn: {
     marginTop: theme.spacing(4)
+  },
+  errorAlert: {
+    width: '100%',
+    backgroundColor: '#D84646',
+    color: 'white',
+    paddingBottom: 12,
+    paddingTop: 12,
+    paddingLeft: 48,
+    paddingRight: 48,
+    display: 'flex'
   }
 }));
 
@@ -32,6 +50,8 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
   const lastName = useFormField('', 'text');
   const email = useFormField('', 'email');
   const password = useFormField('', 'text');
+
+  const [errors, setErrors] = useState('');
 
   const [register] = useRegisterMutation();
 
@@ -47,8 +67,10 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
       }
     });
 
-    if (response && response.data && response.data.register) {
+    if (response && response.data && response.data.register.user) {
       history.push('/');
+    } else if (response && response.data && response.data.register.errors) {
+      setErrors(response.data.register.errors[0].message);
     }
   };
 
@@ -97,6 +119,11 @@ const Register: React.FC<RouteComponentProps> = ({ history }) => {
             </div>
             <Button className={classes.submitBtn} variant="contained" color="primary" type="submit">Submit</Button>
           </form>
+          <Snackbar open={!!errors && !!errors.length}>
+            <Paper variant="elevation" className={classes.errorAlert}>
+              <Typography variant="h6">{errors}</Typography>
+            </Paper>
+          </Snackbar>
         </Container>
       </Paper>
     </div>
