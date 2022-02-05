@@ -17,7 +17,7 @@ const session = require('express-session');
 (async () => {
   let RedisStore = require('connect-redis')(session)
   let redisClient = new Redis({
-    host: process.env.REDIS_URL,
+    host: 'redis',
     port: process.env.REDIS_PORT
   });
 

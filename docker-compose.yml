@@ -34,6 +34,7 @@ services:
       - "3001:3001"
     depends_on:
       - db
+      - redis
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
