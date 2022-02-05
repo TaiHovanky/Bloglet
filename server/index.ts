@@ -17,15 +17,15 @@ const session = require('express-session');
 (async () => {
   let RedisStore = require('connect-redis')(session)
   let redisClient = new Redis({
-    host: 'localhost',
-    port: 6379
+    host: process.env.REDIS_URL,
+    port: process.env.REDIS_PORT
   });
 
   const app = express();
   app.use(cors({
     /* Use IP address of droplet with the exposed port that React app container runs on.
     Note that port isn't needed because Web container exposes port 80 */
-    origin: 'http://localhost:3000',
+    origin: 'http://159.223.122.194',
     credentials: true
   }));
   app.use(cookieParser());
