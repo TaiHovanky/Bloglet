@@ -43,6 +43,7 @@ services:
       - REDIS_URL=${REDIS_URL}
       - REDIS_PORT=${REDIS_PORT}
       - SESSION_SECRET=${SESSION_SECRET}
+      - APP_URL=${APP_URL}
   web:
     stdin_open: true
     image: web
@@ -59,6 +60,7 @@ services:
     environment:
       # Use polling to watch for file changes in React app (works with react-scripts)
       - CHOKIDAR_USEPOLLING=true
+      - APP_URL=${APP_URL}
     
 networks:
   # Bridge network allows all of my containers to communicate with each other
