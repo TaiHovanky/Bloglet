@@ -7,3 +7,6 @@ ARG APP_URL
 ENV APP_URL=$APP_URL
 EXPOSE 80
 CMD ["npm", "run", "build"]
+
+FROM nginx
+COPY --from=build /app/build /usr/share/nginx/html
