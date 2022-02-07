@@ -17,6 +17,7 @@ services:
       - social-app-network
   redis:
     image: redis
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
     networks:
       - social-app-network
   server:
