@@ -4,9 +4,9 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-# ARG REDIS_URL
-# ARG REDIS_PORT
-# ARG SESSION_SECRET
+ARG REDIS_URL
+ARG REDIS_PORT
+ARG SESSION_SECRET
 
 # After the files were copied, build/compile the ts. Built app now lives in dist
 RUN npm run build
