@@ -13,8 +13,9 @@ import { CommentResolver } from './src/graphql/comment.resolver';
 const Redis = require("ioredis");
 const session = require('express-session');
 
-
 (async () => {
+  console.log('process variables', process.env.SESSION_SECRET, 'url:', process.env.REDIS_URL,
+    'port:', process.env.REDIS_PORT);
   let RedisStore = require('connect-redis')(session)
   let redisClient = new Redis({
     host: 'redis',
