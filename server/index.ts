@@ -46,6 +46,8 @@ const session = require('express-session');
     })
   );
 
+  console.log('process variables2', process.env.SESSION_SECRET, 'url:', process.env.REDIS_URL,
+    'port:', process.env.REDIS_PORT);
   /* Retry connecting to postgres database because it might take a while
   for the database to spin up and be connectable */
   let retries = 5;
