@@ -37,11 +37,11 @@ services:
     networks:
       - social-app-network
     environment:
-      - ACCESS_TOKEN_SECRET={ACCESS_TOKEN_SECRET}
-      - REFRESH_TOKEN_SECRET={REFRESH_TOKEN_SECRET}
-      - REDIS_URL={REDIS_URL}
-      - REDIS_PORT={REDIS_PORT}
-      - SESSION_SECRET={SESSION_SECRET}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_PORT=${REDIS_PORT}
+      - SESSION_SECRET=${SESSION_SECRET}
   web:
     stdin_open: true
     image: web
