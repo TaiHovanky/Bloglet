@@ -18,8 +18,8 @@ const session = require('express-session');
     'port:', process.env.REDIS_PORT);
   let RedisStore = require('connect-redis')(session)
   let redisClient = new Redis({
-    host: 'redis',
-    port: 6379
+    host: process.env.REDIS_URL,
+    port: process.env.REDIS_PORT
   });
 
   const app = express();
@@ -35,7 +35,7 @@ const session = require('express-session');
     session({
       store: new RedisStore({ client: redisClient }),
       saveUninitialized: false,
-      secret: 'keyboardneko',
+      secret: process.env.SESSION_SECRET,
       resave: false,
       cookie: {
         secure: false,
