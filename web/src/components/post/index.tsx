@@ -18,6 +18,9 @@ const useStyles = makeStyles({
   post: {
     marginBottom: 12,
   },
+  inline: {
+    display: 'inline',
+  },
   likes: {
     marginBottom: 4
   }
@@ -41,11 +44,23 @@ const Post: React.FC<Props> = ({
     <Card className={classes.root} variant="outlined" key={post.id}>
       <CardContent>
         <div className={classes.post}>
+          <span>
+            <Typography
+              component="span"
+              variant="subtitle2"
+              className={classes.inline}
+              color="textPrimary"
+            >
+              {post && post.user ? `${post.user.firstName} ${post.user.lastName} ` : ''}
+            </Typography>
+          </span>
+          <Typography variant="caption" className={classes.inline}>
+            {new Date(post.createdAt).toLocaleString()}
+          </Typography>
+        </div>
+        <div className={classes.post}>
           <Typography variant="subtitle1">
             {post.content}
-          </Typography>
-          <Typography variant="caption">
-            {new Date(post.createdAt).toLocaleString()}
           </Typography>
         </div>
         <Grid container spacing={3} className={classes.likes}>

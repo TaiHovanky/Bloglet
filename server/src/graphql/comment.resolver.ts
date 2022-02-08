@@ -1,8 +1,7 @@
-import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Mutation, Resolver, UseMiddleware } from 'type-graphql';
 import { Post } from '../entity/Post';
 import { User } from '../entity/User';
 import { Comment } from '../entity/Comment';
-import { requestContext } from '../types/context.interface';
 import { errorHandler } from '../utils/error-handler.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
 import { CommentLike } from '../entity/CommentLike';
@@ -17,7 +16,6 @@ export class CommentResolver {
     @Arg('postId') postId: number,
     @Arg('comment') comment: string,
     @Arg('createdAt') createdAt: string,
-    @Ctx() { res }: requestContext
   ) {
     try {
       const user = await User.findOne({
@@ -49,9 +47,10 @@ export class CommentResolver {
         post.likes = post.likes && post.likes.length ? post.likes : [];
         return post;
       }
+      console.log('failed to save comment');
       return null;
     } catch(err) {
-      errorHandler(`Comment creation failed: ${err}`, res);
+      errorHandler(`Comment creation failed: ${err}`);
       return null;
     }
   }
@@ -62,7 +61,6 @@ export class CommentResolver {
     @Arg('userId') userId: number,
     @Arg('commentId') commentId: number,
     @Arg('isAlreadyLiked') isAlreadyLiked: boolean,
-    @Ctx() { res }: requestContext
   ) {
     try {
       const commentToUpdate: Comment | undefined = await Comment
@@ -98,7 +96,7 @@ export class CommentResolver {
       }
       return null;
     } catch(err) {
-      errorHandler(`Failed to like post: ${err}`, res);
+      errorHandler(`Failed to like post: ${err}`);
       return null;
     }
   }

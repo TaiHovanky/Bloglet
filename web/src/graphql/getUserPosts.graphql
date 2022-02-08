@@ -11,9 +11,13 @@ query GetUserPosts(
     isGettingNewsfeed: $isGettingNewsfeed
   ) {
     id
-    creatorId
     content
     createdAt
+    user {
+      id
+      firstName
+      lastName
+    }
     likes {
       user {
         id
