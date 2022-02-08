@@ -13,11 +13,10 @@ import { CommentResolver } from './src/graphql/comment.resolver';
 const Redis = require("ioredis");
 const session = require('express-session');
 
-
 (async () => {
   let RedisStore = require('connect-redis')(session)
   let redisClient = new Redis({
-    host: 'localhost',
+    host: process.env.REDIS_URL,
     port: 6379
   });
 
@@ -25,7 +24,7 @@ const session = require('express-session');
   app.use(cors({
     /* Use IP address of droplet with the exposed port that React app container runs on.
     Note that port isn't needed because Web container exposes port 80 */
-    origin: 'http://localhost:3000',
+    origin: process.env.APP_URL,
     credentials: true
   }));
   app.use(cookieParser());

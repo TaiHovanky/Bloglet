@@ -63,7 +63,6 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
       }
     });
 
-    console.log('res', response)
     if (response && response.data && response.data.login.user) {
       history.push('/');
     } else if (response && response.data && response.data.login.errors) {
