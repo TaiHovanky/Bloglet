@@ -9,5 +9,14 @@ mutation Register(
     lastName: $lastName,
     email: $email,
     password: $password
-  )
+  ) {
+    user {
+      id
+      email
+    }
+    errors {
+      field
+      message
+    }
+  }
 }

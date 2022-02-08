@@ -3,18 +3,17 @@ import { Like } from 'typeorm';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { User } from '../entity/User';
 import { requestContext } from '../types/context.interface';
-import { sendRefreshToken } from '../utils/send-refresh-token.util';
 import { errorHandler } from '../utils/error-handler.util';
-import { createAccessToken, createRefreshToken } from '../utils/create-tokens.util';
 import { isAuthenticated } from '../utils/is-authenticated.util';
+import FieldError from '../types/error.object-type';
 
 @ObjectType()
-class LoginResponse {
-  @Field()
-  token: string;
+class UserResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
 
-  @Field(() => User)
-  user: User;
+  @Field(() => User, { nullable: true })
+  user?: User;
 }
 
 @Resolver()
@@ -28,35 +27,57 @@ export class UserResolver {
       .catch((err) => errorHandler(`Failed to get users: ${err}`, res));
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => UserResponse)
   async register(
     @Arg('firstName') firstName: string,
     @Arg('lastName') lastName: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { res }: requestContext
+    @Ctx() { req }: requestContext
   ) {
+    if (password.length <= 2) {
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "Password must be greater than 2",
+          },
+        ],
+      };
+    }
     /* Hash the password and then insert the user data and hashed password into db. */
     const hashedPassword = await bcrypt.hash(password, 12);
-
-    await User.insert({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword
-    })
-    .catch((err) => {
-      errorHandler(`User registration failed: ${err}`, res);
-      return false;
-    });
-    return true;
+    try {
+      const user = {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword
+      };
+      const userInsert = await User.insert(user);
+      const newUser = {...userInsert.raw[0], ...user};
+      req.session.user = newUser;
+      return { user };
+    } catch(err) {
+      if (err.code === '23505') {
+        return {
+          errors: [
+            {
+              field: 'email',
+              message: 'Email already taken',
+            },
+          ],
+        };
+      }
+      return { errors: [{ field: 'registration', message: `Registration failed` }] };
+    };
   }
 
-  @Mutation(() => LoginResponse)
+  @Mutation(() => UserResponse)
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { res }: requestContext
+    @Ctx() { req }: requestContext
   ) {
     /* Get the user from database using the email, then compare the password that was entered
     to the password from the db. Sign a JWT and return that. */
@@ -64,32 +85,38 @@ export class UserResolver {
 
     if (user) {
       const isPasswordValid: boolean = await compare(password, user.password);
-
       if (isPasswordValid) {
-        const accessToken = createAccessToken(user);
-        const refreshToken = createRefreshToken(user);
-
-        sendRefreshToken(res, refreshToken);
-        return { token: accessToken, user };
+        req.session.user = user;
+        return { user };
       }
     }
-
-    return errorHandler('Login failed', res);
+    return { errors: [{ field: 'login', message: 'Login failed' }] };
   }
 
   @Mutation(() => Boolean)
-  async logout(@Ctx() { res }: any) {
-    sendRefreshToken(res, '');
-    return true;
+  async logout(@Ctx() { req, res }: any) {
+    return new Promise((resolve) =>
+      req.session.destroy((err: any) => {
+        res.clearCookie('connect.sid');
+        req.session = null;
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      })
+    );
   }
 
   @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type
   @UseMiddleware(isAuthenticated)
   async homePage(
-    @Ctx() { payload, res }: requestContext
+    @Ctx() { req, res }: requestContext
   ) {
-    if (payload) {
-      return User.findOne({ where: { email: payload.email }})
+    if (req && req.session && req.session.user) {
+      return User.findOne({ where: { id: req.session.user.id }})
         .catch((err) => {
           errorHandler(`Home page user query failed: ${err}`, res);
           return null;

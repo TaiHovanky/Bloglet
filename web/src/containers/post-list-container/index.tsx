@@ -88,11 +88,6 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
     [clearPosts]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
-
-  if (postsLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <PostList
       posts={postsData?.getUserPosts}

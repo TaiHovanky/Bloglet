@@ -21,7 +21,7 @@ export class User extends BaseEntity {
   lastName: string;
 
   @Field() // Field() indicates a field that can be returned by users query
-  @Column('text', { nullable: true })
+  @Column('text', { unique: true })
   email: string;
 
   @Column('text', { nullable: true })

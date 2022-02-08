@@ -6,11 +6,6 @@ export const errorHandler = (err: any, res: Response) => {
       return res.status(400).json({ message: err });
   }
 
-  if (err.name === 'UnauthorizedError') {
-      // jwt authentication error
-      return res.status(401).json({ message: 'Invalid Token' });
-  }
-
   // default to 500 server error
   return res.status(500).json({ message: err.message });
 }
