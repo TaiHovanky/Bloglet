@@ -7,11 +7,11 @@ import Routes from './Routes';
 import './index.css';
 import cache from './cache';
 
-console.log('react app url', process.env.REACT_APP_APP_URL, process.env.APP_URL)
+console.log('react app url', process.env.REACT_APP_URL, process.env.APP_URL)
 
 const httpLink = createHttpLink({
   // Use IP address of droplet with the exposed port that server container runs on
-  uri: `${process.env.REACT_APP_APP_URL}:3001/graphql`,
+  uri: `${process.env.REACT_APP_URL}:3001/graphql`,
   credentials: 'include' // need this so that cookie gets set after login response,
 });
 
