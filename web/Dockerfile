@@ -1,12 +1,12 @@
-FROM node as build
+FROM node as build-stage
 WORKDIR /app
 COPY package.json ./
 RUN npm install
 COPY . .
 ARG APP_URL
 ENV APP_URL=$APP_URL
-EXPOSE 80
-CMD ["npm", "run", "build"]
+RUN npm run build
 
 FROM nginx
-COPY --from=build /build /usr/share/nginx/html
+COPY --from=build-stage /app/build /usr/share/nginx/html
+# EXPOSE 80
