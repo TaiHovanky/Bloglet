@@ -51,7 +51,7 @@ services:
       dockerfile: Dockerfile
       context: './web'
       args:
-      - REACT_APP_URL=${APP_URL}
+        - REACT_APP_URL=${APP_URL}
     volumes:
       - /app/node_modules
     ports:
