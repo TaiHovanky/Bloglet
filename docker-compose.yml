@@ -50,6 +50,8 @@ services:
     build:
       dockerfile: Dockerfile
       context: './web'
+      args:
+      - REACT_APP_URL=${APP_URL}
     volumes:
       - /app/node_modules
     ports:
@@ -57,8 +59,6 @@ services:
       - "80:80"
     networks:
       - social-app-network
-    args:
-      - REACT_APP_URL=${APP_URL}
     environment:
       # Use polling to watch for file changes in React app (works with react-scripts)
       - CHOKIDAR_USEPOLLING=true
