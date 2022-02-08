@@ -3,8 +3,8 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install
 COPY . .
-ARG APP_URL
-ENV APP_URL=$APP_URL
+ARG REACT_APP_URL
+ENV REACT_APP_URL=$REACT_APP_URL
 RUN npm run build
 
 FROM nginx
