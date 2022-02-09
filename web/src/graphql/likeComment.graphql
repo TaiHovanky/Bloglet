@@ -13,6 +13,7 @@ mutation LikeComment($userId: Float!, $commentId: Float!, $isAlreadyLiked: Boole
       id
       firstName
       lastName
+      email
     }
     post {
       id

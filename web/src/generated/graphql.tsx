@@ -219,7 +219,7 @@ export type CreateCommentMutation = (
         )> }
       )>>, user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
       )>, post?: Maybe<(
         { __typename?: 'Post' }
         & Pick<Post, 'id'>
@@ -260,7 +260,7 @@ export type CreatePostMutation = (
         )> }
       )>>, user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
       )>, post?: Maybe<(
         { __typename?: 'Post' }
         & Pick<Post, 'id'>
@@ -355,7 +355,7 @@ export type GetUserPostsQuery = (
         )> }
       )>>, user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
       )>, post?: Maybe<(
         { __typename?: 'Post' }
         & Pick<Post, 'id'>
@@ -396,7 +396,7 @@ export type LikeCommentMutation = (
       )> }
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName'>
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
     )>, post?: Maybe<(
       { __typename?: 'Post' }
       & Pick<Post, 'id'>
@@ -529,6 +529,7 @@ export const CreateCommentDocument = gql`
         id
         firstName
         lastName
+        email
       }
       post {
         id
@@ -597,6 +598,7 @@ export const CreatePostDocument = gql`
         id
         firstName
         lastName
+        email
       }
       post {
         id
@@ -791,6 +793,7 @@ export const GetUserPostsDocument = gql`
         id
         firstName
         lastName
+        email
       }
       post {
         id
@@ -887,6 +890,7 @@ export const LikeCommentDocument = gql`
       id
       firstName
       lastName
+      email
     }
     post {
       id
