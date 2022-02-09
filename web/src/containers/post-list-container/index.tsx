@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import PostList from '../../components/post-list';
 import { useMutation, useQuery } from '@apollo/client';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromProfileToHomeVar } from '../../cache';
-import { GetUserPostsDocument, LikePostDocument } from '../../generated/graphql';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
+import { GetUserPostsDocument, LikePostDocument, User } from '../../generated/graphql';
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 import clearUserPosts from '../../cache-queries/clear-user-posts';
@@ -89,12 +89,26 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
     [clearPosts]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
+  const handlePostCreatorClick = (user: User) => {
+    clearPosts();
+    currentUserProfileVar({...user});
+    currentGetUserPostsCursorVar(0);
+    // Handles switching between user profiles while still on Home
+    getUserPosts({
+      variables: {
+        userId: user.id,
+        cursor: 0,
+        offsetLimit: OFFSET_LIMIT,
+        isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
+      }
+    });
+  }
+
   return (
     <PostList
       posts={postsData?.getUserPosts}
       likePost={handleLikePost}
-      getUserPosts={getUserPosts}
-      clearPosts={clearPosts}
+      handlePostCreatorClick={handlePostCreatorClick}
     />
   );
 }

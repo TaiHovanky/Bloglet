@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { currentUserProfileVar } from '../../cache';
+import { currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 import { CreateCommentDocument } from '../../generated/graphql';
 import CommentInput from '../../components/comment-input';
@@ -23,12 +23,12 @@ const CommentInputContainer = ({ postId }: Props) => {
     }
   });
 
-  const handleCreateComment = async (e: React.FormEvent, comment: string, creatorId: number, callback: ()=> void): Promise<void> => {
+  const handleCreateComment = async (e: React.FormEvent, comment: string, callback: ()=> void): Promise<void> => {
     e.preventDefault();
     await createComment({
       variables: {
         comment,
-        userId: creatorId,
+        userId: loggedInUserProfileVar().id,
         postId,
         createdAt: new Date().toLocaleString()
       },

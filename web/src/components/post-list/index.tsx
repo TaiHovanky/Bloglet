@@ -2,18 +2,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, Container, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
 import { CommentOutlined } from '@material-ui/icons';
 import CommentListContainer from '../../containers/comment-list-container';
-import LikeButton from '../like-button';
 import CommentInputContainer from '../../containers/comment-input-container';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
-import User from '../../types/user.interface';
-import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
-import { GetUserPostsQuery } from '../../generated/graphql';
+import { GetUserPostsQuery, User } from '../../generated/graphql';
+import LikeButtonContainer from '../../containers/like-button-container';
 
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
   likePost: any,
-  getUserPosts: any,
-  clearPosts: any
+  handlePostCreatorClick: (user: User) => void
 }
 
 const useStyles = makeStyles({
@@ -38,8 +34,7 @@ const useStyles = makeStyles({
 const PostList: React.FC<Props> = ({
   posts,
   likePost,
-  getUserPosts,
-  clearPosts
+  handlePostCreatorClick
 }: Props) => {
   const classes = useStyles();
 
@@ -50,21 +45,6 @@ const PostList: React.FC<Props> = ({
       setShowCommentInput(true);
     }
   };
-
-  const handlePostCreatorClick = (user: User) => {
-    clearPosts();
-    currentUserProfileVar({...user});
-    currentGetUserPostsCursorVar(0);
-    // Handles switching between user profiles while still on Home
-    getUserPosts({
-      variables: {
-        userId: user.id,
-        cursor: 0,
-        offsetLimit: OFFSET_LIMIT,
-        isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
-      }
-    });
-  }
 
   return (
     <Container maxWidth="sm">
@@ -93,7 +73,7 @@ const PostList: React.FC<Props> = ({
             </div>
             <Grid container spacing={3} className={classes.likes}>
               <Grid item xs={1}>
-                <LikeButton item={post} likeMutation={likePost} />
+                <LikeButtonContainer item={post} likeMutation={likePost} />
               </Grid>
               <Grid item xs={2}>
                 <Typography variant="subtitle1" color="textSecondary">{post.likes.length}</Typography>
