@@ -17,6 +17,7 @@ mutation CreateComment(
       id
       firstName
       lastName
+      email
     }
     likes {
       user {

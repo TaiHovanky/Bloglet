@@ -71,7 +71,7 @@ const Profile: React.FC<RouteComponentProps> = () => {
           />
         </div>
         <PostInputContainer />
-        <PostListContainer isGettingNewsfeed={false} />
+        <PostListContainer isGettingNewsfeed={false} getUserPosts={getUserPosts} />
       </Container>
     </div>
   );
