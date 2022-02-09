@@ -6,16 +6,14 @@ import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
-import { User } from '../../generated/graphql';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
-import NavBar from '../navbar';
-import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
 import { Link } from 'react-router-dom';
+import { loggedInUserProfileVar } from '../../cache';
+import NavBar from '../navbar';
+import { User } from '../../generated/graphql';
 
 interface Props {
   searchUsers: any,
-  getUserPosts: any,
-  clearPosts: any,
+  handleMenuClick: (user: User, handleClose: () => void) => void,
   data?: any,
 }
 
@@ -81,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts, data }: Props) => {
+const PrimaryAppBar: React.FC<Props> = ({ handleMenuClick, searchUsers, data }: Props) => {
   const classes = useStyles();
   const user = loggedInUserProfileVar();
 
@@ -97,28 +95,12 @@ const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts,
     });
   }, [value, searchUsers])
 
-  const handleOpen = () => {
+  const handleOpen = (): void => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setOpen(false);
-  };
-
-  const handleMenuClick = (user: User) => {
-    clearPosts();
-    currentUserProfileVar({...user});
-    currentGetUserPostsCursorVar(0);
-    // Handles switching between user profiles while still on Home
-    getUserPosts({
-      variables: {
-        userId: user.id,
-        cursor: 0,
-        offsetLimit: OFFSET_LIMIT,
-        isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
-      }
-    });
-    handleClose();
   };
 
   function handleListKeyDown(event: any) {
@@ -128,7 +110,7 @@ const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts,
     }
   }
 
-  const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
     if (data) {
       handleOpen();
@@ -180,7 +162,7 @@ const PrimaryAppBar: React.FC<Props> = ({ getUserPosts, searchUsers, clearPosts,
                         {data && data.searchUsers?.map(
                           (user: any, index: number) => (
                             <Link to="/" key={index}>
-                              <MenuItem key={index} onClick={() => handleMenuClick(user)}>
+                              <MenuItem key={index} onClick={() => handleMenuClick(user, handleClose)}>
                                 {user.firstName} {user.lastName}
                               </MenuItem>
                             </Link>

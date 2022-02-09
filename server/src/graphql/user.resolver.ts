@@ -20,11 +20,9 @@ class UserResponse {
 export class UserResolver {
 
   @Query(() => [User])
-  users(
-    @Ctx() { res }: requestContext
-  ) {
+  users() {
     return User.find({ relations: ['likedPosts']})
-      .catch((err) => errorHandler(`Failed to get users: ${err}`, res));
+      .catch((err) => errorHandler(`Failed to get users: ${err}`));
   }
 
   @Mutation(() => UserResponse)
@@ -113,12 +111,12 @@ export class UserResolver {
   @Query(() => User, { nullable: true }) // Query type needs to have its return type defined - can't infer type
   @UseMiddleware(isAuthenticated)
   async homePage(
-    @Ctx() { req, res }: requestContext
+    @Ctx() { req }: requestContext
   ) {
     if (req && req.session && req.session.user) {
       return User.findOne({ where: { id: req.session.user.id }})
         .catch((err) => {
-          errorHandler(`Home page user query failed: ${err}`, res);
+          errorHandler(`Home page user query failed: ${err}`);
           return null;
         });
     }
@@ -128,13 +126,12 @@ export class UserResolver {
   @Query(() => [User], { nullable: true })
   @UseMiddleware(isAuthenticated)
   async searchUsers(
-    @Arg('name') name: string,
-    @Ctx() { res }: requestContext
+    @Arg('name') name: string
   ) {
     if (name) {
       return User.find({ where: { firstName: Like(`%${name}%`) }})
         .catch((err) => {
-          errorHandler(`Search user query failed: ${err}`, res);
+          errorHandler(`Search user query failed: ${err}`);
         });
     }
     return null;

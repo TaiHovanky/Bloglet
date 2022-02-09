@@ -1,15 +1,20 @@
 import React from 'react';
 import { Grid, List, ListItem, ListItemText, makeStyles, Typography } from '@material-ui/core';
-import LikeButton from '../like-button';
+import LikeButtonContainer from '../../containers/like-button-container';
+import { User } from '../../generated/graphql';
 
 interface Props {
   comments: Array<any>;
   likeComment: any;
+  handleItemCreatorClick: (user: User) => void
 }
 
 const useStyles = makeStyles({
   root: {
     minWidth: 400
+  },
+  commentCreator: {
+    cursor: 'pointer'
   },
   inline: {
     display: 'inline',
@@ -22,7 +27,7 @@ const useStyles = makeStyles({
   }
 });
 
-const CommentList: React.FC<Props> = ({ comments, likeComment }: Props) => {
+const CommentList: React.FC<Props> = ({ comments, likeComment, handleItemCreatorClick }: Props) => {
   const classes = useStyles();
 
   return (
@@ -35,14 +40,16 @@ const CommentList: React.FC<Props> = ({ comments, likeComment }: Props) => {
                 <ListItemText
                   secondary={
                     <React.Fragment>
-                      <Typography
-                        component="span"
-                        variant="subtitle2"
-                        className={classes.inline}
-                        color="textPrimary"
-                      >
-                        {comment && comment.user ? `${comment.user.firstName} ${comment.user.lastName} ` : ''}
-                      </Typography>
+                      <span onClick={() => handleItemCreatorClick(comment.user)} className={classes.commentCreator}>
+                        <Typography
+                          component="span"
+                          variant="subtitle2"
+                          className={classes.inline}
+                          color="textPrimary"
+                        >
+                          {comment && comment.user ? `${comment.user.firstName} ${comment.user.lastName} ` : ''}
+                        </Typography>
+                      </span>
                       <Typography
                         component="span"
                         variant="body2"
@@ -60,7 +67,7 @@ const CommentList: React.FC<Props> = ({ comments, likeComment }: Props) => {
                 />
               </Grid>
               <Grid item xs={1}>
-                <LikeButton item={comment} likeMutation={likeComment} />
+                <LikeButtonContainer item={comment} likeMutation={likeComment} />
               </Grid>
               <Grid item xs={1}>
                 <Typography variant="subtitle1" color="textSecondary">{comment && comment.likes ? comment.likes.length : 0}</Typography>

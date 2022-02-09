@@ -1,9 +1,14 @@
 mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
   likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {  
     id
-    creatorId
     content
     createdAt
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
     likes {
       user {
         id

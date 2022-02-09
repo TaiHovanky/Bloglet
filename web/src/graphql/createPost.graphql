@@ -1,9 +1,14 @@
 mutation CreatePost($creatorId: Float!, $content: String!) {
   createPost(creatorId: $creatorId, content: $content) {
     id
-    creatorId
     content
     createdAt
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
     likes {
       user {
         id
@@ -23,6 +28,7 @@ mutation CreatePost($creatorId: Float!, $content: String!) {
         id
         firstName
         lastName
+        email
       }
       post {
         id

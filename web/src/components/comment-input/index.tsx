@@ -1,10 +1,9 @@
 import React, { ChangeEvent, useState } from 'react';
 import { TextField } from '@material-ui/core';
-import { loggedInUserProfileVar } from '../../cache';
 
 interface Props {
   loading: boolean,
-  handleCreateComment: (e: React.FormEvent, comment: string, creatorId: number, callback: () => void) => Promise<void>
+  handleCreateComment: (e: React.FormEvent, comment: string, callback: () => void) => Promise<void>
 }
 
 const CommentInput = ({ loading, handleCreateComment }: Props) => {
@@ -19,7 +18,7 @@ const CommentInput = ({ loading, handleCreateComment }: Props) => {
   };
 
   return (
-    <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => handleCreateComment(e, comment, loggedInUserProfileVar().id, clearForm)}>
+    <form noValidate autoComplete="off" onSubmit={(e: React.FormEvent) => handleCreateComment(e, comment, clearForm)}>
       <div>
         <TextField
           label="Comment"

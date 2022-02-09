@@ -116,6 +116,7 @@ export type Post = {
   createdAt?: Maybe<Scalars['DateTime']>;
   likes?: Maybe<Array<PostLike>>;
   comments?: Maybe<Array<Comment>>;
+  user?: Maybe<User>;
 };
 
 export type PostLike = {
@@ -175,12 +176,13 @@ export type User = {
   followers?: Maybe<Array<Follows>>;
   comments?: Maybe<Array<Comment>>;
   likedComments?: Maybe<Array<CommentLike>>;
+  posts?: Maybe<Array<Post>>;
 };
 
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type CreateCommentMutationVariables = Exact<{
@@ -195,8 +197,11 @@ export type CreateCommentMutation = (
   { __typename?: 'Mutation' }
   & { createComment?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
-    & { likes?: Maybe<Array<(
+    & Pick<Post, 'id' | 'content' | 'createdAt'>
+    & { user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+    )>, likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
         { __typename?: 'User' }
@@ -214,7 +219,7 @@ export type CreateCommentMutation = (
         )> }
       )>>, user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
       )>, post?: Maybe<(
         { __typename?: 'Post' }
         & Pick<Post, 'id'>
@@ -233,8 +238,11 @@ export type CreatePostMutation = (
   { __typename?: 'Mutation' }
   & { createPost?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
-    & { likes?: Maybe<Array<(
+    & Pick<Post, 'id' | 'content' | 'createdAt'>
+    & { user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+    )>, likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
         { __typename?: 'User' }
@@ -252,7 +260,7 @@ export type CreatePostMutation = (
         )> }
       )>>, user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
       )>, post?: Maybe<(
         { __typename?: 'Post' }
         & Pick<Post, 'id'>
@@ -325,8 +333,11 @@ export type GetUserPostsQuery = (
   { __typename?: 'Query' }
   & { getUserPosts?: Maybe<Array<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
-    & { likes?: Maybe<Array<(
+    & Pick<Post, 'id' | 'content' | 'createdAt'>
+    & { user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+    )>, likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
         { __typename?: 'User' }
@@ -344,7 +355,7 @@ export type GetUserPostsQuery = (
         )> }
       )>>, user?: Maybe<(
         { __typename?: 'User' }
-        & Pick<User, 'id' | 'firstName' | 'lastName'>
+        & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
       )>, post?: Maybe<(
         { __typename?: 'Post' }
         & Pick<Post, 'id'>
@@ -385,7 +396,7 @@ export type LikeCommentMutation = (
       )> }
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'firstName' | 'lastName'>
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
     )>, post?: Maybe<(
       { __typename?: 'Post' }
       & Pick<Post, 'id'>
@@ -404,8 +415,11 @@ export type LikePostMutation = (
   { __typename?: 'Mutation' }
   & { likePost?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'creatorId' | 'content' | 'createdAt'>
-    & { likes?: Maybe<Array<(
+    & Pick<Post, 'id' | 'content' | 'createdAt'>
+    & { user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>
+    )>, likes?: Maybe<Array<(
       { __typename?: 'PostLike' }
       & { user: (
         { __typename?: 'User' }
@@ -425,10 +439,10 @@ export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
     { __typename?: 'UserResponse' }
-    & { user: (
+    & { user?: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id' | 'email'>
-    ), errors?: Maybe<Array<(
+    )>, errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
       & Pick<FieldError, 'field' | 'message'>
     )>> }
@@ -455,10 +469,10 @@ export type RegisterMutation = (
   { __typename?: 'Mutation' }
   & { register: (
     { __typename?: 'UserResponse' }
-    & { user: (
+    & { user?: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id' | 'email'>
-    ), errors?: Maybe<Array<(
+    )>, errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
       & Pick<FieldError, 'field' | 'message'>
     )>> }
@@ -488,9 +502,14 @@ export const CreateCommentDocument = gql`
     createdAt: $createdAt
   ) {
     id
-    creatorId
     content
     createdAt
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
     likes {
       user {
         id
@@ -510,6 +529,7 @@ export const CreateCommentDocument = gql`
         id
         firstName
         lastName
+        email
       }
       post {
         id
@@ -551,9 +571,14 @@ export const CreatePostDocument = gql`
     mutation CreatePost($creatorId: Float!, $content: String!) {
   createPost(creatorId: $creatorId, content: $content) {
     id
-    creatorId
     content
     createdAt
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
     likes {
       user {
         id
@@ -573,6 +598,7 @@ export const CreatePostDocument = gql`
         id
         firstName
         lastName
+        email
       }
       post {
         id
@@ -740,9 +766,14 @@ export const GetUserPostsDocument = gql`
     isGettingNewsfeed: $isGettingNewsfeed
   ) {
     id
-    creatorId
     content
     createdAt
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
     likes {
       user {
         id
@@ -762,6 +793,7 @@ export const GetUserPostsDocument = gql`
         id
         firstName
         lastName
+        email
       }
       post {
         id
@@ -858,6 +890,7 @@ export const LikeCommentDocument = gql`
       id
       firstName
       lastName
+      email
     }
     post {
       id
@@ -897,9 +930,14 @@ export const LikePostDocument = gql`
     mutation LikePost($userId: Float!, $postId: Float!, $isAlreadyLiked: Boolean!) {
   likePost(userId: $userId, postId: $postId, isAlreadyLiked: $isAlreadyLiked) {
     id
-    creatorId
     content
     createdAt
+    user {
+      id
+      firstName
+      lastName
+      email
+    }
     likes {
       user {
         id
