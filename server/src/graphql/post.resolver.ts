@@ -1,8 +1,7 @@
-import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { Post } from '../entity/Post';
 import { User } from '../entity/User';
 import { PostLike } from '../entity/PostLike';
-import { requestContext } from '../types/context.interface';
 import { isAuthenticated } from '../utils/is-authenticated.util';
 import { errorHandler } from '../utils/error-handler.util';
 
@@ -15,7 +14,6 @@ export class PostResolver {
     @Arg('cursor') cursor: number,
     @Arg('offsetLimit') offsetLimit: number,
     @Arg('isGettingNewsfeed') isGettingNewsfeed: boolean,
-    @Ctx() { res }: requestContext
   ) {
     let query = Post
       .createQueryBuilder('posts')
@@ -39,11 +37,12 @@ export class PostResolver {
       .leftJoinAndMapOne('comment_like.user', 'users', 'users3', 'comment_like.user_id = users3.id')
       .leftJoinAndMapMany('posts.likes', 'post_like', 'likes', 'posts.id = likes.post_id')
       .leftJoinAndMapOne('likes.user', 'users', 'users4', 'likes.user_id = users4.id')
+      .leftJoinAndMapOne('posts.user', 'users', 'users5', 'posts.creatorId = users5.id')
 
     return query
       .getMany()
       .catch((err) => {
-        errorHandler(`Failed to get user posts: ${err}`, res);
+        errorHandler(`Failed to get user posts: ${err}`);
         return null;
       });
   }
@@ -51,10 +50,9 @@ export class PostResolver {
   @Query(() => Post)
   getPost(
     @Arg('postId') postId: number,
-    @Ctx() { res }: requestContext
   ) {
     return Post.find({ where: { id: postId }})
-      .catch((err) => errorHandler(`Failed to get post: ${err}`, res));
+      .catch((err) => errorHandler(`Failed to get post: ${err}`));
   }
 
   @Mutation(() => Post, { nullable: true })
@@ -63,11 +61,18 @@ export class PostResolver {
     @Arg('creatorId') creatorId: number, 
     @Arg('content') content: string,
   ) {
-    const newPost = new Post(content, creatorId);
-    const savedPost = await Post.save(newPost);
-    savedPost.comments = [];
-    savedPost.likes = [];
-    return savedPost;
+    const user = await User.findOne({
+      where: { id: creatorId },
+      relations: ['posts']
+    });
+    if (user) {
+      const newPost = new Post(content, user);
+      const savedPost = await Post.save(newPost);
+      savedPost.comments = [];
+      savedPost.likes = [];
+      return savedPost;
+    }
+    return null;
   }
 
   @Mutation(() => Post, { nullable: true })
@@ -76,7 +81,6 @@ export class PostResolver {
     @Arg('postId') postId: number,
     @Arg('userId') userId: number,
     @Arg('isAlreadyLiked') isAlreadyLiked: boolean,
-    @Ctx() { res }: requestContext
   ) {
     try {
       const postToUpdate: Post | undefined = await Post
@@ -111,7 +115,7 @@ export class PostResolver {
       }
       return null;
     } catch(err) {
-      errorHandler(`Failed to like post: ${err}`, res);
+      errorHandler(`Failed to like post: ${err}`);
       return null;
     }
   }

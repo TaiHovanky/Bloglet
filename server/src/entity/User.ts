@@ -4,6 +4,7 @@ import { Follows } from './Follows';
 import { PostLike } from './PostLike';
 import { Comment } from './Comment';
 import { CommentLike } from './CommentLike';
+import { Post } from './Post';
 
 @ObjectType()
 @Entity('users')
@@ -51,4 +52,8 @@ export class User extends BaseEntity {
   @Field(() => [CommentLike], { nullable: true })
   @OneToMany(() => CommentLike, (commentLike: CommentLike) => commentLike.user)
   likedComments: Array<CommentLike>;
+
+  @Field(() => [Post], { nullable: true })
+  @OneToMany(() => Post, (post: Post) => post.user)
+  posts: Array<Post>;
 }

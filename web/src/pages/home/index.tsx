@@ -114,7 +114,10 @@ const Home: React.FC<RouteComponentProps> = () => {
             {loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id &&
               <PostInputContainer />
             }
-            <PostListContainer isGettingNewsfeed={loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id} />
+            <PostListContainer
+              isGettingNewsfeed={loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id}
+              getUserPosts={getUserPosts}
+            />
           </Container>
         </> :
         <SplashPage />

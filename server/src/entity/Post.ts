@@ -1,18 +1,19 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { PostLike } from './PostLike';
 import { Comment } from './Comment';
+import { User } from './User';
 
 @ObjectType()
 @Entity('posts')
 export class Post extends BaseEntity {
   constructor(
     content: string,
-    creatorId: number,
+    user: User
   ) {
     super();
     this.content = content;
-    this.creatorId = creatorId;
+    this.user = user;
   }
 
   @Field()
@@ -38,4 +39,9 @@ export class Post extends BaseEntity {
   @Field(() => [Comment], { nullable: true })
   @OneToMany(() => Comment, (comment: Comment) => comment.post)
   comments: Array<Comment>;
+
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, user => user.posts)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }

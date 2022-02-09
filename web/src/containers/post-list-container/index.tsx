@@ -9,9 +9,10 @@ import clearUserPosts from '../../cache-queries/clear-user-posts';
 
 interface Props {
   isGettingNewsfeed: boolean;
+  getUserPosts: any;
 }
 
-const PostListContainer = ({ isGettingNewsfeed }: Props) => {
+const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
   const { data: postsData, loading: postsLoading, fetchMore } = useQuery(GetUserPostsDocument, {
     variables: {
       userId: currentUserProfileVar().id,
@@ -92,6 +93,8 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
     <PostList
       posts={postsData?.getUserPosts}
       likePost={handleLikePost}
+      getUserPosts={getUserPosts}
+      clearPosts={clearPosts}
     />
   );
 }
