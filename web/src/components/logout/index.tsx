@@ -1,10 +1,9 @@
 import React from 'react';
 import { ListItem, ListItemText, makeStyles } from '@material-ui/core';
-import { useLogoutMutation } from '../../generated/graphql';
-import { loggedInUserProfileVar } from '../../cache';
-import User from '../../types/user.interface';
 
-interface Props {}
+interface Props {
+  handleLogoutClick: any
+}
 
 const useStyles = makeStyles(() => ({
   logoutItemText: {
@@ -13,15 +12,8 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const Logout: React.FC<Props> = () => {
+const Logout: React.FC<Props> = ({ handleLogoutClick }) => {
   const classes = useStyles();
-  const [logout, { client }] = useLogoutMutation();
-
-  const handleLogoutClick = async () => {
-    await logout();
-    loggedInUserProfileVar(new User(0, '', '', ''));
-    await client.resetStore(); // resets the apollo client store
-  };
 
   return (
     <ListItem button onClick={handleLogoutClick}>

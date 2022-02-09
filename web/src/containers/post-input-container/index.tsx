@@ -3,7 +3,7 @@ import PostInput from '../../components/post-input';
 import { useMutation } from '@apollo/client';
 import { CreatePostDocument, Post } from '../../generated/graphql';
 import { readGetUserPostsQuery } from '../../utils/cache-modification.util';
-import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 
 const PostInputContainer = () => {
   const [createPost] = useMutation(CreatePostDocument, {
@@ -21,13 +21,13 @@ const PostInputContainer = () => {
     code, it's ultimately faster than refetching because there's not a network call. */
   });
 
-  const handleCreatePost = async (e: React.FormEvent, creatorId: number, callback: ()=> void): Promise<void> => {
+  const handleCreatePost = async (e: React.FormEvent, callback: ()=> void): Promise<void> => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 1);
     await createPost({
       variables: {
-        creatorId,
+        creatorId: loggedInUserProfileVar().id,
         content: formData.get('content') as string,
       }
     });

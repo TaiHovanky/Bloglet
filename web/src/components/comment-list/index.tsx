@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, List, ListItem, ListItemText, makeStyles, Typography } from '@material-ui/core';
-import LikeButton from '../like-button';
+import LikeButtonContainer from '../../containers/like-button-container';
 
 interface Props {
   comments: Array<any>;
@@ -60,7 +60,7 @@ const CommentList: React.FC<Props> = ({ comments, likeComment }: Props) => {
                 />
               </Grid>
               <Grid item xs={1}>
-                <LikeButton item={comment} likeMutation={likeComment} />
+                <LikeButtonContainer item={comment} likeMutation={likeComment} />
               </Grid>
               <Grid item xs={1}>
                 <Typography variant="subtitle1" color="textSecondary">{comment && comment.likes ? comment.likes.length : 0}</Typography>
