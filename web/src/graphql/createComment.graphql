@@ -38,6 +38,7 @@ mutation CreateComment(
         id
         firstName
         lastName
+        email
       }
       post {
         id

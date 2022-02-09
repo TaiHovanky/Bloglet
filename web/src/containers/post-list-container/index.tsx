@@ -89,7 +89,7 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
     [clearPosts]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
-  const handlePostCreatorClick = (user: User) => {
+  const handleItemCreatorClick = (user: User) => {
     clearPosts();
     currentUserProfileVar({...user});
     currentGetUserPostsCursorVar(0);
@@ -108,7 +108,7 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
     <PostList
       posts={postsData?.getUserPosts}
       likePost={handleLikePost}
-      handlePostCreatorClick={handlePostCreatorClick}
+      handleItemCreatorClick={handleItemCreatorClick}
     />
   );
 }

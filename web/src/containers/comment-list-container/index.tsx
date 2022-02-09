@@ -2,14 +2,15 @@ import React from 'react';
 import CommentList from '../../components/comment-list';
 import { useMutation } from '@apollo/client';
 import { currentUserProfileVar } from '../../cache';
-import { LikeCommentDocument } from '../../generated/graphql';
+import { LikeCommentDocument, User } from '../../generated/graphql';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
 
 interface Props {
   comments: Array<any>;
+  handleItemCreatorClick: (user: User) => void
 }
 
-const CommentListContainer = ({ comments }: Props) => {
+const CommentListContainer = ({ comments, handleItemCreatorClick }: Props) => {
   const [likeComment] = useMutation(LikeCommentDocument, {
     update(cache, { data }) {
       const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
@@ -37,6 +38,7 @@ const CommentListContainer = ({ comments }: Props) => {
     <CommentList
       comments={comments}
       likeComment={handleLikeComment}
+      handleItemCreatorClick={handleItemCreatorClick}
     />
   );
 }

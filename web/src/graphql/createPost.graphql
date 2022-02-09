@@ -28,6 +28,7 @@ mutation CreatePost($creatorId: Float!, $content: String!) {
         id
         firstName
         lastName
+        email
       }
       post {
         id

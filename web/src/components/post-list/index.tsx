@@ -9,7 +9,7 @@ import LikeButtonContainer from '../../containers/like-button-container';
 interface Props {
   posts: GetUserPostsQuery['getUserPosts'],
   likePost: any,
-  handlePostCreatorClick: (user: User) => void
+  handleItemCreatorClick: (user: User) => void
 }
 
 const useStyles = makeStyles({
@@ -34,7 +34,7 @@ const useStyles = makeStyles({
 const PostList: React.FC<Props> = ({
   posts,
   likePost,
-  handlePostCreatorClick
+  handleItemCreatorClick
 }: Props) => {
   const classes = useStyles();
 
@@ -52,7 +52,7 @@ const PostList: React.FC<Props> = ({
         <Card className={classes.root} variant="outlined" key={post.id}>
           <CardContent>
             <div className={classes.post}>
-              <span onClick={() => handlePostCreatorClick(post.user)} className={classes.postCreator}>
+              <span onClick={() => handleItemCreatorClick(post.user)} className={classes.postCreator}>
                 <Typography
                   component="span"
                   variant="subtitle2"
@@ -88,7 +88,7 @@ const PostList: React.FC<Props> = ({
               </Grid>
             </Grid>
             {showCommentInput && <CommentInputContainer postId={post.id} />}
-            <CommentListContainer comments={post.comments} />
+            <CommentListContainer comments={post.comments} handleItemCreatorClick={handleItemCreatorClick} />
           </CardContent>
         </Card>
       )) : []}
