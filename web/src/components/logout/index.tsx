@@ -2,7 +2,7 @@ import React from 'react';
 import { ListItem, ListItemText, makeStyles } from '@material-ui/core';
 
 interface Props {
-  handleLogoutClick: any
+  handleLogoutClick: () => any
 }
 
 const useStyles = makeStyles(() => ({

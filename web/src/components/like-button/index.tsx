@@ -4,7 +4,7 @@ import { ThumbUp, ThumbUpOutlined } from '@material-ui/icons';
 
 interface Props {
   isAlreadyLiked: boolean
-  handleLikeButtonClick: () => any
+  handleLikeButtonClick: () => void
 }
 
 const LikeButton = ({ isAlreadyLiked, handleLikeButtonClick}: Props) => {

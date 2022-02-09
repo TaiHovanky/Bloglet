@@ -13,7 +13,7 @@ const LikeButtonContainer = ({ item, likeMutation}: Props) => {
   const isAlreadyLiked: boolean = item && item.likes ?
     item.likes.some((like: PostLike | CommentLike) => like.user && like.user.id === loggedInUserProfileVar().id) : false;
 
-  const handleLikeButtonClick = () => {
+  const handleLikeButtonClick = (): void => {
     likeMutation(loggedInUserProfileVar().id, item.id, isAlreadyLiked);
   }
 
