@@ -23,12 +23,12 @@ export class PostResolver {
 
     if (isGettingNewsfeed) {
       query = query
-        .leftJoinAndSelect('users', 'users', 'posts.creatorId = users.id')
+        .leftJoinAndSelect('users', 'users', 'posts.user_id = users.id')
         .leftJoin('users.following', 'user_follows_user')
-        .where('user_follows_user.follower_id = :userId', { userId });
+        .where('user_follows_user.follower_id = :userId OR posts.user_id = :userId', { userId });
     } else {
       query = query
-        .where('posts.creatorId = :creatorId', { creatorId: userId });
+        .where('posts.user_id = :userId', { userId });
     }
     query = query
       .leftJoinAndMapMany('posts.comments', 'comment', 'comment', 'posts.id = comment.post_id')
@@ -37,7 +37,7 @@ export class PostResolver {
       .leftJoinAndMapOne('comment_like.user', 'users', 'users3', 'comment_like.user_id = users3.id')
       .leftJoinAndMapMany('posts.likes', 'post_like', 'likes', 'posts.id = likes.post_id')
       .leftJoinAndMapOne('likes.user', 'users', 'users4', 'likes.user_id = users4.id')
-      .leftJoinAndMapOne('posts.user', 'users', 'users5', 'posts.creatorId = users5.id')
+      .leftJoinAndMapOne('posts.user', 'users', 'users5', 'posts.user_id = users5.id')
 
     return query
       .getMany()

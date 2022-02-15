@@ -22,6 +22,7 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
     },
     skip: !currentUserProfileVar().id || isSwitchingFromProfileToHomeVar() === true,
     onError: (err: any) => console.log('getting user posts error:', err),
+    onCompleted: (stuff) => console.log('stuff', stuff)
   });
 
   const [likePost] = useMutation(LikePostDocument, {

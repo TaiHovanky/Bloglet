@@ -3,7 +3,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
+import { Search } from '@material-ui/icons';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { Link } from 'react-router-dom';
@@ -38,11 +38,10 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
+    marginRight: 0,
+    marginLeft: 'auto',
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(3),
       width: 'auto',
     },
   },
@@ -122,12 +121,12 @@ const PrimaryAppBar: React.FC<Props> = ({ handleMenuClick, searchUsers, data }: 
       <AppBar position="static">
         <Toolbar>
           <NavBar />
-          {user && <Typography className={classes.title} variant="h6" noWrap>
-            Welcome, {`${user.firstName} ${user.lastName}`}
-          </Typography>}
+          <Typography className={classes.title} variant="h6" noWrap>
+            Practice Social Media App
+          </Typography>
           {user && <div className={classes.search}>
             <div className={classes.searchIcon}>
-              <SearchIcon />
+              <Search />
             </div>
             <InputBase
               placeholder="Search…"
