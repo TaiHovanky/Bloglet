@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Container, makeStyles, Typography } from '@material-ui/core';
+import { Backdrop, CircularProgress, Container, makeStyles, Typography } from '@material-ui/core';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
 import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromHomeToProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
@@ -13,16 +13,20 @@ import { RouteComponentProps } from 'react-router';
 import getIsSwitchingFromHomeToProfile from '../../cache-queries/is-switching-from-home-to-profile';
 import getIsSwitchingFromProfileToHome from '../../cache-queries/is-switching-from-profile-to-home';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   homePageContainer: {
     minHeight: '100vh'
   },
   currentUserInfoContainer: {
     marginBottom: 30
-  }
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
 }));
 
-const Profile: React.FC<RouteComponentProps> = () => {
+const Profile: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
   // eslint-disable-next-line
@@ -34,18 +38,22 @@ const Profile: React.FC<RouteComponentProps> = () => {
   // eslint-disable-next-line
   const isSwitchingFromProfileToHome = useQuery(getIsSwitchingFromProfileToHome);
 
-  const [getUserPosts] = useLazyQuery(GetUserPostsDocument, {
+  const [getUserPosts, { loading }] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
     onError: (err) => console.log('get user posts lazy query error', err),
   });
 
+  const currentUserId = currentUserProfileVar().id;
+
   useEffect(() => {
     isSwitchingFromHomeToProfileVar(true);
     currentGetUserPostsCursorVar(0);
-    currentUserProfileVar(loggedInUserProfileVar());
+    // currentUserProfileVar(loggedInUserProfileVar());
+    console.log('profile use effect',  currentUserProfileVar().id);
     getUserPosts({
       variables: {
-        userId: loggedInUserProfileVar().id,
+        // userId: loggedInUserProfileVar().id,
+        userId: currentUserProfileVar().id,
         cursor: 0,
         offsetLimit: OFFSET_LIMIT,
         isGettingNewsfeed: false
@@ -56,14 +64,14 @@ const Profile: React.FC<RouteComponentProps> = () => {
       isSwitchingFromHomeToProfileVar(false);
       isSwitchingFromProfileToHomeVar(true);
     }
-  }, [getUserPosts]);
+  }, [getUserPosts, currentUserId]);
 
   return (
     <div className={classes.homePageContainer}>
       <Container maxWidth="sm">
         <div className={classes.currentUserInfoContainer}>
           <Typography variant="h4">
-            {`${loggedInUserProfileVar().firstName} ${loggedInUserProfileVar().lastName}`}
+            {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}'s Profile`}
           </Typography>
           <UserFollowsContainer
             loggedInUser={loggedInUserProfileVar().id}
@@ -71,8 +79,15 @@ const Profile: React.FC<RouteComponentProps> = () => {
           />
         </div>
         <PostInputContainer />
-        <PostListContainer isGettingNewsfeed={false} getUserPosts={getUserPosts} />
+        <PostListContainer
+          isGettingNewsfeed={false}
+          getUserPosts={getUserPosts}
+          history={history}
+        />
       </Container>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   );
 }

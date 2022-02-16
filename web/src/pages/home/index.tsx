@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home: React.FC<RouteComponentProps> = () => {
+const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
   // eslint-disable-next-line
@@ -84,17 +84,19 @@ const Home: React.FC<RouteComponentProps> = () => {
         currentUserProfileVar().id !== loggedInUserProfileVar().id
       ) {
         // Handles change from logged in user's Profile page to Home
-        getUserPosts({
-          variables: {
-            userId: currentUserProfileVar().id,
-            cursor: 0,
-            offsetLimit: OFFSET_LIMIT,
-            isGettingNewsfeed: false
-          }
-        });
+        console.log('handling change from profile to home', currentUserProfileVar().id, loggedInUserProfileVar().id);
+        // getUserPosts({
+        //   variables: {
+        //     userId: loggedInUserProfileVar().id,
+        //     cursor: 0,
+        //     offsetLimit: OFFSET_LIMIT,
+        //     isGettingNewsfeed: true
+        //   }
+        // });
+        currentUserProfileVar(loggedInUserProfileVar());
       }
     },
-    [homePageQueryExecutor, getUserPosts]
+    [homePageQueryExecutor]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
   return (
@@ -115,8 +117,9 @@ const Home: React.FC<RouteComponentProps> = () => {
               <PostInputContainer />
             }
             <PostListContainer
-              isGettingNewsfeed={loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id}
+              isGettingNewsfeed={true}
               getUserPosts={getUserPosts}
+              history={history}
             />
           </Container>
         </> :

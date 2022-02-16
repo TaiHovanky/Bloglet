@@ -10,9 +10,11 @@ import clearUserPosts from '../../cache-queries/clear-user-posts';
 interface Props {
   isGettingNewsfeed: boolean;
   getUserPosts: any;
+  history: any;
 }
 
-const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
+const PostListContainer = ({ isGettingNewsfeed, getUserPosts, history }: Props) => {
+  // console.log('rendering postlist container', currentUserProfileVar(), currentGetUserPostsCursorVar());
   const { data: postsData, loading: postsLoading, fetchMore } = useQuery(GetUserPostsDocument, {
     variables: {
       userId: currentUserProfileVar().id,
@@ -20,7 +22,7 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
       offsetLimit: OFFSET_LIMIT,
       isGettingNewsfeed
     },
-    skip: !currentUserProfileVar().id || isSwitchingFromProfileToHomeVar() === true,
+    // skip: !currentUserProfileVar().id || isSwitchingFromProfileToHomeVar() === true,
     onError: (err: any) => console.log('getting user posts error:', err),
     onCompleted: (stuff) => console.log('stuff', stuff)
   });
@@ -84,6 +86,7 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
   useEffect(
     () => {
       return function cleanupPostsList() {
+        console.log('clearing posts');
         clearPosts();
       }
     },
@@ -94,15 +97,16 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts }: Props) => {
     clearPosts();
     currentUserProfileVar({...user});
     currentGetUserPostsCursorVar(0);
+    history.push('/profile');
     // Handles switching between user profiles while still on Home
-    getUserPosts({
-      variables: {
-        userId: user.id,
-        cursor: 0,
-        offsetLimit: OFFSET_LIMIT,
-        isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
-      }
-    });
+    // getUserPosts({
+    //   variables: {
+    //     userId: user.id,
+    //     cursor: 0,
+    //     offsetLimit: OFFSET_LIMIT,
+    //     isGettingNewsfeed: false
+    //   }
+    // });
   }
 
   return (
