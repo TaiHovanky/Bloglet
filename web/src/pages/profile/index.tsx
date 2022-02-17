@@ -47,6 +47,7 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
 
   useEffect(() => {
     isSwitchingFromHomeToProfileVar(true);
+    isSwitchingFromProfileToHomeVar(false);
     currentGetUserPostsCursorVar(0);
     // currentUserProfileVar(loggedInUserProfileVar());
     console.log('profile use effect',  currentUserProfileVar().id);

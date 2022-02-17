@@ -79,24 +79,25 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
         homePageQueryExecutor();
       }
       if (
-        isSwitchingFromProfileToHomeVar() === true &&
+        isSwitchingFromProfileToHomeVar() === true
         // Prevents infinite loop when the user navigates to their own newsfeed
-        currentUserProfileVar().id !== loggedInUserProfileVar().id
+        // && currentUserProfileVar().id !== loggedInUserProfileVar().id
       ) {
+        currentUserProfileVar(loggedInUserProfileVar());
         // Handles change from logged in user's Profile page to Home
         console.log('handling change from profile to home', currentUserProfileVar().id, loggedInUserProfileVar().id);
-        // getUserPosts({
-        //   variables: {
-        //     userId: loggedInUserProfileVar().id,
-        //     cursor: 0,
-        //     offsetLimit: OFFSET_LIMIT,
-        //     isGettingNewsfeed: true
-        //   }
-        // });
-        currentUserProfileVar(loggedInUserProfileVar());
+        getUserPosts({
+          variables: {
+            userId: loggedInUserProfileVar().id,
+            cursor: 0,
+            offsetLimit: OFFSET_LIMIT,
+            isGettingNewsfeed: true
+          }
+        });
+        // currentUserProfileVar(loggedInUserProfileVar());
       }
     },
-    [homePageQueryExecutor]
+    [homePageQueryExecutor, getUserPosts]
   ); /* This calls the homePageQuery once to get the currently logged in user */
 
   return (
