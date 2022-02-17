@@ -39,10 +39,12 @@ const cache = new InMemoryCache({
         },
         getUserPosts: {
           keyArgs: ['type', 'id'],
-          merge(existing = [], incoming, { args }) {
+          merge(existing = [], incoming = [], { args }) {
             if (
-              (args && args.userId !== currentUserProfileVar().id)
-              || checkForDuplicateItems(existing, incoming)
+              existing && existing.length && (
+                (args && args.userId !== currentUserProfileVar().id)
+                || checkForDuplicateItems(existing, incoming)
+              )
               // || (args && args.isGettingNewsfeed === true && isSwitchingFromHomeToProfileVar() === true))
             ) {
               /* If the args.userId don't match the current user that's being viewed, return existing (instead of merging the incoming).

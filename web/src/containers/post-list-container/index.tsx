@@ -22,7 +22,8 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts, history }: Props) 
       offsetLimit: OFFSET_LIMIT,
       isGettingNewsfeed
     },
-    skip: !currentUserProfileVar().id || isSwitchingFromProfileToHomeVar() === true,
+    skip: !currentUserProfileVar().id,
+      // || isSwitchingFromProfileToHomeVar() === true,
     onError: (err: any) => console.log('getting user posts error:', err),
     onCompleted: (stuff) => console.log('stuff', stuff)
   });

@@ -56,8 +56,17 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
         is updated, causing the useGetUserPostsQuery to call with a new userId. */
         loggedInUserProfileVar(newUser);
         // Manually set these react variables to false to avoid case where it randomly appears as true
-        isSwitchingFromProfileToHomeVar(false);
-        isSwitchingFromHomeToProfileVar(false);
+        // isSwitchingFromProfileToHomeVar(false);
+        // isSwitchingFromHomeToProfileVar(false);
+        console.log('home getting posts after completed');
+        getUserPosts({
+          variables: {
+            userId: newUser.id,
+            cursor: 0,
+            offsetLimit: OFFSET_LIMIT,
+            isGettingNewsfeed: true
+          }
+        });
       }
     }
   });
@@ -66,9 +75,9 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const [getUserPosts, { loading: postsLoading }] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
     onError: (err) => console.log('get user posts lazy query error', err),
-    onCompleted: (data) => {
-      isSwitchingFromProfileToHomeVar(false);
-    }
+    // onCompleted: (data) => {
+    //   isSwitchingFromProfileToHomeVar(false);
+    // }
   });
 
   useEffect(
@@ -78,24 +87,24 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
       if (!loggedInUserProfileVar() || !loggedInUserProfileVar().id) {
         homePageQueryExecutor();
       }
-      if (
-        isSwitchingFromProfileToHomeVar() === true
-        // Prevents infinite loop when the user navigates to their own newsfeed
-        // && currentUserProfileVar().id !== loggedInUserProfileVar().id
-      ) {
-        currentUserProfileVar(loggedInUserProfileVar());
+      // if (
+      //   isSwitchingFromProfileToHomeVar() === true
+      //   // Prevents infinite loop when the user navigates to their own newsfeed
+      //   // && currentUserProfileVar().id !== loggedInUserProfileVar().id
+      // ) {
+        // currentUserProfileVar(loggedInUserProfileVar());
         // Handles change from logged in user's Profile page to Home
         console.log('handling change from profile to home', currentUserProfileVar().id, loggedInUserProfileVar().id);
-        getUserPosts({
-          variables: {
-            userId: loggedInUserProfileVar().id,
-            cursor: 0,
-            offsetLimit: OFFSET_LIMIT,
-            isGettingNewsfeed: true
-          }
-        });
+        // getUserPosts({
+        //   variables: {
+        //     userId: loggedInUserProfileVar().id,
+        //     cursor: 0,
+        //     offsetLimit: OFFSET_LIMIT,
+        //     isGettingNewsfeed: true
+        //   }
+        // });
         // currentUserProfileVar(loggedInUserProfileVar());
-      }
+      // }
     },
     [homePageQueryExecutor, getUserPosts]
   ); /* This calls the homePageQuery once to get the currently logged in user */

@@ -37,7 +37,7 @@ const NavBar = () => {
 
   const handleHomePageClick = () => {
     console.log('going home');
-    isSwitchingFromProfileToHomeVar(true);
+    // isSwitchingFromProfileToHomeVar(true);
     currentUserProfileVar(loggedInUserProfileVar());
   };
 

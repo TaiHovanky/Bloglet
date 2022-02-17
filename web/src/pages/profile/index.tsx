@@ -46,8 +46,8 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
   const currentUserId = currentUserProfileVar().id;
 
   useEffect(() => {
-    isSwitchingFromHomeToProfileVar(true);
-    isSwitchingFromProfileToHomeVar(false);
+    // isSwitchingFromHomeToProfileVar(true);
+    // isSwitchingFromProfileToHomeVar(false);
     currentGetUserPostsCursorVar(0);
     // currentUserProfileVar(loggedInUserProfileVar());
     console.log('profile use effect',  currentUserProfileVar().id);
@@ -62,8 +62,8 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
     });
 
     return function cleanupPostsList() {
-      isSwitchingFromHomeToProfileVar(false);
-      isSwitchingFromProfileToHomeVar(true);
+      // isSwitchingFromHomeToProfileVar(false);
+      // isSwitchingFromProfileToHomeVar(true);
     }
   }, [getUserPosts, currentUserId]);
 
