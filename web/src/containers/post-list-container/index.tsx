@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PostList from '../../components/post-list';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
 import { GetUserPostsDocument, LikePostDocument, User } from '../../generated/graphql';
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
@@ -11,13 +11,16 @@ interface Props {
   isGettingNewsfeed: boolean;
   getUserPosts: any;
   history: any;
+  userId: number;
 }
 
-const PostListContainer = ({ isGettingNewsfeed, getUserPosts, history }: Props) => {
+const PostListContainer = ({ isGettingNewsfeed, getUserPosts, history, userId }: Props) => {
   // console.log('rendering postlist container', currentUserProfileVar(), currentGetUserPostsCursorVar());
+
+  console.log('current user ', userId);
   const { data: postsData, loading: postsLoading, fetchMore } = useQuery(GetUserPostsDocument, {
     variables: {
-      userId: currentUserProfileVar().id,
+      userId,
       cursor: currentGetUserPostsCursorVar(),
       offsetLimit: OFFSET_LIMIT,
       isGettingNewsfeed

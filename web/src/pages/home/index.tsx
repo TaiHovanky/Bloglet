@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography, Backdrop, CircularProgress } from '@material-ui/core';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery, useReactiveVar } from '@apollo/client';
 import {
   GetUserPostsDocument,
   useHomePageLazyQuery,
@@ -45,6 +45,8 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   // eslint-disable-next-line
   const isSwitchingFromProfileToHome = useQuery(getIsSwitchingFromProfileToHome);
 
+  const currentUser = useReactiveVar(currentUserProfileVar);
+
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({
     fetchPolicy: 'network-only',
     onCompleted: (data: any) => {
@@ -59,14 +61,14 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
         // isSwitchingFromProfileToHomeVar(false);
         // isSwitchingFromHomeToProfileVar(false);
         console.log('home getting posts after completed');
-        getUserPosts({
-          variables: {
-            userId: newUser.id,
-            cursor: 0,
-            offsetLimit: OFFSET_LIMIT,
-            isGettingNewsfeed: true
-          }
-        });
+        // getUserPosts({
+        //   variables: {
+        //     userId: newUser.id,
+        //     cursor: 0,
+        //     offsetLimit: OFFSET_LIMIT,
+        //     isGettingNewsfeed: true
+        //   }
+        // });
       }
     }
   });
@@ -75,9 +77,10 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const [getUserPosts, { loading: postsLoading }] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
     onError: (err) => console.log('get user posts lazy query error', err),
-    // onCompleted: (data) => {
-    //   isSwitchingFromProfileToHomeVar(false);
-    // }
+    onCompleted: (data) => {
+      console.log('get user posts in home page');
+      isSwitchingFromProfileToHomeVar(false);
+    }
   });
 
   useEffect(
@@ -95,19 +98,21 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
         // currentUserProfileVar(loggedInUserProfileVar());
         // Handles change from logged in user's Profile page to Home
         console.log('handling change from profile to home', currentUserProfileVar().id, loggedInUserProfileVar().id);
-        // getUserPosts({
-        //   variables: {
-        //     userId: loggedInUserProfileVar().id,
-        //     cursor: 0,
-        //     offsetLimit: OFFSET_LIMIT,
-        //     isGettingNewsfeed: true
-        //   }
-        // });
+        getUserPosts({
+          variables: {
+            userId: currentUser.id,
+            cursor: 0,
+            offsetLimit: OFFSET_LIMIT,
+            isGettingNewsfeed: true
+          }
+        });
         // currentUserProfileVar(loggedInUserProfileVar());
       // }
     },
-    [homePageQueryExecutor, getUserPosts]
+    [homePageQueryExecutor, getUserPosts, currentUser]
   ); /* This calls the homePageQuery once to get the currently logged in user */
+
+  // const currentUserId = useReactiveVar(currentUserProfileVar);
 
   return (
     <div className={classes.homePageContainer}>
@@ -130,6 +135,7 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
               isGettingNewsfeed={true}
               getUserPosts={getUserPosts}
               history={history}
+              userId={currentUser.id}
             />
           </Container>
         </> :

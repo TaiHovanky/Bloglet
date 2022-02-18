@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Backdrop, CircularProgress, Container, makeStyles, Typography } from '@material-ui/core';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery, useReactiveVar } from '@apollo/client';
 import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
 import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromHomeToProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
 import UserFollowsContainer from '../../containers/user-follows-container';
@@ -67,6 +67,8 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
     }
   }, [getUserPosts, currentUserId]);
 
+  const currentId = useReactiveVar(currentUserProfileVar);
+
   return (
     <div className={classes.homePageContainer}>
       <Container maxWidth="sm">
@@ -84,6 +86,7 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
           isGettingNewsfeed={false}
           getUserPosts={getUserPosts}
           history={history}
+          userId={currentId.id}
         />
       </Container>
       <Backdrop className={classes.backdrop} open={loading}>
