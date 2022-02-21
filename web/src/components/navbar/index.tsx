@@ -3,7 +3,10 @@ import { Divider, Drawer, List, ListItem, ListItemText, makeStyles, IconButton }
 import { Menu } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import LogoutContainer from '../../containers/logout-container';
-import { loggedInUserProfileVar, currentUserProfileVar } from '../../cache';
+
+interface Props {
+  handleHomePageClick: () => void;
+}
 
 const drawerWidth = 240;
 
@@ -27,16 +30,12 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const NavBar = () => {
+const NavBar = ({ handleHomePageClick }: Props) => {
   const classes = useStyles();
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
 
   const toggleDrawer = (open: boolean) => {
     setIsNavDrawerOpen(open);
-  };
-
-  const handleHomePageClick = () => {
-    currentUserProfileVar(loggedInUserProfileVar());
   };
 
   return (

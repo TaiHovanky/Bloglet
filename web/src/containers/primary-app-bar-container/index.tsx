@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import PrimaryAppBar from '../../components/primary-app-bar';
 import { User, useSearchUsersLazyQuery } from '../../generated/graphql';
 import clearUserPosts from '../../cache-queries/clear-user-posts';
-import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 
 const PrimaryAppBarContainer = () => {
   const history = useHistory();
@@ -33,11 +33,16 @@ const PrimaryAppBarContainer = () => {
     }, 0);
   };
 
+  const handleHomePageClick = () => {
+    currentUserProfileVar(loggedInUserProfileVar());
+  };
+
   return (
     <PrimaryAppBar
       searchUsers={searchUsers}
       data={data}
       handleMenuClick={handleMenuClick}
+      handleHomePageClick={handleHomePageClick}
     />
   );
 }

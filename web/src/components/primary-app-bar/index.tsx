@@ -13,8 +13,9 @@ import { User } from '../../generated/graphql';
 
 interface Props {
   searchUsers: any,
-  handleMenuClick: (user: User, handleClose: () => void) => void,
   data?: any,
+  handleMenuClick: (user: User, handleClose: () => void) => void,
+  handleHomePageClick: () => void,
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -30,6 +31,8 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
+    color: 'white',
+    textDecoration: 'none'
   },
   search: {
     position: 'relative',
@@ -78,7 +81,12 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const PrimaryAppBar: React.FC<Props> = ({ handleMenuClick, searchUsers, data }: Props) => {
+const PrimaryAppBar: React.FC<Props> = ({
+  handleMenuClick,
+  handleHomePageClick,
+  searchUsers,
+  data
+}: Props) => {
   const classes = useStyles();
   const user = loggedInUserProfileVar();
 
@@ -120,10 +128,12 @@ const PrimaryAppBar: React.FC<Props> = ({ handleMenuClick, searchUsers, data }: 
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          <NavBar />
-          <Typography className={classes.title} variant="h6" noWrap>
-            Practice Social Media App
-          </Typography>
+          <NavBar handleHomePageClick={handleHomePageClick} />
+          <Link to="/" onClick={handleHomePageClick}>
+            <Typography className={classes.title} variant="h6" noWrap>
+              Practice Social Media App
+            </Typography>
+          </Link>
           {user && <div className={classes.search}>
             <div className={classes.searchIcon}>
               <Search />
