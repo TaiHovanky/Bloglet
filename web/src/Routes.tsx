@@ -1,11 +1,14 @@
 import './App.css';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Router, Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
+import {createBrowserHistory}  from 'history';
 import Home from './pages/home';
 import Register from './pages/register';
 import Login from './pages/login';
 import Profile from './pages/profile';
 import PrimaryAppBarContainer from './containers/primary-app-bar-container';
+
+const history = createBrowserHistory();
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -18,7 +21,7 @@ const Routes = () => {
   const classes = useStyles();
 
   return (
-    <BrowserRouter>
+    <Router history={history}>
       <main className={classes.content}>
         <PrimaryAppBarContainer />
         <Switch>
@@ -28,7 +31,7 @@ const Routes = () => {
           <Route exact path="/login" component={Login} />
         </Switch>
       </main>
-    </BrowserRouter>
+    </Router>
   );
 }
 

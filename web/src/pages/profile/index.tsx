@@ -1,17 +1,13 @@
 import React, { useEffect } from 'react';
 import { Backdrop, CircularProgress, Container, makeStyles, Typography } from '@material-ui/core';
-import { useLazyQuery, useQuery, useReactiveVar } from '@apollo/client';
-import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromHomeToProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
+import { useLazyQuery, useReactiveVar } from '@apollo/client';
+import { RouteComponentProps } from 'react-router';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 import UserFollowsContainer from '../../containers/user-follows-container';
 import PostInputContainer from '../../containers/post-input-container';
 import PostListContainer from '../../containers/post-list-container';
-import getLoggedInUserProfile from '../../cache-queries/logged-in-user-profile';
 import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
 import { GetUserPostsDocument } from '../../generated/graphql';
-import { RouteComponentProps } from 'react-router';
-import getIsSwitchingFromHomeToProfile from '../../cache-queries/is-switching-from-home-to-profile';
-import getIsSwitchingFromProfileToHome from '../../cache-queries/is-switching-from-profile-to-home';
 
 const useStyles = makeStyles((theme) => ({
   homePageContainer: {
@@ -30,44 +26,28 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
   // eslint-disable-next-line
-  const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
+  const currentGetUserPostsCursor = useReactiveVar(currentGetUserPostsCursorVar);
   // eslint-disable-next-line
-  const loggedInUserProfile = useQuery(getLoggedInUserProfile);
-  // eslint-disable-next-line
-  const isSwitchingFromHomeToProfile = useQuery(getIsSwitchingFromHomeToProfile);
-  // eslint-disable-next-line
-  const isSwitchingFromProfileToHome = useQuery(getIsSwitchingFromProfileToHome);
+  const loggedInUserProfile = useReactiveVar(loggedInUserProfileVar);
+  const currentUserProfile = useReactiveVar(currentUserProfileVar);
 
   const [getUserPosts, { loading }] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
     onError: (err) => console.log('get user posts lazy query error', err),
   });
 
-  const currentUserId = currentUserProfileVar().id;
 
   useEffect(() => {
-    // isSwitchingFromHomeToProfileVar(true);
-    // isSwitchingFromProfileToHomeVar(false);
     currentGetUserPostsCursorVar(0);
-    // currentUserProfileVar(loggedInUserProfileVar());
-    console.log('profile use effect',  currentUserProfileVar().id);
     getUserPosts({
       variables: {
-        // userId: loggedInUserProfileVar().id,
-        userId: currentUserProfileVar().id,
+        userId: currentUserProfile.id,
         cursor: 0,
         offsetLimit: OFFSET_LIMIT,
         isGettingNewsfeed: false
       },
     });
-
-    return function cleanupPostsList() {
-      // isSwitchingFromHomeToProfileVar(false);
-      // isSwitchingFromProfileToHomeVar(true);
-    }
-  }, [getUserPosts, currentUserId]);
-
-  const currentId = useReactiveVar(currentUserProfileVar);
+  }, [getUserPosts, currentUserProfile]);
 
   return (
     <div className={classes.homePageContainer}>
@@ -84,9 +64,7 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
         <PostInputContainer />
         <PostListContainer
           isGettingNewsfeed={false}
-          getUserPosts={getUserPosts}
           history={history}
-          userId={currentId.id}
         />
       </Container>
       <Backdrop className={classes.backdrop} open={loading}>

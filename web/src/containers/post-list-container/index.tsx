@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import PostList from '../../components/post-list';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
+import { currentGetUserPostsCursorVar, currentUserProfileVar } from '../../cache';
 import { GetUserPostsDocument, LikePostDocument, User } from '../../generated/graphql';
 import { OFFSET_LIMIT, SCROLL_DIRECTION_DOWN, useScrollDirection } from '../../hooks/use-scroll.hook';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
@@ -9,26 +9,20 @@ import clearUserPosts from '../../cache-queries/clear-user-posts';
 
 interface Props {
   isGettingNewsfeed: boolean;
-  getUserPosts: any;
   history: any;
-  userId: number;
 }
 
-const PostListContainer = ({ isGettingNewsfeed, getUserPosts, history, userId }: Props) => {
-  // console.log('rendering postlist container', currentUserProfileVar(), currentGetUserPostsCursorVar());
-
-  console.log('current user ', userId);
+const PostListContainer = ({ isGettingNewsfeed, history }: Props) => {
+  const currentUser = useReactiveVar(currentUserProfileVar);
   const { data: postsData, loading: postsLoading, fetchMore } = useQuery(GetUserPostsDocument, {
     variables: {
-      userId,
+      userId: currentUser.id,
       cursor: currentGetUserPostsCursorVar(),
       offsetLimit: OFFSET_LIMIT,
       isGettingNewsfeed
     },
-    skip: !currentUserProfileVar().id,
-      // || isSwitchingFromProfileToHomeVar() === true,
+    skip: !currentUser.id,
     onError: (err: any) => console.log('getting user posts error:', err),
-    onCompleted: (stuff) => console.log('stuff', stuff)
   });
 
   const [likePost] = useMutation(LikePostDocument, {
@@ -90,7 +84,6 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts, history, userId }:
   useEffect(
     () => {
       return function cleanupPostsList() {
-        console.log('clearing posts');
         clearPosts();
       }
     },
@@ -102,15 +95,6 @@ const PostListContainer = ({ isGettingNewsfeed, getUserPosts, history, userId }:
     currentUserProfileVar({...user});
     currentGetUserPostsCursorVar(0);
     history.push('/profile');
-    // Handles switching between user profiles while still on Home
-    // getUserPosts({
-    //   variables: {
-    //     userId: user.id,
-    //     cursor: 0,
-    //     offsetLimit: OFFSET_LIMIT,
-    //     isGettingNewsfeed: false
-    //   }
-    // });
   }
 
   return (

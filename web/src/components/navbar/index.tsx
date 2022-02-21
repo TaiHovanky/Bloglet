@@ -3,7 +3,7 @@ import { Divider, Drawer, List, ListItem, ListItemText, makeStyles, IconButton }
 import { Menu } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import LogoutContainer from '../../containers/logout-container';
-import { loggedInUserProfileVar, currentUserProfileVar, isSwitchingFromProfileToHomeVar } from '../../cache';
+import { loggedInUserProfileVar, currentUserProfileVar } from '../../cache';
 
 const drawerWidth = 240;
 
@@ -36,8 +36,6 @@ const NavBar = () => {
   };
 
   const handleHomePageClick = () => {
-    console.log('going home');
-    // isSwitchingFromProfileToHomeVar(true);
     currentUserProfileVar(loggedInUserProfileVar());
   };
 
