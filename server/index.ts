@@ -39,7 +39,7 @@ const session = require('express-session');
         secure: false,
         sameSite: 'lax',
         httpOnly: true,
-        maxAge: 120000
+        maxAge: 600000
       }
     })
   );

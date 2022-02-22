@@ -1,14 +1,18 @@
 import React from 'react';
 import PostInput from '../../components/post-input';
-import { useMutation } from '@apollo/client';
-import { CreatePostDocument, Post } from '../../generated/graphql';
+import { useMutation, useReactiveVar } from '@apollo/client';
+import { CreatePostDocument, Post, User } from '../../generated/graphql';
 import { readGetUserPostsQuery } from '../../utils/cache-modification.util';
 import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 
 const PostInputContainer = () => {
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
+  const currentGetUserPostsCursor: number = useReactiveVar(currentGetUserPostsCursorVar);
+
   const [createPost] = useMutation(CreatePostDocument, {
     update(cache, data) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfile.id);
       cache.modify({
         fields: {
           getUserPosts() {
@@ -24,10 +28,10 @@ const PostInputContainer = () => {
   const handleCreatePost = async (e: React.FormEvent, callback: ()=> void): Promise<void> => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    currentGetUserPostsCursorVar(currentGetUserPostsCursorVar() + 1);
+    currentGetUserPostsCursorVar(currentGetUserPostsCursor + 1);
     await createPost({
       variables: {
-        creatorId: loggedInUserProfileVar().id,
+        creatorId: loggedInUser.id,
         content: formData.get('content') as string,
       }
     });

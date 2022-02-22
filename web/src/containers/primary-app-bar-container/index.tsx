@@ -1,12 +1,16 @@
 import React from 'react';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useMutation, useReactiveVar } from '@apollo/client';
+import { useHistory } from 'react-router-dom';
 import PrimaryAppBar from '../../components/primary-app-bar';
-import { GetUserPostsDocument, User, useSearchUsersLazyQuery } from '../../generated/graphql';
+import { User, useSearchUsersLazyQuery } from '../../generated/graphql';
 import clearUserPosts from '../../cache-queries/clear-user-posts';
-import { currentGetUserPostsCursorVar, currentUserProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
-import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
+import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 
 const PrimaryAppBarContainer = () => {
+  const history = useHistory();
+
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
+
   const [clearPosts] = useMutation(clearUserPosts, {
     update(cache) {
       cache.modify({
@@ -19,37 +23,29 @@ const PrimaryAppBarContainer = () => {
     }
   });
 
-  const [getUserPosts] = useLazyQuery(GetUserPostsDocument, {
-    fetchPolicy: 'network-only',
-    onError: (err) => console.log('get user posts lazy query error', err),
-    onCompleted: (data) => {
-      isSwitchingFromProfileToHomeVar(false);
-    }
-  });
-
   const [searchUsers, { data }] = useSearchUsersLazyQuery();
 
   const handleMenuClick = (user: User, handleClose: () => void): void => {
-    clearPosts();
-    currentUserProfileVar({...user});
+    currentUserProfileVar(user);
     currentGetUserPostsCursorVar(0);
-    // Handles switching between user profiles while still on Home
-    getUserPosts({
-      variables: {
-        userId: user.id,
-        cursor: 0,
-        offsetLimit: OFFSET_LIMIT,
-        isGettingNewsfeed: currentUserProfileVar().id === loggedInUserProfileVar().id
-      }
-    });
+    clearPosts();
     handleClose();
+    setTimeout(() => {
+      history.push('/profile');
+    }, 0);
+  };
+
+  const handleHomePageClick = () => {
+    currentUserProfileVar(loggedInUser);
   };
 
   return (
     <PrimaryAppBar
       searchUsers={searchUsers}
       data={data}
+      loggedInUser={loggedInUser}
       handleMenuClick={handleMenuClick}
+      handleHomePageClick={handleHomePageClick}
     />
   );
 }

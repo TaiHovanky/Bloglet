@@ -1,8 +1,8 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useReactiveVar } from '@apollo/client';
 import { currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
-import { CreateCommentDocument } from '../../generated/graphql';
+import { CreateCommentDocument, User } from '../../generated/graphql';
 import CommentInput from '../../components/comment-input';
 
 interface Props {
@@ -10,9 +10,12 @@ interface Props {
 }
 
 const CommentInputContainer = ({ postId }: Props) => {
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
+
   const [createComment, { loading }] = useMutation(CreateCommentDocument, {
     update(cache, { data }) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfile.id);
       cache.modify({
         fields: {
           getUserPosts() {
@@ -28,7 +31,7 @@ const CommentInputContainer = ({ postId }: Props) => {
     await createComment({
       variables: {
         comment,
-        userId: loggedInUserProfileVar().id,
+        userId: loggedInUser.id,
         postId,
         createdAt: new Date().toLocaleString()
       },

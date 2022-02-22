@@ -4,6 +4,10 @@ import { Menu } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import LogoutContainer from '../../containers/logout-container';
 
+interface Props {
+  handleHomePageClick: () => void;
+}
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -26,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const NavBar = () => {
+const NavBar = ({ handleHomePageClick }: Props) => {
   const classes = useStyles();
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
 
@@ -51,7 +55,7 @@ const NavBar = () => {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-          <Link to="/">
+          <Link to="/" onClick={handleHomePageClick}>
             <ListItem button>
               <ListItemText className={classes.menuItemText} primary="Home" />
             </ListItem>

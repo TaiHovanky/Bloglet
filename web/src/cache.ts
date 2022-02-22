@@ -5,8 +5,6 @@ import { checkForDuplicateItems } from './utils/cache-modification.util';
 export const currentUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
 export const currentGetUserPostsCursorVar: ReactiveVar<number> = makeVar(0);
 export const loggedInUserProfileVar: ReactiveVar<User> = makeVar(new User(0, '', '', ''));
-export const isSwitchingFromHomeToProfileVar = makeVar(false);
-export const isSwitchingFromProfileToHomeVar = makeVar(false);
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -27,29 +25,20 @@ const cache = new InMemoryCache({
             return loggedInUserProfileVar();
           }
         },
-        isSwitchingFromHomeToProfile: {
-          read() {
-            return isSwitchingFromHomeToProfileVar();
-          }
-        },
-        isSwitchingFromProfileToHome: {
-          read() {
-            return isSwitchingFromProfileToHomeVar();
-          }
-        },
         getUserPosts: {
           keyArgs: ['type', 'id'],
-          merge(existing = [], incoming, { args }) {
+          merge(existing = [], incoming = [], { args }) {
             if (
-              (args && args.userId !== currentUserProfileVar().id)
-              || (checkForDuplicateItems(existing, incoming)
-              || (args && args.isGettingNewsfeed === true && isSwitchingFromHomeToProfileVar() === true))
+              existing &&
+              existing.length &&
+              (
+                (args && args.userId !== currentUserProfileVar().id)
+                || checkForDuplicateItems(existing, incoming)
+              )
             ) {
               /* If the args.userId don't match the current user that's being viewed, return existing (instead of merging the incoming).
               This is so that you don't see posts from another user on a different user's profile page.
-              If there are duplicate posts then default to returning the existing posts. 
-              If the args for the data include isGettingNewsfeed and you're on your Profile page, return the existing posts.
-              isSwitchingFromHomeToProfileVar === true indicates that you're on your Profile page */
+              If there are duplicate posts then default to returning the existing posts. */
               return [...existing];
             }
             return existing && existing.length ? [...existing, ...incoming] : incoming;

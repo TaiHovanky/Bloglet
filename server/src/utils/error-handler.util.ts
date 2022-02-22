@@ -1,6 +1,6 @@
 export const errorHandler = (err: any) => {
   if (typeof (err) === 'string') {
-      console.info(err);
+      console.info(err, new Date().toLocaleString());
       return;
   }
 
