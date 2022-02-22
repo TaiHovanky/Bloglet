@@ -1,9 +1,9 @@
 import React from 'react';
 import FollowButton from '../../components/follow-button';
 import UserFollows from '../../components/user-follows';
-import { useMutation } from '@apollo/client';
+import { useMutation, useReactiveVar } from '@apollo/client';
 import { currentUserProfileVar } from '../../cache';
-import { Follows, FollowUserDocument, useGetFollowersQuery, useGetFollowingQuery } from '../../generated/graphql';
+import { Follows, FollowUserDocument, useGetFollowersQuery, useGetFollowingQuery, User } from '../../generated/graphql';
 
 interface Props {
   loggedInUser: number;
@@ -11,13 +11,15 @@ interface Props {
 }
 
 const UserFollowsContainer = ({ loggedInUser, userToBeFollowed }: Props) => {
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
+
   const { data: followingData, loading: followingLoading } = useGetFollowingQuery({
-    variables: { userId: currentUserProfileVar().id },
+    variables: { userId: currentUserProfile.id },
     fetchPolicy: 'network-only'
   });
 
   const { data: followerData, loading: followerLoading } = useGetFollowersQuery({
-    variables: { userId: currentUserProfileVar().id },
+    variables: { userId: currentUserProfile.id },
     fetchPolicy: 'network-only'
   });
 

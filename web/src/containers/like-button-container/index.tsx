@@ -1,5 +1,6 @@
 import React from 'react';
-import { CommentLike, PostLike } from '../../generated/graphql';
+import { useReactiveVar } from '@apollo/client';
+import { CommentLike, PostLike, User } from '../../generated/graphql';
 import { loggedInUserProfileVar } from '../../cache';
 import LikeButton from '../../components/like-button';
 
@@ -9,12 +10,13 @@ interface Props {
 }
 
 const LikeButtonContainer = ({ item, likeMutation}: Props) => {
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
 
   const isAlreadyLiked: boolean = item && item.likes ?
-    item.likes.some((like: PostLike | CommentLike) => like.user && like.user.id === loggedInUserProfileVar().id) : false;
+    item.likes.some((like: PostLike | CommentLike) => like.user && like.user.id === loggedInUser.id) : false;
 
   const handleLikeButtonClick = (): void => {
-    likeMutation(loggedInUserProfileVar().id, item.id, isAlreadyLiked);
+    likeMutation(loggedInUser.id, item.id, isAlreadyLiked);
   }
 
   return (

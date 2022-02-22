@@ -1,22 +1,18 @@
 import React, { useEffect } from 'react';
 import { Container, makeStyles, Typography, Backdrop, CircularProgress } from '@material-ui/core';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useReactiveVar } from '@apollo/client';
 import {
   GetUserPostsDocument,
   useHomePageLazyQuery,
+  User
 } from '../../generated/graphql';
 import SplashPage from '../../components/splash-page';
-import getCurrentUserProfile from '../../cache-queries/current-user-profile';
-import getCurrentGetUserPostsCursor from '../../cache-queries/current-user-posts-cursor';
-import { currentUserProfileVar, isSwitchingFromHomeToProfileVar, isSwitchingFromProfileToHomeVar, loggedInUserProfileVar } from '../../cache';
+import { currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 import UserFollowsContainer from '../../containers/user-follows-container';
 import PostInputContainer from '../../containers/post-input-container';
 import PostListContainer from '../../containers/post-list-container';
-import getLoggedInUserProfile from '../../cache-queries/logged-in-user-profile';
 import { RouteComponentProps } from 'react-router';
 import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
-import getIsSwitchingFromHomeToProfile from '../../cache-queries/is-switching-from-home-to-profile';
-import getIsSwitchingFromProfileToHome from '../../cache-queries/is-switching-from-profile-to-home';
 
 const useStyles = makeStyles((theme) => ({
   homePageContainer: {
@@ -31,19 +27,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home: React.FC<RouteComponentProps> = () => {
+const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
-  // eslint-disable-next-line
-  const currentUserProfile = useQuery(getCurrentUserProfile);
-  // eslint-disable-next-line
-  const currentGetUserPostsCursor = useQuery(getCurrentGetUserPostsCursor);
-  // eslint-disable-next-line
-  const loggedInUserProfile = useQuery(getLoggedInUserProfile);
-  // eslint-disable-next-line
-  const isSwitchingFromHomeToProfile = useQuery(getIsSwitchingFromHomeToProfile);
-  // eslint-disable-next-line
-  const isSwitchingFromProfileToHome = useQuery(getIsSwitchingFromProfileToHome);
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
 
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({
     fetchPolicy: 'network-only',
@@ -55,9 +43,6 @@ const Home: React.FC<RouteComponentProps> = () => {
         which user posts to display. In primaryAppBar, when a user is searched for and selected, currentUserProfileVar
         is updated, causing the useGetUserPostsQuery to call with a new userId. */
         loggedInUserProfileVar(newUser);
-        // Manually set these react variables to false to avoid case where it randomly appears as true
-        isSwitchingFromProfileToHomeVar(false);
-        isSwitchingFromHomeToProfileVar(false);
       }
     }
   });
@@ -65,59 +50,46 @@ const Home: React.FC<RouteComponentProps> = () => {
 
   const [getUserPosts, { loading: postsLoading }] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
-    onError: (err) => console.log('get user posts lazy query error', err),
-    onCompleted: (data) => {
-      isSwitchingFromProfileToHomeVar(false);
-    }
+    onError: (err) => console.log('get user posts lazy query error', err)
   });
 
   useEffect(
     () => {
       /* Only run the homePageQuery if user has just logged in. We don't want this query running everytime
       the user switches from Profile to Home page. */
-      if (!loggedInUserProfileVar() || !loggedInUserProfileVar().id) {
+      if (!loggedInUser || !loggedInUser.id) {
         homePageQueryExecutor();
       }
-      if (
-        isSwitchingFromProfileToHomeVar() === true &&
-        // Prevents infinite loop when the user navigates to their own newsfeed
-        currentUserProfileVar().id !== loggedInUserProfileVar().id
-      ) {
-        // Handles change from logged in user's Profile page to Home
-        getUserPosts({
-          variables: {
-            userId: currentUserProfileVar().id,
-            cursor: 0,
-            offsetLimit: OFFSET_LIMIT,
-            isGettingNewsfeed: false
-          }
-        });
-      }
+      getUserPosts({
+        variables: {
+          userId: loggedInUser.id,
+          cursor: 0,
+          offsetLimit: OFFSET_LIMIT,
+          isGettingNewsfeed: true
+        }
+      });
     },
-    [homePageQueryExecutor, getUserPosts]
-  ); /* This calls the homePageQuery once to get the currently logged in user */
+    [homePageQueryExecutor, getUserPosts, loggedInUser]
+  ); /* This calls the homePageQuery once to get the currently logged in user's newsfeed */
 
   return (
     <div className={classes.homePageContainer}>
-      {(userData && userData.homePage) || (loggedInUserProfileVar() && loggedInUserProfileVar().id) ?
+      {(userData && userData.homePage) || (loggedInUser && loggedInUser.id) ?
         <>
           <Container maxWidth="sm">
             <div className={classes.currentUserInfoContainer}>
               <Typography variant="h4">
-                {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
+                {`${currentUserProfile.firstName} ${currentUserProfile.lastName}`}
               </Typography>
               <UserFollowsContainer
-                loggedInUser={loggedInUserProfileVar().id}
-                userToBeFollowed={currentUserProfileVar().id}
+                loggedInUser={loggedInUser.id}
+                userToBeFollowed={currentUserProfile.id}
               />
             </div>
-            {loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id &&
+            {loggedInUser && currentUserProfile.id === loggedInUser.id &&
               <PostInputContainer />
             }
-            <PostListContainer
-              isGettingNewsfeed={loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id}
-              getUserPosts={getUserPosts}
-            />
+            <PostListContainer isGettingNewsfeed={true} />
           </Container>
         </> :
         <SplashPage />
