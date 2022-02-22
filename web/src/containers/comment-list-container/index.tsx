@@ -1,6 +1,6 @@
 import React from 'react';
 import CommentList from '../../components/comment-list';
-import { useMutation } from '@apollo/client';
+import { useMutation, useReactiveVar } from '@apollo/client';
 import { currentUserProfileVar } from '../../cache';
 import { LikeCommentDocument, User } from '../../generated/graphql';
 import { readGetUserPostsQuery, updatePosts } from '../../utils/cache-modification.util';
@@ -11,9 +11,11 @@ interface Props {
 }
 
 const CommentListContainer = ({ comments, handleItemCreatorClick }: Props) => {
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
+
   const [likeComment] = useMutation(LikeCommentDocument, {
     update(cache, { data }) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfile.id);
       cache.modify({
         fields: {
           getUserPosts() {

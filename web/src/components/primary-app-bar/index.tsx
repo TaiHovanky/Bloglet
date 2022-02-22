@@ -7,15 +7,15 @@ import { Search } from '@material-ui/icons';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import { loggedInUserProfileVar } from '../../cache';
 import NavBar from '../navbar';
 import { User } from '../../generated/graphql';
 
 interface Props {
-  searchUsers: any,
-  data?: any,
-  handleMenuClick: (user: User, handleClose: () => void) => void,
-  handleHomePageClick: () => void,
+  searchUsers: any;
+  data?: any;
+  loggedInUser?: User; 
+  handleMenuClick: (user: User, handleClose: () => void) => void;
+  handleHomePageClick: () => void;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -85,10 +85,10 @@ const PrimaryAppBar: React.FC<Props> = ({
   handleMenuClick,
   handleHomePageClick,
   searchUsers,
-  data
+  data,
+  loggedInUser
 }: Props) => {
   const classes = useStyles();
-  const user = loggedInUserProfileVar();
 
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
@@ -134,7 +134,7 @@ const PrimaryAppBar: React.FC<Props> = ({
               Practice Social Media App
             </Typography>
           </Link>
-          {user && <div className={classes.search}>
+          {loggedInUser && loggedInUser.id && <div className={classes.search}>
             <div className={classes.searchIcon}>
               <Search />
             </div>

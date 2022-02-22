@@ -1,14 +1,16 @@
 import React from 'react';
 import PostInput from '../../components/post-input';
-import { useMutation } from '@apollo/client';
-import { CreatePostDocument, Post } from '../../generated/graphql';
+import { useMutation, useReactiveVar } from '@apollo/client';
+import { CreatePostDocument, Post, User } from '../../generated/graphql';
 import { readGetUserPostsQuery } from '../../utils/cache-modification.util';
 import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 
 const PostInputContainer = () => {
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
+
   const [createPost] = useMutation(CreatePostDocument, {
     update(cache, data) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfile.id);
       cache.modify({
         fields: {
           getUserPosts() {

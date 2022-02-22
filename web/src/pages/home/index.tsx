@@ -4,9 +4,10 @@ import { useLazyQuery, useReactiveVar } from '@apollo/client';
 import {
   GetUserPostsDocument,
   useHomePageLazyQuery,
+  User
 } from '../../generated/graphql';
 import SplashPage from '../../components/splash-page';
-import { currentUserProfileVar, loggedInUserProfileVar, currentGetUserPostsCursorVar } from '../../cache';
+import { currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 import UserFollowsContainer from '../../containers/user-follows-container';
 import PostInputContainer from '../../containers/post-input-container';
 import PostListContainer from '../../containers/post-list-container';
@@ -29,13 +30,8 @@ const useStyles = makeStyles((theme) => ({
 const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
-  // eslint-disable-next-line
-  const currentGetUserPostsCursor = useReactiveVar(currentGetUserPostsCursorVar);
-  // eslint-disable-next-line
-  const loggedInUserProfile = useReactiveVar(loggedInUserProfileVar);
-  // eslint-disable-next-line
-  const currentUserProfile = useReactiveVar(currentUserProfileVar);
-  const loggedInUser = useReactiveVar(loggedInUserProfileVar);
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
 
   const [homePageQueryExecutor, { data: userData, loading }] = useHomePageLazyQuery({
     fetchPolicy: 'network-only',
@@ -61,7 +57,7 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
     () => {
       /* Only run the homePageQuery if user has just logged in. We don't want this query running everytime
       the user switches from Profile to Home page. */
-      if (!loggedInUserProfileVar() || !loggedInUserProfileVar().id) {
+      if (!loggedInUser || !loggedInUser.id) {
         homePageQueryExecutor();
       }
       getUserPosts({
@@ -78,25 +74,22 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <div className={classes.homePageContainer}>
-      {(userData && userData.homePage) || (loggedInUserProfileVar() && loggedInUserProfileVar().id) ?
+      {(userData && userData.homePage) || (loggedInUser && loggedInUser.id) ?
         <>
           <Container maxWidth="sm">
             <div className={classes.currentUserInfoContainer}>
               <Typography variant="h4">
-                {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}`}
+                {`${currentUserProfile.firstName} ${currentUserProfile.lastName}`}
               </Typography>
               <UserFollowsContainer
-                loggedInUser={loggedInUserProfileVar().id}
-                userToBeFollowed={currentUserProfileVar().id}
+                loggedInUser={loggedInUser.id}
+                userToBeFollowed={currentUserProfile.id}
               />
             </div>
-            {loggedInUserProfileVar() && currentUserProfileVar().id === loggedInUserProfileVar().id &&
+            {loggedInUser && currentUserProfile.id === loggedInUser.id &&
               <PostInputContainer />
             }
-            <PostListContainer
-              isGettingNewsfeed={true}
-              history={history}
-            />
+            <PostListContainer isGettingNewsfeed={true} />
           </Container>
         </> :
         <SplashPage />

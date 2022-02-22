@@ -7,7 +7,7 @@ import UserFollowsContainer from '../../containers/user-follows-container';
 import PostInputContainer from '../../containers/post-input-container';
 import PostListContainer from '../../containers/post-list-container';
 import { OFFSET_LIMIT } from '../../hooks/use-scroll.hook';
-import { GetUserPostsDocument } from '../../generated/graphql';
+import { GetUserPostsDocument, User } from '../../generated/graphql';
 
 const useStyles = makeStyles((theme) => ({
   homePageContainer: {
@@ -25,11 +25,8 @@ const useStyles = makeStyles((theme) => ({
 const Profile: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
-  // eslint-disable-next-line
-  const currentGetUserPostsCursor = useReactiveVar(currentGetUserPostsCursorVar);
-  // eslint-disable-next-line
-  const loggedInUserProfile = useReactiveVar(loggedInUserProfileVar);
-  const currentUserProfile = useReactiveVar(currentUserProfileVar);
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
+  const currentUserProfile: User = useReactiveVar(currentUserProfileVar);
 
   const [getUserPosts, { loading }] = useLazyQuery(GetUserPostsDocument, {
     fetchPolicy: 'network-only',
@@ -54,18 +51,15 @@ const Profile: React.FC<RouteComponentProps> = ({ history }) => {
       <Container maxWidth="sm">
         <div className={classes.currentUserInfoContainer}>
           <Typography variant="h4">
-            {`${currentUserProfileVar().firstName} ${currentUserProfileVar().lastName}'s Profile`}
+            {`${currentUserProfile.firstName} ${currentUserProfile.lastName}'s Profile`}
           </Typography>
           <UserFollowsContainer
-            loggedInUser={loggedInUserProfileVar().id}
-            userToBeFollowed={currentUserProfileVar().id}
+            loggedInUser={loggedInUser.id}
+            userToBeFollowed={currentUserProfile.id}
           />
         </div>
         <PostInputContainer />
-        <PostListContainer
-          isGettingNewsfeed={false}
-          history={history}
-        />
+        <PostListContainer isGettingNewsfeed={false} />
       </Container>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />

@@ -15,7 +15,6 @@ const LogoutContainer: React.FC<Props> = ({ history }) => {
     await logout();
     loggedInUserProfileVar(new User(0, '', '', ''));
     await client.resetStore(); // resets the apollo client store
-    // history.push('/');
   };
 
   return (

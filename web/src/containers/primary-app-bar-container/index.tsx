@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useReactiveVar } from '@apollo/client';
 import { useHistory } from 'react-router-dom';
 import PrimaryAppBar from '../../components/primary-app-bar';
 import { User, useSearchUsersLazyQuery } from '../../generated/graphql';
@@ -8,6 +8,8 @@ import { currentGetUserPostsCursorVar, currentUserProfileVar, loggedInUserProfil
 
 const PrimaryAppBarContainer = () => {
   const history = useHistory();
+
+  const loggedInUser: User = useReactiveVar(loggedInUserProfileVar);
 
   const [clearPosts] = useMutation(clearUserPosts, {
     update(cache) {
@@ -34,13 +36,14 @@ const PrimaryAppBarContainer = () => {
   };
 
   const handleHomePageClick = () => {
-    currentUserProfileVar(loggedInUserProfileVar());
+    currentUserProfileVar(loggedInUser);
   };
 
   return (
     <PrimaryAppBar
       searchUsers={searchUsers}
       data={data}
+      loggedInUser={loggedInUser}
       handleMenuClick={handleMenuClick}
       handleHomePageClick={handleHomePageClick}
     />
