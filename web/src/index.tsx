@@ -9,7 +9,7 @@ import cache from './cache';
 
 const httpLink = createHttpLink({
   // Use IP address of droplet with the exposed port that server container runs on
-  uri:  `${process.env.REACT_APP_URL}:3001/graphql`,
+  uri: `${process.env.REACT_APP_URL}:3001/graphql`,
   credentials: 'include' // need this so that cookie gets set after login response,
 });
 
