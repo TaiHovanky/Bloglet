@@ -134,7 +134,7 @@ const PrimaryAppBar: React.FC<Props> = ({
               Practice Social Media App
             </Typography>
           </Link>
-          {loggedInUser && loggedInUser.id && <div className={classes.search}>
+          {(loggedInUser && loggedInUser.id) ? <div className={classes.search}>
             <div className={classes.searchIcon}>
               <Search />
             </div>
@@ -183,7 +183,7 @@ const PrimaryAppBar: React.FC<Props> = ({
                 </Grow>
               )}
             </Popper>
-          </div>}
+          </div> : null}
         </Toolbar>
       </AppBar>
     </div>

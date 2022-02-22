@@ -4,11 +4,9 @@ import { loggedInUserProfileVar } from '../../cache';
 import User from '../../types/user.interface';
 import Logout from '../../components/logout';
 
-interface Props {
-  history?: any;
-}
+interface Props {}
 
-const LogoutContainer: React.FC<Props> = ({ history }) => {
+const LogoutContainer: React.FC<Props> = () => {
   const [logout, { client }] = useLogoutMutation();
 
   const handleLogoutClick = async () => {

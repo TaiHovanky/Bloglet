@@ -31,7 +31,7 @@ const PostListContainer = ({ isGettingNewsfeed }: Props) => {
 
   const [likePost] = useMutation(LikePostDocument, {
     update(cache, { data }) {
-      const posts: any = readGetUserPostsQuery(cache, currentUserProfileVar().id);
+      const posts: any = readGetUserPostsQuery(cache, currentUserProfile.id);
       cache.modify({
         fields: {
           getUserPosts() {
