@@ -8,7 +8,7 @@ import { errorHandler } from '../utils/error-handler.util';
 @Resolver()
 export class PostResolver {
   @Query(() => [Post], { nullable: true })
-  @UseMiddleware(isAuthenticated)
+  // @UseMiddleware(isAuthenticated)
   getUserPosts(
     @Arg('userId') userId: number,
     @Arg('cursor') cursor: number,
@@ -117,6 +117,23 @@ export class PostResolver {
     } catch(err) {
       errorHandler(`Failed to like post: ${err}`);
       return null;
+    }
+  }
+
+  @Mutation(() => Boolean, { nullable: true })
+  async deletePost(
+    @Arg('postId') postId: number
+  ) {
+    try {
+      await Post
+        .createQueryBuilder('posts')
+        .delete()
+        .where('posts.id = :postId', { postId })
+        .execute();
+      return true;
+    } catch(err) {
+      errorHandler(`Failed to delete post: ${err}`);
+      return false;
     }
   }
 }
