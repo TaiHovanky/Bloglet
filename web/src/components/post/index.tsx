@@ -3,8 +3,9 @@ import { Card, CardContent, Grid, IconButton, makeStyles, Typography } from '@ma
 import { CommentOutlined } from '@material-ui/icons';
 import CommentListContainer from '../../containers/comment-list-container';
 import CommentInputContainer from '../../containers/comment-input-container';
-import { User } from '../../generated/graphql';
 import LikeButtonContainer from '../../containers/like-button-container';
+import PostMenu from '../post-menu';
+import { User } from '../../generated/graphql';
 
 interface Props {
   post: any;
@@ -83,6 +84,10 @@ const Post: React.FC<Props> = ({
           </Grid>
           <Grid item xs={2}>
             <Typography variant="subtitle1" color="textSecondary">{post.comments.length}</Typography>
+          </Grid>
+          <Grid item xs={4}></Grid>
+          <Grid item xs={2}>
+            <PostMenu />
           </Grid>
         </Grid>
         {showCommentInput && <CommentInputContainer postId={post.id} />}
