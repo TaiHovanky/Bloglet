@@ -18,6 +18,7 @@ const PostList: React.FC<Props> = ({
     <Container maxWidth="sm">
       {!!posts ? posts.map((post: any) => (
         <Post
+          key={`post-${post.id}`}
           post={post}
           likePost={likePost}
           handleItemCreatorClick={handleItemCreatorClick}

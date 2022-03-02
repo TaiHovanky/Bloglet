@@ -4,7 +4,7 @@ import { CommentOutlined } from '@material-ui/icons';
 import CommentListContainer from '../../containers/comment-list-container';
 import CommentInputContainer from '../../containers/comment-input-container';
 import LikeButtonContainer from '../../containers/like-button-container';
-import PostMenu from '../post-menu';
+import PostMenuContainer from '../../containers/post-menu-container';
 import { User } from '../../generated/graphql';
 
 interface Props {
@@ -87,7 +87,7 @@ const Post: React.FC<Props> = ({
           </Grid>
           <Grid item xs={4}></Grid>
           <Grid item xs={2}>
-            <PostMenu />
+            <PostMenuContainer postId={post.id} />
           </Grid>
         </Grid>
         {showCommentInput && <CommentInputContainer postId={post.id} />}
