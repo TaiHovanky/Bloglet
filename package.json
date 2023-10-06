@@ -2,7 +2,7 @@
   "name": "bloglet",
   "version": "1.0.0",
   "scripts": {
-    "start": "cd server && ts-node index.ts"
+    "start": "npm i --save-dev @types/cookie-parser@1.4.2 && cd server && ts-node index.ts"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
