@@ -1,0 +1,17 @@
+{
+  "name": "bloglet",
+  "version": "1.0.0",
+  "workspaces": ["server", "web"],
+  "scripts": {
+    "heroku-postbuild": "npm install --prefix web && npm run build --prefix web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaiHovanky/Bloglet.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TaiHovanky/Bloglet/issues"
+  },
+  "homepage": "https://github.com/TaiHovanky/Bloglet#readme"
+}
