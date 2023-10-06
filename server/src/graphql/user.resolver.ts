@@ -1,3 +1,4 @@
+// @ts-ignore
 import bcrypt, { compare } from 'bcryptjs';
 import { Like } from 'typeorm';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from 'type-graphql';
@@ -44,7 +45,8 @@ export class UserResolver {
       };
     }
     /* Hash the password and then insert the user data and hashed password into db. */
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // @ts-ignore
+    const hashedPassword: any = await bcrypt.hash(password, 12) as any;
     try {
       const user = {
         firstName,
