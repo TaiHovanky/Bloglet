@@ -1,3 +1,5 @@
+console.log('process.env.DB_HOST', process.env.DB_HOST, process.env.DB_PORT, process.env.DB_USER, process.env.DB_PW, process.env.DB_NAME);
+
 module.exports = {
    "type": "postgres",
    "host": process.env.DB_HOST,
@@ -8,12 +10,8 @@ module.exports = {
    "synchronize": true,
    "logging": false,
    "entities": ["src/entity/**/*"],
-   "migrations": ["src/migration/**/*"],
-   "subscribers": ["src/subscriber/**/*"],
    "cli": {
       "entitiesDir": "src/entity",
-      "migrationsDir": "src/migration",
-      "subscribersDir": "src/subscriber"
    },
    "ssl": true,
   "extra": {
