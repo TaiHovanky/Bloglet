@@ -17,8 +17,8 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start-client": "react-scripts start",
+    "build": "react-scripts build && (cd ../server && npm install)",
     "eject": "react-scripts eject",
     "gen": "graphql-codegen --config codegen.yml"
   },

@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import 'reflect-metadata';
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -68,11 +69,20 @@ const session = require('express-session');
     // needed or else Ctx doesn't pass into mutations/queries
   });
 
-  app.get('/', (_req, res) => res.send('hello'));
+  app.get('/', (_req, res) => {
+    res.sendFile(
+      path.join(__dirname, '../client/build/index.html'),
+      function(err) {
+        if (err) {
+          res.status(500).send(err);
+        }
+      }
+    );
+  });
 
   apolloServer.applyMiddleware({ app, cors: false }); // need "cors: false" to avoid cors error
 
-  app.listen(3001, () => {
-    console.log('app listening at 3001');
+  app.listen(process.env.PORT || 3001, () => {
+    console.log('app listening at', process.env.PORT);
   });
 })()
