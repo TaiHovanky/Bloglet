@@ -16,12 +16,15 @@ const Redis = require("ioredis");
 const session = require('express-session');
 
 (async () => {
+  console.log('process.env.REDIS_HOST', process.env.REDIS_HOST, process.env.REDIS_PORT, process.env.REDIS_PW)
   let RedisStore = require('connect-redis')(session)
   let redisClient = new Redis({
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
-    password: process.env.REDIS_PASSWORD
+    password: process.env.REDIS_PW
   });
+
+
 
   const app = express();
   app.use(cors({
