@@ -38,6 +38,14 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
     onCompleted: (data: any) => {
       if (data && data.homePage) {
         const {__typename, ...newUser} = data.homePage;
+        getUserPosts({
+          variables: {
+            userId: newUser.id,
+            cursor: 0,
+            offsetLimit: OFFSET_LIMIT,
+            isGettingNewsfeed: true
+          }
+        });
         currentUserProfileVar(newUser); /* this updates the local Apollo state in the cache for the currentUserProfileVar
         reactive variable. Instead of using routing to open a user profile, I'll be using local state to determine
         which user posts to display. In primaryAppBar, when a user is searched for and selected, currentUserProfileVar
@@ -59,15 +67,18 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
       the user switches from Profile to Home page. */
       if (!loggedInUser || !loggedInUser.id) {
         homePageQueryExecutor();
+      } else {
+        getUserPosts({
+          variables: {
+            userId: loggedInUser.id,
+            cursor: 0,
+            offsetLimit: OFFSET_LIMIT,
+            isGettingNewsfeed: true
+          }
+        });
       }
-      getUserPosts({
-        variables: {
-          userId: loggedInUser.id,
-          cursor: 0,
-          offsetLimit: OFFSET_LIMIT,
-          isGettingNewsfeed: true
-        }
-      });
+
+      return () => {}
     },
     [homePageQueryExecutor, getUserPosts, loggedInUser]
   ); /* This calls the homePageQuery once to get the currently logged in user's newsfeed */

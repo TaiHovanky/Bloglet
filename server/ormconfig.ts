@@ -1,10 +1,10 @@
-{
+export default {
    "type": "postgres",
-   "host": "db",
-   "port": 5432,
-   "username": "<postgres-username>",
-   "password": "<postgres-password>",
-   "database": "<postgres-db>",
+   "host": process.env.DB_HOST,
+   "port": process.env.DB_PORT,
+   "username": process.env.DB_USER,
+   "password": process.env.DB_PW,
+   "database": process.env.DB_NAME,
    "synchronize": true,
    "logging": false,
    "entities": ["src/entity/**/*"],
@@ -14,5 +14,11 @@
       "entitiesDir": "src/entity",
       "migrationsDir": "src/migration",
       "subscribersDir": "src/subscriber"
+   },
+   "ssl": true,
+  "extra": {
+      "ssl": {
+         "rejectUnauthorized": false
+      }
    }
 }

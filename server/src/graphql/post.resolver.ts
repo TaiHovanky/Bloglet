@@ -119,4 +119,21 @@ export class PostResolver {
       return null;
     }
   }
+
+  @Mutation(() => Boolean, { nullable: true })
+  async deletePost(
+    @Arg('postId') postId: number
+  ) {
+    try {
+      await Post
+        .createQueryBuilder('posts')
+        .delete()
+        .where('posts.id = :postId', { postId })
+        .execute();
+      return true;
+    } catch(err) {
+      errorHandler(`Failed to delete post: ${err}`);
+      return false;
+    }
+  }
 }
