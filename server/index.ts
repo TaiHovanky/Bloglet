@@ -75,7 +75,7 @@ const session = require('express-session');
 
   app.get('/', (_req, res) => {
     res.sendFile(
-      path.join(__dirname, '../client/build/index.html'),
+      path.join(__dirname, '../web/build/index.html'),
       function(err) {
         if (err) {
           res.status(500).send(err);
