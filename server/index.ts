@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import path from 'path';
 import express from 'express';
 import cors from 'cors';
+// @ts-ignore
 import cookieParser from 'cookie-parser';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
@@ -29,7 +30,7 @@ const session = require('express-session');
     origin: process.env.APP_URL,
     credentials: true
   }));
-  app.use(cookieParser());
+  app.use(cookieParser() as any);
 
   app.use(
     session({
