@@ -19,7 +19,7 @@ export class PostLike extends BaseEntity {
   @PrimaryGeneratedColumn() id: number;
 
   @Field(() => Post)
-  @ManyToOne(() => Post, (post: Post) => post.likes)
+  @ManyToOne(() => Post, (post: Post) => post.likes, { onDelete: 'CASCADE' })
   // one Post can have many likes?
   @JoinColumn({ name: 'post_id' })
   post: Post;

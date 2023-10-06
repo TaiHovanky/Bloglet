@@ -33,7 +33,7 @@ export class Comment extends BaseEntity {
   user: User;
 
   @Field(() => Post, { nullable: true })
-  @ManyToOne(() => Post, (post: Post) => post.comments)
+  @ManyToOne(() => Post, (post: Post) => post.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post: Post;
 

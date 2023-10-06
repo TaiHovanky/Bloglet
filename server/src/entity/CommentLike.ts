@@ -22,7 +22,7 @@ export class CommentLike extends BaseEntity {
   user: User;
 
   @Field(() => Comment, { nullable: true })
-  @ManyToOne(() => Comment, (comment: Comment) => comment.likes)
+  @ManyToOne(() => Comment, (comment: Comment) => comment.likes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
 }

@@ -4,7 +4,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import { Search } from '@material-ui/icons';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { alpha, makeStyles } from '@material-ui/core/styles';
 import { ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import NavBar from '../navbar';
@@ -37,9 +37,9 @@ const useStyles = makeStyles((theme) => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
     marginRight: 0,
     marginLeft: 'auto',
@@ -131,7 +131,7 @@ const PrimaryAppBar: React.FC<Props> = ({
           <NavBar handleHomePageClick={handleHomePageClick} />
           <Link to="/" onClick={handleHomePageClick}>
             <Typography className={classes.title} variant="h6" noWrap>
-              Practice Social Media App
+              Bloglet
             </Typography>
           </Link>
           {(loggedInUser && loggedInUser.id) ? <div className={classes.search}>

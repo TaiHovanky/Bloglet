@@ -27,8 +27,8 @@ const UserFollowsContainer = ({ loggedInUser, userToBeFollowed }: Props) => {
     update(cache, data) {
       cache.modify({
         fields: {
-          getFollowers(existingFollowers: Array<Follows>) {
-            const oldFollowers: Array<Follows> = existingFollowers ? [...existingFollowers] : [];
+          getFollowers(existingFollowers: any) {
+            const oldFollowers: Array<any> = existingFollowers ? [...existingFollowers] : [];
             if (!data.data.followUser) {
               const unfollowedIndex = oldFollowers.findIndex((follow) => {
                 return follow && follow.follower ? follow.follower.id === loggedInUser : false;

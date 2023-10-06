@@ -11,6 +11,7 @@ import {
 import { RouteComponentProps } from 'react-router';
 import { useFormField } from '../../hooks/use-form-field.hook';
 import { useLoginMutation } from '../../generated/graphql';
+import { currentUserProfileVar, loggedInUserProfileVar } from '../../cache';
 
 const useStyles = makeStyles((theme) => ({
   loginPageContainer: {
@@ -64,8 +65,14 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
     });
 
     if (response && response.data && response.data.login.user) {
+      currentUserProfileVar(response.data.login.user as any); /* this updates the local Apollo state in the cache for the currentUserProfileVar
+        reactive variable. Instead of using routing to open a user profile, I'll be using local state to determine
+        which user posts to display. In primaryAppBar, when a user is searched for and selected, currentUserProfileVar
+        is updated, causing the useGetUserPostsQuery to call with a new userId. */
+        loggedInUserProfileVar(response.data.login.user as any);
       history.push('/');
-    } else if (response && response.data && response.data.login.errors) {
+    } 
+    else if (response && response.data && response.data.login.errors) {
       setErrors(response.data.login.errors[0].message);
     }
   }
@@ -97,11 +104,11 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
             </div>
             <Button className={classes.submitBtn} variant="contained" color="primary" type="submit">Submit</Button>
           </form>
-          <Snackbar open={!!errors && !!errors.length}>
+          {/* <Snackbar open={!!errors && !!errors.length}>
             <Paper variant="elevation" className={classes.errorAlert}>
               <Typography variant="h6">{errors}</Typography>
             </Paper>
-          </Snackbar>
+          </Snackbar> */}
         </Container>
       </Paper>
     </div>
