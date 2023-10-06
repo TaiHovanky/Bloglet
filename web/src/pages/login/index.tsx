@@ -104,11 +104,11 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
             </div>
             <Button className={classes.submitBtn} variant="contained" color="primary" type="submit">Submit</Button>
           </form>
-          {/* <Snackbar open={!!errors && !!errors.length}>
+          <Snackbar open={!!errors && !!errors.length}>
             <Paper variant="elevation" className={classes.errorAlert}>
               <Typography variant="h6">{errors}</Typography>
             </Paper>
-          </Snackbar> */}
+          </Snackbar>
         </Container>
       </Paper>
     </div>
