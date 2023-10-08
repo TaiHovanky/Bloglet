@@ -9,7 +9,7 @@ import cache from './cache';
 
 const httpLink = createHttpLink({
   // Use IP address of droplet with the exposed port that server container runs on
-  uri: `http://localhost:${process.env.PORT || 3001}/graphql`,
+  uri: `https://shrouded-sierra-25706-554993cb2282.herokuapp.com/graphql`,
   credentials: 'include' // need this so that cookie gets set after login response,
 });
 
