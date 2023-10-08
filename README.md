@@ -6,3 +6,5 @@ To run it, clone the repo, and then open two separate terminal tabs. In one, cd 
 A Postgres database was set up using Aiven. Select the Free tier and create an instance. Copy/paste the credentials into a .env file in the server/ folder.
 
 For the Redis cache that handles the sessions, I set up a free account on Redis Cloud and added the credentials to the .env.
+
+Currently, it has been deployed to https://shrouded-sierra-25706-554993cb2282.herokuapp.com/ 
