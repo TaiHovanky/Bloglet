@@ -73,7 +73,9 @@ const session = require('express-session');
     // needed or else Ctx doesn't pass into mutations/queries
   });
 
-  app.get('/', (_req, res) => {
+  app.use(express.static(path.join(__dirname, '../web/build')));
+
+  app.get('*', (_req, res) => {
     res.sendFile(
       path.join(__dirname, '../web/build/index.html'),
       function(err) {
