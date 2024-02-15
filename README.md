@@ -8,3 +8,5 @@ A Postgres database was set up using Aiven. Select the Free tier and create an i
 For the Redis cache that handles the sessions, I set up a free account on Redis Cloud and added the credentials to the .env.
 
 Currently, it has been deployed to https://shrouded-sierra-25706-554993cb2282.herokuapp.com/ 
+
+https://www.eventbrite.com/e/defense-innovation-backstage-networking-reception-tech-showcase-tickets-825271929557?fbclid=IwAR1SDQ1CgHIEuNZvq_2WSGXhx7azH570vQfzZfd_lqD1JApcd4tId7k2WT4
